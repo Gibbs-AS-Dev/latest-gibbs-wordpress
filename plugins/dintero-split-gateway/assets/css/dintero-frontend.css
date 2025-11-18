@@ -1,0 +1,367 @@
+/* Dintero Modal Styles */
+.dintero-modal {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.dintero-modal-content {
+    background: #fff;
+    margin: 5% auto;
+    padding: 30px 20px 20px 20px;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+}
+
+.dintero-close {
+    color: #aaa;
+    position: absolute;
+    right: 20px;
+    top: 10px;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.dintero-close:hover {
+    color: #000;
+}
+
+.dintero-modal-content h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 24px;
+}
+
+.dintero-form-columns {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.dintero-column {
+    flex: 1;
+}
+
+.dintero-modal-content .form-group {
+    margin-bottom: 15px;
+}
+
+.dintero-modal-content label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #333;
+}
+
+.dintero-modal-content input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.dintero-modal-content input[type="text"]:focus {
+    border-color: #4CAF50;
+    outline: none;
+    box-shadow: 0 0 0 2px #e8f5e9;
+}
+
+.dintero-modal-content input[type="text"].error {
+    border-color: #f44336;
+    box-shadow: 0 0 0 2px #ffebee;
+}
+
+.dintero-modal-content .btn-primary {
+    background: #008474; 
+    color: #fff;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    font-weight: 500;
+}
+
+.dintero-modal-content .btn-primary:hover {
+    background: #008474;
+    transform: translateY(-1px);
+}
+
+.dintero-modal-content .btn-primary:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Toggle Switch Style */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+    vertical-align: middle;
+}
+
+.switch input { 
+    display: none; 
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; 
+    left: 0; 
+    right: 0; 
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px; 
+    width: 18px;
+    left: 3px; 
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+    background-color: #4CAF50;
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* Message Styles */
+.dintero-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 500;
+    z-index: 10000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: slideIn 0.3s ease-out;
+}
+
+.dintero-success {
+    background: linear-gradient(90deg, #4CAF50 0%, #43A047 100%);
+}
+
+.dintero-error {
+    background: linear-gradient(90deg, #f44336 0%, #d32f2f 100%);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Field Error Styles */
+.field-error {
+    color: #f44336;
+    font-size: 12px;
+    margin-top: 5px;
+    font-weight: 500;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .dintero-modal-content {
+        margin: 10% auto;
+        max-width: 95%;
+        padding: 20px 15px 15px 15px;
+    }
+    
+    .dintero-form-columns {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .dintero-modal-content h3 {
+        font-size: 20px;
+    }
+    
+    .dintero-message {
+        right: 10px;
+        left: 10px;
+        top: 10px;
+    }
+}
+
+/* Button Styles */
+#open_dintero_settings {
+    background: #008474; 
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+    margin-right: 10px;
+}
+
+#open_dintero_settings:hover {
+    background: #008474; 
+}
+
+#open_dintero_seller {
+    background: #008474; 
+    color: #fff;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+#open_dintero_seller:hover {
+    background: #388E3C;
+}
+
+/* Form Elements */
+.dintero-modal-content select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+    background: #fff;
+}
+
+.dintero-modal-content select:focus {
+    border-color: #008474; 
+    outline: none;
+    box-shadow: 0 0 0 2px #e8f5e9;
+}
+
+.dintero-modal-content input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid #e0e0e0;
+    border-radius: 6px;
+    font-size: 16px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.dintero-modal-content input[type="password"]:focus {
+    border-color: #008474;
+    outline: none;
+    box-shadow: 0 0 0 2px #e8f5e9;
+}
+
+/* Form Actions */
+.form-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.form-actions .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    font-weight: 500;
+}
+
+.form-actions .btn-secondary {
+    background: #008474; 
+    color: #fff;
+}
+
+.form-actions .btn-secondary:hover {
+    background: #008474; 
+    transform: translateY(-1px);
+}
+
+.form-actions .btn:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Seller Info */
+.seller-info {
+    margin-bottom: 20px;
+}
+
+.seller-info p {
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.seller-details {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 6px;
+    border-left: 4px solid #4CAF50;
+}
+
+.seller-details h4 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.seller-details ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.seller-details li {
+    padding: 5px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.seller-details li:last-child {
+    border-bottom: none;
+}
+
+.seller-details strong {
+    color: #333;
+    min-width: 100px;
+    display: inline-block;
+} 

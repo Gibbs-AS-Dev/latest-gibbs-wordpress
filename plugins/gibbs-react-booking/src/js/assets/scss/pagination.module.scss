@@ -1,0 +1,294 @@
+// Pagination Component Styles
+.gibbsPagination {
+  padding: 18px;
+  // Pagination Component Styles
+  .paginationContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    margin: 2rem 0;
+    padding: 1rem;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    @media (min-width: 768px) {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+    }
+  }
+
+  .paginationInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: center;
+
+    @media (min-width: 768px) {
+      text-align: left;
+      gap: 0.25rem;
+    }
+  }
+
+  .pageInfo {
+    font-size: 0.875rem;
+    color: #6b7280;
+    font-weight: 500;
+  }
+
+  .itemInfo {
+    font-size: 0.875rem;
+    color: #9ca3af;
+  }
+
+  .paginationControls {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: right;
+  }
+
+  .pageNumbers {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  // Navigation Buttons (Previous/Next)
+  .navButton {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    background: #ffffff;
+    color: #374151;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: Source Sans Pro;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 2px 12px;
+    margin: 0px 1px;
+    color: #008474;
+    text-decoration: none;
+
+    &:hover:not(.disabled) {
+      background: #158a84;
+      border-color: #158a84;
+      color: #fff;
+    }
+
+    &:active:not(.disabled) {
+      background: #f3f4f6;
+      transform: translateY(1px);
+    }
+
+    &.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background: #f9fafb;
+      color: #9ca3af;
+    }
+
+    // Chevron icons
+    svg {
+      width: 16px;
+      height: 16px;
+      transition: transform 0.2s ease;
+    }
+
+    &:hover:not(.disabled) svg {
+      transform: scale(1.1);
+    }
+  }
+
+  .prevButton {
+    .chevronLeft {
+      order: -1;
+    }
+  }
+
+  .nextButton {
+    .chevronRight {
+      order: 1;
+    }
+  }
+
+  // Page Number Buttons
+  .pageButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    border: none;
+    background: #ffffff;
+    color: #374151;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    font-family: Source Sans Pro;
+    font-weight: bold;
+    border-radius: 5px;
+    padding: 2px 12px;
+    margin: 0px 1px;
+    color: #008474;
+    text-decoration: none;
+
+    &:hover:not(.active) {
+      background: #158a84;
+      border-color: #158a84;
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    &:active:not(.active) {
+      transform: translateY(0);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    }
+
+    &.active {
+      background: #158a84;
+      border-color: #158a84;
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+
+      &:hover {
+        background: #158a84;
+        border-color: #158a84;
+      }
+    }
+  }
+
+  // Ellipsis
+  .ellipsis {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 40px;
+    height: 40px;
+    color: #9ca3af;
+    font-weight: 500;
+    user-select: none;
+  }
+
+  // Responsive Design
+  @media (max-width: 640px) {
+    .paginationContainer {
+      padding: 0.75rem;
+      margin: 1rem 0;
+    }
+
+    .paginationControls {
+      gap: 0.25rem;
+    }
+
+    .navButton {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+      min-height: 36px;
+
+      span {
+        display: none; // Hide text on mobile, show only icons
+      }
+    }
+
+    .pageButton {
+      min-width: 36px;
+      height: 36px;
+      padding: 0 0.5rem;
+      font-size: 0.8rem;
+    }
+
+    .ellipsis {
+      min-width: 36px;
+      height: 36px;
+    }
+
+    .paginationInfo {
+      font-size: 0.8rem;
+    }
+  }
+
+  // Dark mode support (optional)
+  @media (prefers-color-scheme: dark) {
+    // .paginationContainer {
+    //   background: #1f2937;
+    //   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    // }
+
+    // .navButton,
+    // .pageButton {
+    //   background: #374151;
+    //   border-color: #4b5563;
+    //   color: #d1d5db;
+
+    //   &:hover:not(.disabled) {
+    //     background: #4b5563;
+    //     border-color: #6b7280;
+    //     color: #f9fafb;
+    //   }
+
+    //   &.active {
+    //     background: #158a84;
+    //     border-color: #158a84;
+    //     color: #ffffff;
+    //   }
+    // }
+
+    // .pageInfo {
+    //   color: #d1d5db;
+    // }
+
+    // .itemInfo {
+    //   color: #9ca3af;
+    // }
+
+    // .ellipsis {
+    //   color: #6b7280;
+    // }
+  }
+
+  // Focus states for accessibility
+  .navButton:focus,
+  .pageButton:focus {
+    outline: 2px solid #158a84;
+    outline-offset: 2px;
+  }
+
+  // Loading state (optional)
+  .paginationContainer.loading {
+    opacity: 0.7;
+    pointer-events: none;
+
+    .navButton,
+    .pageButton {
+      cursor: not-allowed;
+    }
+  }
+
+  // Animation for page transitions
+  .pageButton {
+    animation: fadeIn 0.2s ease-in-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(5px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+} 

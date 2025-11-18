@@ -1,0 +1,221 @@
+.emojiPickerContainer {
+  position: absolute;
+  z-index: 1000;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+
+  // Position variants
+  &.bottom-left {
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+  }
+
+  &.bottom-right {
+    top: 100%;
+    right: 0;
+    margin-top: 4px;
+  }
+
+  &.top-left {
+    bottom: 100%;
+    left: 0;
+    margin-bottom: 4px;
+  }
+
+  &.top-right {
+    bottom: 100%;
+    right: 0;
+    margin-bottom: 4px;
+  }
+
+  // Override emoji picker styles to match our theme
+  :global(.EmojiPickerReact) {
+    border: none !important;
+    box-shadow: none !important;
+    background: white !important;
+    border-radius: 8px !important;
+    font-family: inherit !important;
+
+    // Search input styling
+    .epr-search-container {
+      .epr-search {
+        border: 1px solid #d1d5db !important;
+        border-radius: 6px !important;
+        padding: 8px 12px !important;
+        font-size: 14px !important;
+        color: #374151 !important;
+        background: #f9fafb !important;
+        transition: all 0.2s ease !important;
+
+        &:focus {
+          outline: none !important;
+          border-color: #1a9a94 !important;
+          box-shadow: 0 0 0 3px rgba(26, 154, 148, 0.1) !important;
+          background: white !important;
+        }
+
+        &::placeholder {
+          color: #9ca3af !important;
+        }
+      }
+    }
+
+    // Category buttons
+    .epr-category-nav {
+      .epr-category-nav-btn {
+        border: none !important;
+        background: transparent !important;
+        color: #6b7280 !important;
+        padding: 8px 12px !important;
+        border-radius: 4px !important;
+        transition: all 0.2s ease !important;
+
+        &:hover {
+          background: #f3f4f6 !important;
+          color: #374151 !important;
+        }
+
+        &.epr-category-nav-btn-active {
+          background: #1a9a94 !important;
+          color: white !important;
+        }
+      }
+    }
+
+    // Emoji grid
+    .epr-emoji-category-label {
+      color: #374151 !important;
+      font-weight: 600 !important;
+      font-size: 12px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.05em !important;
+      margin: 12px 0 8px 0 !important;
+    }
+
+    .epr-emoji-category-content {
+      .epr-emoji-category-content .epr-emoji {
+        border-radius: 4px !important;
+        transition: all 0.2s ease !important;
+        font-size: 20px !important;
+        padding: 4px !important;
+
+        &:hover {
+          background: #f3f4f6 !important;
+          transform: scale(1.1) !important;
+        }
+      }
+    }
+
+    // Preview section
+    .epr-preview {
+      background: #f9fafb !important;
+      border-top: 1px solid #e5e7eb !important;
+      padding: 12px !important;
+
+      .epr-preview-emoji {
+        font-size: 24px !important;
+      }
+
+      .epr-preview-name {
+        color: #374151 !important;
+        font-weight: 500 !important;
+        font-size: 14px !important;
+      }
+    }
+
+    // Scrollbar styling
+    .epr-body::-webkit-scrollbar {
+      width: 6px !important;
+    }
+
+    .epr-body::-webkit-scrollbar-track {
+      background: #f1f5f9 !important;
+    }
+
+    .epr-body::-webkit-scrollbar-thumb {
+      background: #cbd5e1 !important;
+      border-radius: 3px !important;
+    }
+
+    .epr-body::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8 !important;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .emojiPickerContainer {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    max-width: 90vw !important;
+    max-height: 80vh !important;
+
+    :global(.EmojiPickerReact) {
+      width: 100% !important;
+      height: auto !important;
+      max-height: 70vh !important;
+    }
+  }
+}
+
+// Dark mode support
+@media (prefers-color-scheme: dark) {
+  .emojiPickerContainer {
+    background: #1f2937;
+    border-color: #4b5563;
+
+    :global(.EmojiPickerReact) {
+      background: #1f2937 !important;
+
+      .epr-search-container .epr-search {
+        background: #374151 !important;
+        border-color: #4b5563 !important;
+        color: #d1d5db !important;
+
+        &:focus {
+          border-color: #1a9a94 !important;
+          background: #4b5563 !important;
+        }
+
+        &::placeholder {
+          color: #9ca3af !important;
+        }
+      }
+
+      .epr-category-nav .epr-category-nav-btn {
+        color: #9ca3af !important;
+
+        &:hover {
+          background: #374151 !important;
+          color: #d1d5db !important;
+        }
+
+        &.epr-category-nav-btn-active {
+          background: #1a9a94 !important;
+          color: white !important;
+        }
+      }
+
+      .epr-emoji-category-label {
+        color: #d1d5db !important;
+      }
+
+      .epr-preview {
+        background: #374151 !important;
+        border-top-color: #4b5563 !important;
+
+        .epr-preview-name {
+          color: #d1d5db !important;
+        }
+      }
+    }
+  }
+}

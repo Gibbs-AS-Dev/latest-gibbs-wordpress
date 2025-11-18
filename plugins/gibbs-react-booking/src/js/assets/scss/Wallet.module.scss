@@ -1,0 +1,989 @@
+// ============================================================================
+// WALLET COMPONENT STYLES - Matching Email Template Design
+// ============================================================================
+
+// Main Wallet Wrapper - Matching email template design
+.walletWrapper {
+  padding: 20px;
+  // background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.walletContainer {
+  // max-width: 1200px;
+  margin: 0 auto;
+  // background: #f5f5f5;
+  border-radius: 8px;
+  // box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: visible; // Allow dropdown menus to escape container bounds
+}
+
+// Loading and Error States
+.loading, .error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  text-align: center;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #e0e0e0;
+  border-top: 4px solid #1a9a94;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+
+.spinnerSmall {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top: 2px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-right: 8px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error h2 {
+  color: #ff6b6b;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  background-color: #1a9a94;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #158a84;
+  }
+}
+
+// Balance Wrapper - Matching email template design
+.balanceWrapper {
+  padding: 20px;
+  // background-color: #f5f5f5;
+  margin-bottom: 20px;
+}
+
+.balanceContainer {
+  // max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: visible; // Allow dropdown menus to escape container bounds
+}
+
+// Balance Section
+.balanceSection {
+  padding: 0px;
+}
+
+.balanceHeader {
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 20px;
+  padding: 16px 15px;
+}
+
+.balanceTitle {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.balanceContent {
+  padding: 0px 15px 20px 15px;
+}
+
+.balanceDisplay {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.balanceInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.balanceActions {
+  display: flex;
+  gap: 1rem;
+}
+
+.addFundsBtn {
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 18px;
+  line-height: 1;
+  height: auto;
+  font-weight: 600;
+  border: none;
+  background-color: #F5F8FA;
+  border-radius: 10px;
+  color: #3F4254;
+  font-weight: 600;
+
+  &:hover {
+    background: linear-gradient(135deg, #008575 0%, #008575 100%);
+    transform: translateY(-1px);
+    color: #fff;
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background: #6c757d;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.currencyBadge {
+  background: linear-gradient(135deg, #1a9a94 0%, #158a84 100%);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(26, 154, 148, 0.2);
+}
+
+.balanceAmount {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #1a9a94;
+  text-shadow: 0 2px 4px rgba(26, 154, 148, 0.1);
+}
+
+// Transaction Wrapper - Matching email template design
+.transactionWrapper {
+  padding: 20px;
+  // background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.transactionContainer {
+  // max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: visible; // Allow dropdown menus to escape container bounds
+}
+
+// Transaction Section
+.transactionSection {
+  padding: 0px;
+}
+
+.transactionHeader {
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 20px;
+  padding: 16px 15px;
+}
+
+.transactionTitle {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+// Control Bar Styles - Matching email template design
+.controlBar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  padding: 19px;
+  border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 17px;
+}
+
+.leftControls {
+  display: flex;
+  align-items: center;
+}
+
+.filterControls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.filterLabel {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.searchControls {
+  display: flex;
+  align-items: center;
+}
+
+.searchContainer {
+  position: relative;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  overflow: hidden;
+  background: white;
+}
+
+.searchInput {
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  min-width: 200px;
+  
+  &:focus {
+    outline: none;
+  }
+  
+  &::placeholder {
+    color: #999;
+  }
+}
+
+.searchBtn {
+  background: #f8f9fa;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-left: 1px solid #dee2e6;
+  transition: background 0.2s ease;
+  
+  &:hover {
+    background: #e9ecef;
+  }
+}
+
+.displayInfo {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.btnIcon {
+  font-size: 16px;
+  color: white;
+}
+
+.itemCount {
+  color: #1a9a94;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0.8;
+}
+
+// Table Wrapper for responsive behavior
+.tableWrapper {
+  width: 100%;
+  overflow-x: auto;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  margin-top: 1rem;
+  
+  // Ensure perfect alignment on mobile
+  -webkit-overflow-scrolling: touch;
+  
+  // Custom scrollbar styling
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: rgba(26, 154, 148, 0.1);
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: linear-gradient(90deg, #1a9a94, #158a84);
+    border-radius: 4px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(90deg, #158a84, #1a9a94);
+  }
+  
+  // Ensure table maintains alignment during scroll
+  &:hover {
+    .transactionTable {
+      transform: translateZ(0); // Force hardware acceleration
+    }
+  }
+}
+
+// Transaction Table
+.transactionTable {
+  background-color: #ffffff;
+  border-radius: 16px;
+  overflow: hidden;
+  border: none;
+  width: 100%;
+  min-width: 800px; // Ensure table has minimum width
+  
+  // Ensure perfect alignment on all devices
+  transform: translateZ(0); // Force hardware acceleration
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    table-layout: fixed; // Fixed table layout for consistent column widths
+    
+    // Ensure columns don't shift during scroll
+    th, td {
+      box-sizing: border-box;
+    }
+  }
+  
+  thead {
+    background: linear-gradient(135deg, #1a9a94 0%, #158a84 100%);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+  }
+  
+  th {
+    padding: 18px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #ffffff;
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    position: relative;
+    white-space: nowrap; // Prevent text wrapping
+    overflow: hidden;
+    text-overflow: ellipsis;
+    
+    // Fixed column widths for better alignment
+    &:nth-child(1) { width: 20%; } // When
+    &:nth-child(2) { width: 20%; } // Type
+    &:nth-child(3) { width: 30%; } // Note
+    &:nth-child(4) { width: 20%; } // Amount
+    &:nth-child(5) { width: 10%; } // Status
+    
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 60%;
+      width: 1px;
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+  
+  tbody {
+    tr {
+      border-bottom: 1px solid rgba(26, 154, 148, 0.1);
+      transition: all 0.3s ease;
+      position: relative;
+      
+      &:hover {
+        background: linear-gradient(135deg, rgba(26, 154, 148, 0.05) 0%, rgba(26, 154, 148, 0.02) 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 20px rgba(26, 154, 148, 0.1);
+      }
+      
+      &:last-child {
+        border-bottom: none;
+      }
+      
+      // Alternating row colors
+      &:nth-child(even) {
+        background-color: rgba(248, 249, 250, 0.5);
+      }
+      
+      &:nth-child(even):hover {
+        background: linear-gradient(135deg, rgba(26, 154, 148, 0.08) 0%, rgba(26, 154, 148, 0.03) 100%);
+      }
+    }
+    
+    td {
+      padding: 16px;
+      font-size: 14px;
+      color: #333333;
+      vertical-align: middle;
+      border: none;
+      position: relative;
+      white-space: nowrap; // Prevent text wrapping
+      overflow: hidden;
+      text-overflow: ellipsis;
+      
+      // Fixed column widths matching headers
+      &:nth-child(1) { width: 20%; } // When
+      &:nth-child(2) { width: 20%; } // Type
+      &:nth-child(3) { width: 30%; } // Note
+      &:nth-child(4) { width: 20%; } // Amount
+      &:nth-child(5) { width: 10%; } // Status
+      
+      // Add subtle borders between columns
+      &:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        height: 70%;
+        width: 1px;
+        background: rgba(26, 154, 148, 0.08);
+      }
+    }
+  }
+}
+
+.amountCell {
+  font-weight: 600;
+  font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', 'Courier New', monospace;
+  font-size: 15px;
+  color: #1a9a94;
+  
+  // Add special styling for positive/negative amounts
+  &.positive {
+    color: #1a9a94;
+  }
+  
+  &.negative {
+    color: #dc3545;
+  }
+}
+
+// Enhanced status badges
+.statusBadge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// Status Badges - Enhanced styles
+.statusCompleted {
+  background: linear-gradient(135deg, #1a9a94 0%, #1a9a94 100%);
+  color: white;
+  border: 1px solid rgba(40, 167, 69, 0.3);
+}
+
+.statusFailed {
+  background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+  color: white;
+  border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.statusPending {
+  background: linear-gradient(135deg, #ffc107 0%, #ffb84d 100%);
+  color: #212529;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.statusProcessing {
+  background: linear-gradient(135deg, #17a2b8 0%, #20c997 100%);
+  color: white;
+  border: 1px solid rgba(23, 162, 184, 0.3);
+}
+
+.statusDefault {
+  background: linear-gradient(135deg, #1a9a94 0%, #158a84 100%);
+  color: white;
+  border: 1px solid rgba(26, 154, 148, 0.3);
+}
+
+// Modal Styles
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+}
+
+.modal {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e9ecef;
+}
+
+.modalTitle {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  color: #333333;
+}
+
+.modalForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.formLabel {
+  color: #1a9a94;
+  font-size: 14px;
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.formInput {
+  background-color: #ffffff;
+  border: 2px solid #1a9a94;
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: #333333;
+  font-size: 16px;
+  transition: border-color 0.2s;
+
+  &::placeholder {
+    color: #1a9a94;
+    opacity: 0.6;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #1a9a94;
+  }
+
+  &.inputError {
+    border-color: #ff6b6b;
+    opacity: 0.8;
+  }
+}
+
+.errorTooltip {
+  background-color: #ff6b6b;
+  color: #ffffff;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  margin-top: 4px;
+  border: 1px solid #ff6b6b;
+  opacity: 0.9;
+}
+
+.generalError {
+  background-color: #ff6b6b;
+  color: white;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 14px;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.cancelBtn {
+  background-color: #ffffff !important;
+  color: #1a9a94 !important;
+  border: 2px solid #1a9a94 !important;
+  padding: 10px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  transition: all 0.2s;
+
+  &:hover {
+    background-color: #1a9a94 !important;
+    color: #ffffff !important;
+    border-color: #1a9a94 !important;
+  }
+}
+
+// Responsive Design
+// Debug: This media query should work at 768px and below
+@media (max-width: 768px) {
+  // Force responsive behavior
+  html, body {
+    overflow-x: auto !important;
+  }
+  
+  .walletContainer {
+    padding: 1rem !important;
+    background-color: #f0f8ff !important; // Debug color
+  }
+
+  .balanceWrapper {
+    padding: 1rem !important;
+  }
+
+  .balanceContainer {
+    padding: 1rem !important;
+  }
+
+  .balanceSection {
+    padding: 0px !important;
+  }
+
+  .balanceHeader {
+    padding: 12px 10px !important;
+    margin-bottom: 20px !important;
+  }
+
+  .balanceTitle {
+    font-size: 1.5rem !important;
+  }
+
+  .balanceContent {
+    padding: 0px 10px 15px 10px !important;
+  }
+
+  .balanceDisplay {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1.5rem !important;
+  }
+
+  .balanceInfo {
+    justify-content: center !important;
+  }
+
+  .balanceActions {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .balanceAmount {
+    font-size: 2.5rem !important;
+  }
+
+  .transactionSection {
+    padding: 1.5rem !important;
+  }
+
+  .transactionHeader {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 1rem !important;
+  }
+
+  .controlBar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+
+  .searchControls {
+    width: 100% !important;
+  }
+
+  .searchInput {
+    width: 100% !important;
+    max-width: 300px !important;
+  }
+
+  .displayInfo {
+    text-align: center !important;
+  }
+
+  // Table responsive styles
+  .tableWrapper {
+    border-radius: 12px !important;
+    
+    &::-webkit-scrollbar {
+      height: 6px !important;
+    }
+    
+    // Ensure perfect alignment on mobile
+    transform: translateZ(0) !important;
+  }
+
+  .transactionTable {
+    font-size: 12px !important;
+    min-width: 700px !important; // Ensure table doesn't get too cramped
+    
+    // Force perfect column alignment
+    table {
+      table-layout: fixed !important;
+    }
+    
+    th, td {
+      box-sizing: border-box !important;
+      width: auto !important; // Let CSS handle widths
+    }
+  }
+
+  .transactionTable th,
+  .transactionTable td {
+    padding: 12px 8px !important;
+    font-size: 12px !important;
+  }
+  
+  // Reduce spacing on mobile
+  .transactionTable th {
+    padding: 14px 8px !important;
+  }
+
+  .modal {
+    margin: 1rem !important;
+    padding: 1.5rem !important;
+    width: calc(100% - 2rem) !important;
+  }
+
+  .modalActions {
+    flex-direction: column !important;
+  }
+
+  .cancelBtn,
+  .addFundsBtn {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .walletContainer {
+    padding: 0.5rem !important;
+  }
+
+  .balanceWrapper {
+    padding: 0.5rem !important;
+  }
+
+  .balanceContainer {
+    padding: 0.5rem !important;
+  }
+
+  .balanceSection {
+    padding: 0px !important;
+  }
+
+  .balanceHeader {
+    padding: 10px 8px !important;
+    margin-bottom: 15px !important;
+  }
+
+  .balanceTitle {
+    font-size: 1.25rem !important;
+  }
+
+  .balanceContent {
+    padding: 0px 8px 12px 8px !important;
+  }
+
+  .balanceAmount {
+    font-size: 2rem !important;
+  }
+
+  .currencyBadge {
+    padding: 6px 12px !important;
+    font-size: 12px !important;
+  }
+
+  .addFundsBtn {
+    padding: 10px 20px !important;
+    font-size: 13px !important;
+  }
+
+  .transactionSection {
+    padding: 1rem !important;
+  }
+
+  .transactionTitle {
+    font-size: 1.25rem !important;
+  }
+
+  .searchInput {
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+  }
+
+  .controlBar {
+    padding: 15px !important;
+    gap: 12px !important;
+  }
+
+  .searchBox {
+    width: 100% !important;
+  }
+
+  // Enhanced mobile table styles
+  .tableWrapper {
+    margin: 0 -0.5rem !important; // Negative margin to extend to edges
+    border-radius: 0 !important;
+    
+    &::-webkit-scrollbar {
+      height: 4px !important; // Smaller scrollbar on mobile
+    }
+    
+    // Ensure perfect alignment during scroll
+    transform: translateZ(0) !important;
+  }
+
+  .transactionTable {
+    min-width: 600px !important; // Slightly smaller on mobile
+    
+    // Force perfect column alignment on mobile
+    table {
+      table-layout: fixed !important;
+    }
+    
+    th, td {
+      box-sizing: border-box !important;
+      width: auto !important;
+    }
+  }
+
+  .transactionTable th,
+  .transactionTable td {
+    padding: 10px 6px !important;
+    font-size: 11px !important;
+  }
+
+  .modal {
+    margin: 0.5rem !important;
+    padding: 1rem !important;
+  }
+
+  .modalTitle {
+    font-size: 1.25rem !important;
+  }
+
+  .formInput {
+    font-size: 14px !important;
+    padding: 10px 12px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .walletContainer {
+    padding: 0.25rem;
+  }
+
+  .balanceSection,
+  .transactionSection {
+    padding: 0.75rem;
+  }
+
+  .balanceAmount {
+    font-size: 1.75rem;
+  }
+
+  .transactionTitle {
+    font-size: 1.125rem;
+  }
+
+  .searchInput {
+    font-size: 13px;
+    padding: 8px 10px;
+  }
+  
+  // Ultra-mobile table optimization
+  .transactionTable {
+    margin: 0 -0.25rem;
+    
+    table {
+      min-width: 550px; // Even more compact
+    }
+    
+    th,
+    td {
+      padding: 8px 4px;
+      font-size: 10px;
+    }
+  }
+}
+
+// Add a new breakpoint for very small screens
+@media (max-width: 320px) {
+  .walletContainer {
+    padding: 0.125rem;
+  }
+  
+  .balanceSection,
+  .transactionSection {
+    padding: 0.5rem;
+  }
+  
+  .transactionTable {
+    margin: 0 -0.125rem;
+    
+    table {
+      min-width: 500px;
+    }
+    
+    th,
+    td {
+      padding: 6px 3px;
+      font-size: 9px;
+    }
+  }
+  
+  .statusBadge {
+    padding: 4px 8px;
+    font-size: 9px;
+    min-width: 60px;
+  }
+} 

@@ -1,0 +1,354 @@
+{
+  "apiVersion": 2,
+  "name": "tsb/team",
+  "title": "Team Section",
+  "description": "Showcase team members in various layouts and designs.",
+  "category": "widgets",
+  "keywords": [
+    "team",
+    "members",
+    "team members"
+  ],
+  "textdomain": "team-section",
+  "attributes": {
+    "align": {
+      "type": "string",
+      "default": "wide"
+    },
+    "members": {
+      "type": "array",
+      "default": [
+        {
+          "background": {
+            "color": "#0000"
+          },
+          "border": {
+            "radius": "3px"
+          },
+          "shadow": [],
+          "photo": {
+            "id": null,
+            "url": "",
+            "alt": "",
+            "title": ""
+          },
+          "photoBorder": {
+            "radius": "50%"
+          },
+          "name": "Martin",
+          "nameColor": "#333",
+          "title": "Founder",
+          "titleColor": "#333",
+          "separator": {
+            "width": "20%",
+            "height": "3px",
+            "color": "#777"
+          },
+          "bio": "I am a self-motivated and self-taught professional who likes to solve problems.",
+          "bioColor": "#333",
+          "social": [
+            {
+              "link": "#",
+              "icon": {
+                "class": "fab fa-facebook-f"
+              }
+            },
+            {
+              "link": "#",
+              "icon": {
+                "class": "fab fa-twitter"
+              }
+            },
+            {
+              "link": "#",
+              "icon": {
+                "class": "fab fa-linkedin-in"
+              }
+            }
+          ],
+          "socialIconColors": {
+            "type": "object",
+            "default": {
+              "color": "#fff",
+              "bg": "#4527a4"
+            }
+          }
+        },
+        {
+          "background": {
+            "color": "#0000"
+          },
+          "border": {
+            "radius": "3px"
+          },
+          "shadow": [],
+          "photo": {
+            "id": null,
+            "url": "",
+            "alt": "",
+            "title": ""
+          },
+          "photoBorder": {
+            "radius": "50%"
+          },
+          "name": "Mary",
+          "nameColor": "#333",
+          "title": "Co-Founder",
+          "titleColor": "#333",
+          "separator": {
+            "width": "20%",
+            "height": "3px",
+            "color": "#777"
+          },
+          "bio": "I am a self-motivated and self-taught professional who likes to solve problems.",
+          "bioColor": "#333",
+          "social": [
+            {
+              "link": "#",
+              "icon": {
+                "class": "fab fa-facebook-f"
+              }
+            },
+            {
+              "link": "#",
+              "icon": {
+                "class": "fab fa-twitter"
+              }
+            },
+            {
+              "link": "#",
+              "icon": {
+                "class": "fab fa-linkedin-in"
+              }
+            }
+          ],
+          "socialIconColors": {
+            "type": "object",
+            "default": {
+              "color": "#fff",
+              "bg": "#4527a4"
+            }
+          }
+        },
+        {
+          "background": {
+            "color": "#0000"
+          },
+          "border": {
+            "radius": "3px"
+          },
+          "shadow": [],
+          "photo": {
+            "id": null,
+            "url": "",
+            "alt": "",
+            "title": ""
+          },
+          "photoBorder": {
+            "radius": "50%"
+          },
+          "name": "John Doe",
+          "nameColor": "#333",
+          "title": "CEO",
+          "titleColor": "#333",
+          "separator": {
+            "width": "20%",
+            "height": "3px",
+            "color": "#777"
+          },
+          "bio": "I am a self-motivated and self-taught professional who likes to solve problems.",
+          "bioColor": "#333",
+          "social": [
+            {
+              "link": "#",
+              "icon": {
+                "class": "fab fa-facebook-f"
+              }
+            },
+            {
+              "link": "#",
+              "icon": {
+                "class": "fab fa-twitter"
+              }
+            },
+            {
+              "link": "#",
+              "icon": {
+                "class": "fab fa-linkedin-in"
+              }
+            }
+          ],
+          "socialIconColors": {
+            "type": "object",
+            "default": {
+              "color": "#fff",
+              "bg": "#4527a4"
+            }
+          }
+        }
+      ]
+    },
+    "columns": {
+      "type": "object",
+      "default": {
+        "desktop": 3,
+        "tablet": 2,
+        "mobile": 1
+      }
+    },
+    "columnGap": {
+      "type": "string",
+      "default": "30px"
+    },
+    "rowGap": {
+      "type": "string",
+      "default": "30px"
+    },
+    "layout": {
+      "type": "string",
+      "default": "vertical"
+    },
+    "theme": {
+      "type": "string",
+      "default": "default"
+    },
+    "isLinkNewTab": {
+      "type": "boolean",
+      "default": false
+    },
+    "textAlign": {
+      "type": "string",
+      "default": "center"
+    },
+    "padding": {
+      "type": "object",
+      "default": {
+        "vertical": "50px",
+        "horizontal": "20px"
+      }
+    },
+    "photoWidth": {
+      "type": "string",
+      "default": "170px"
+    },
+    "photoMargin": {
+      "type": "object",
+      "default": {
+        "side": 4,
+        "bottom": "20px"
+      }
+    },
+    "nameTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 20,
+          "tablet": 18,
+          "mobile": 16
+        },
+        "fontWeight": 600
+      }
+    },
+    "nameMargin": {
+      "type": "object",
+      "default": {
+        "side": 4,
+        "bottom": "10px"
+      }
+    },
+    "isTitle": {
+      "type": "boolean",
+      "default": true
+    },
+    "titleTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 16,
+          "tablet": 16,
+          "mobile": 16
+        }
+      }
+    },
+    "titleMargin": {
+      "type": "object",
+      "default": {
+        "side": 4,
+        "bottom": "10px"
+      }
+    },
+    "isSep": {
+      "type": "boolean",
+      "default": true
+    },
+    "sepMargin": {
+      "type": "object",
+      "default": {
+        "side": 4,
+        "bottom": "15px"
+      }
+    },
+    "isBio": {
+      "type": "boolean",
+      "default": true
+    },
+    "bioTypo": {
+      "type": "object",
+      "default": {
+        "fontSize": {
+          "desktop": 15,
+          "tablet": 15,
+          "mobile": 15
+        }
+      }
+    },
+    "bioMargin": {
+      "type": "object",
+      "default": {
+        "side": 4,
+        "bottom": "15px"
+      }
+    },
+    "isSocial": {
+      "type": "boolean",
+      "default": true
+    },
+    "socialSize": {
+      "type": "string",
+      "default": "22px"
+    },
+    "socialIconMargin": {
+      "type": "object",
+      "default": {
+        "side": 2,
+        "vertical": "10px",
+        "horizontal": "10px"
+      }
+    }
+  },
+  "supports": {
+    "align": [
+      "wide",
+      "full"
+    ],
+    "html": false
+  },
+  "example": {
+    "attributes": {
+      "preview": true,
+      "columns": {
+        "desktop": 1,
+        "tablet": 1,
+        "mobile": 1
+      }
+    }
+  },
+  "editorScript": "file:./index.js",
+  "editorStyle": "file:./index.css",
+  "style": [
+    "file:./view.css",
+    "fontAwesome"
+  ],
+  "render": "file:./render.php",
+  "viewScript": "file:./view.js"
+}
