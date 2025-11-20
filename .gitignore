@@ -22,7 +22,6 @@
 !/wp-content/plugins/
 !/wp-content/themes/
 
-!/.github/
 
 /wp-content/plugins/gibbs-react-booking/node_modules
 /wp-content/plugins/gibbs-react-booking/node_modules/*
