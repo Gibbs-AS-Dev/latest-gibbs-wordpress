@@ -1163,14 +1163,14 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
               </form>
               
               {/* Social Login Separator */}
-              <div className={styles.socialLoginSeparator} style={{ display:  'none' }}>
+              <div className={styles.socialLoginSeparator} >
                 <span className={styles.separatorLine}></span>
                 <span className={styles.separatorText}>{Ltext("or log in with")}</span>
                 <span className={styles.separatorLine}></span>
               </div>
 
               {/* Social Login Buttons */}
-              <div className={styles.socialLoginButtons} style={{ display:  'none' }}>
+              <div className={styles.socialLoginButtons} >
                 <button 
                   type="button" 
                   className={`${styles.socialBtn} ${styles.socialBtnVipps}`}

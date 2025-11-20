@@ -335,9 +335,10 @@
       white-space: nowrap;
 
       &:hover {
-        background: linear-gradient(135deg, #158a84 0%, #1a9a94 100%);
+        color: white !important;
+       // background: linear-gradient(135deg, #158a84 0%, #1a9a94 100%);
         transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(26, 154, 148, 0.3);
+        //box-shadow: 0 4px 12px rgba(26, 154, 148, 0.3);
       }
 
       &:active {

@@ -5,7 +5,7 @@
 }
 
 .container {
-  max-width: 1200px;
+  // max-width: 1200px;
   margin: 0 auto;
   background: #ffffff;
   border-radius: 16px;
@@ -148,13 +148,6 @@
   }
 }
 
-.tableWrapper {
-  width: 100%;
-  overflow-x: auto;
-  border-radius: 12px;
-  border: 1px solid rgba(15, 23, 42, 0.06);
-  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
-}
 
 .statusBadge {
   display: inline-flex;
@@ -319,7 +312,6 @@
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
-  justify-content: flex-end;
 }
 
 .editButton {

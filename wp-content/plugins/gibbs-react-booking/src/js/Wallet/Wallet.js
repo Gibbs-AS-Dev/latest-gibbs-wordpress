@@ -3,8 +3,8 @@ import axios from 'axios';
 import { Ltext, getLanguage } from '../utils/wallet-translations';
 import Modal from '../components/Modal';
 import Table from '../components/Table';
+import Button from '../components/Button';
 import styles from '../assets/scss/Wallet.module.scss';
-import tableStyles from '../assets/scss/table.module.scss';
 import '../assets/scss/Wallet.scss';
 
 function Wallet({ page_id, apiUrl, homeUrl, user_token }) {
@@ -221,12 +221,12 @@ function Wallet({ page_id, apiUrl, homeUrl, user_token }) {
         <div className={styles.error}>
           <h2>{Ltext("Error")}</h2>
           <p>{error}</p>
-          <button 
-            className={styles.btn} 
+          <Button 
+            variant="primary" 
             onClick={fetchWalletData}
           >
             {Ltext("Retry")}
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -249,15 +249,15 @@ function Wallet({ page_id, apiUrl, homeUrl, user_token }) {
                   <span className={styles.balanceAmount}>{currentBalance.toFixed(2)}</span>
                 </div>
                 <div className={styles.balanceActions}>
-                  <button 
-                    className={styles.addFundsBtn}
+                  <Button 
+                    variant="primary"
                     onClick={() => {
                       setIsFromAdmin(false); // Reset flag for regular customer click
                       setShowAddFundsModal(true);
                     }}
                   >
                     {Ltext("Add funds")}
-                  </button>
+                  </Button>
                 </div>
               </div>
             </div>
@@ -293,9 +293,14 @@ function Wallet({ page_id, apiUrl, homeUrl, user_token }) {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={styles.searchInput}
               />
-              <button className={styles.searchBtn}>
+              <Button 
+                variant="ghost" 
+                size="small"
+                className={styles.searchBtn}
+                type="button"
+              >
                 <i className="fa fa-search"></i>
-              </button>
+              </Button>
             </div>
           </div>
 
@@ -303,53 +308,52 @@ function Wallet({ page_id, apiUrl, homeUrl, user_token }) {
             {Ltext("Displaying")} {filteredTransactions.length} {Ltext("transactions")}
           </div>
         </div>
-
-        <div className={tableStyles.tableWrapper}>
-          <Table
-            tableClassName={`${tableStyles.table} ${styles.transactionTable}`}
-            tableStyle={{minWidth: '800px'}}
-            rowStyle={{height: 'auto'}}
-            data={filteredTransactions}
-            getRowKey={(row) => row.id}
-            columns={[
-              {
-                header: Ltext("When"),
-                thStyle: { width: '20%' },
-                tdStyle: { width: '20%' },
-                render: (transaction) => transaction.created_at
-              },
-              {
-                header: Ltext("Type"),
-                thStyle: { width: '15%' },
-                tdStyle: { width: '15%' },
-                render: (transaction) => transaction.type
-              },
-              {
-                header: Ltext("Note"),
-                thStyle: { width: '35%' },
-                tdStyle: { width: '35%' },
-                render: (transaction) => transaction.description
-              },
-              {
-                header: Ltext("Amount (NOK)"),
-                thStyle: { width: '15%' },
-                tdStyle: { width: '15%' },
-                tdClassName: styles.amountCell,
-                render: (transaction) => formatAmount(transaction.amount, transaction.type)
-              },
-              {
-                header: Ltext("Status"),
-                thStyle: { width: '15%' },
-                tdStyle: { width: '15%' },
-                render: (transaction) => (
-                  <span className={`${styles.statusBadge} ${getStatusColor(transaction.status)}`}>
-                    {transaction.status}
-                  </span>
-                )
-              }
-            ]}
-          />
-        </div>
+            <div style={{padding: '20px 16px'}}>
+              <Table
+                tableClassName={styles.transactionTable}
+                tableStyle={{minWidth: '800px'}}
+                rowStyle={{height: 'auto'}}
+                data={filteredTransactions}
+                getRowKey={(row) => row.id}
+                  columns={[
+                    {
+                      header: Ltext("When"),
+                      thStyle: { width: '20%' },
+                      tdStyle: { width: '20%' },
+                      render: (transaction) => transaction.created_at
+                    },
+                    {
+                      header: Ltext("Type"),
+                      thStyle: { width: '15%' },
+                      tdStyle: { width: '15%' },
+                      render: (transaction) => transaction.type
+                    },
+                    {
+                      header: Ltext("Note"),
+                      thStyle: { width: '35%' },
+                      tdStyle: { width: '35%' },
+                      render: (transaction) => transaction.description
+                    },
+                    {
+                      header: Ltext("Amount (NOK)"),
+                      thStyle: { width: '15%' },
+                      tdStyle: { width: '15%' },
+                      tdClassName: styles.amountCell,
+                      render: (transaction) => formatAmount(transaction.amount, transaction.type)
+                    },
+                    {
+                      header: Ltext("Status"),
+                      thStyle: { width: '15%' },
+                      tdStyle: { width: '15%' },
+                      render: (transaction) => (
+                        <span className={`${styles.statusBadge} ${getStatusColor(transaction.status)}`}>
+                          {transaction.status}
+                        </span>
+                      )
+                    }
+                  ]}
+              />
+            </div>  
           </div>
         </div>
       </div>
@@ -407,29 +411,23 @@ function Wallet({ page_id, apiUrl, homeUrl, user_token }) {
           
           {/* Modal Footer with Form Actions */}
           <div className={styles.modalActions}>
-            <button 
-              className={styles.cancelBtn}
+            <Button 
+              variant="secondary"
               onClick={() => {
                 setShowAddFundsModal(false);
                 setIsFromAdmin(false); // Reset flag when cancel is clicked
               }}
             >
               {Ltext("Cancel")}
-            </button>
-            <button 
-              className={styles.addFundsBtn}
+            </Button>
+            <Button 
+              variant="primary"
               onClick={handleAddFunds}
               disabled={submitting}
+              loading={submitting}
             >
-              {submitting ? (
-                <>
-                  <div className={styles.spinnerSmall}></div>
-                  {Ltext("Adding...")}
-                </>
-              ) : (
-                Ltext("Add funds")
-              )}
-            </button>
+              {submitting ? Ltext("Adding...") : Ltext("Add funds")}
+            </Button>
           </div>
         </Modal>
       )}

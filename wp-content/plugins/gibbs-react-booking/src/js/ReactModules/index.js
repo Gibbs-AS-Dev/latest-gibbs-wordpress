@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import SubscriptionDiscount from '../SubscriptionDiscount/SubscriptionDiscount.js';
+import ComponentGallery from './ComponentGallery.js';
 
 // React Modules container responsible for rendering requested component
 function ReactModulesContainer({ component, page_id, apiUrl, homeUrl, user_token = null, owner_id = null }) {
@@ -23,8 +24,12 @@ function ReactModulesContainer({ component, page_id, apiUrl, homeUrl, user_token
                     />
                 );
             
+            case 'component_gallery':
+            case 'components':
+                return <ComponentGallery />;
+            
             default:
-                return <div className="rmp-error">Invalid view state</div>;
+                return <div className="rmp-error">Invalid view state: {currentView}</div>;
         }
     };
 

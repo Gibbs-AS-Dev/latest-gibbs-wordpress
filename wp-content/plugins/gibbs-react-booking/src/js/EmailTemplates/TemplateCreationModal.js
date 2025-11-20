@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import Modal from '../components/Modal';
 import QuillEditor from '../components/QuillEditor';
 import TextareaWithEmoji from '../components/TextareaWithEmoji';
+import Button from '../components/Button';
 import { Ltext, getLanguage } from '../utils/emailTemplate-translations';
 import styles from '../assets/scss/templateCreationModal.module.scss';
 
@@ -516,42 +517,47 @@ function TemplateCreationModal({
 
           {/* Action Buttons Section */}
             <div className={styles.dataFieldsSection}>
-              <button
+              <Button
                 type="button"
+                variant="outline"
                 onClick={() => setShowDataFields(!showDataFields)}
                 className={styles.insertDataFieldsBtn}
                 disabled={isSubmitting}
+                leftIcon={<i className="fa fa-plus"></i>}
+                rightIcon={<i className={`fa ${showDataFields ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>}
               >
-                <i className="fa fa-plus"></i>
                 {Ltext("Insert Data Fields")}
-                <i className={`fa ${showDataFields ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
-              </button>
+              </Button>
               
               {formData.type === 'email' && formData.editorType === 'html' && (
-                <button
+                <Button
                   type="button"
+                  variant="outline"
                   onClick={toggleHtmlPreview}
                   className={styles.previewToggleBtn}
                   disabled={isSubmitting}
+                  leftIcon={<i className={`fa ${showHtmlPreview ? 'fa-eye-slash' : 'fa-eye'}`}></i>}
                 >
-                  <i className={`fa ${showHtmlPreview ? 'fa-eye-slash' : 'fa-eye'}`}></i> {showHtmlPreview ? Ltext('Hide Preview') : Ltext('Show Preview')}
-                </button>
+                  {showHtmlPreview ? Ltext('Hide Preview') : Ltext('Show Preview')}
+                </Button>
               )}
               
               {showDataFields && (
                 <div className={styles.dataFieldsDropdown}>
                   <div className={styles.dataFieldsGrid}>
                     {dataFields.map(field => (
-                      <button
+                      <Button
                         key={field.key}
                         type="button"
+                        variant="ghost"
+                        size="small"
                         onClick={() => insertDataField(field.key)}
                         className={styles.dataFieldItem}
                         disabled={isSubmitting}
+                        leftIcon={<i className={`fa ${field.icon}`} style={{ color: field.color }}></i>}
                       >
-                        <span><i className={`fa ${field.icon}`} style={{ color: field.color }}></i></span>
                         {field.label}
-                      </button>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -560,21 +566,22 @@ function TemplateCreationModal({
 
           {/* Form Actions */}
           <div className={styles.formActions}>
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={handleCancel}
-              className={styles.cancelBtn}
               disabled={isSubmitting}
             >
               {Ltext("Cancel")}
-            </button>
-            <button
+            </Button>
+            <Button
               type="submit"
-              className={styles.submitBtn}
+              variant="primary"
               disabled={isSubmitting}
+              loading={isSubmitting}
             >
               {isSubmitting ? Ltext('Saving...') : (isEdit ? Ltext('Update') : Ltext('Create'))}
-            </button>
+            </Button>
           </div>
 
           {errorMessage && (

@@ -4,10 +4,10 @@ import axios from 'axios';
 import { Ltext, getLanguage } from '../utils/emailTemplate-translations';
 import TemplateCreationModal from './TemplateCreationModal';
 import styles from '../assets/scss/emailTemplates.module.scss';
-import tableStyles from '../assets/scss/table.module.scss';
 import '../assets/scss/emailTemplates.scss';
 import Modal from '../components/Modal'; // Added import for Modal
 import Table from '../components/Table';
+import Button from '../components/Button';
 
 function EmailTemplate({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
   const [templates, setTemplates] = useState([]);
@@ -430,18 +430,24 @@ function EmailTemplate({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
         }}
         onClick={handleDropdownClick}
       >
-        <button 
+        <Button 
+          variant="ghost"
+          size="small"
           className={styles.editBtn}
           onClick={handleEditClick}
+          leftIcon={<i className="fa fa-edit" style={{ color: '#1a9a94' }}></i>}
         >
-          <i className="fa fa-edit" style={{ color: '#1a9a94' }}></i> {Ltext("Edit")}
-        </button>
-        <button 
+          {Ltext("Edit")}
+        </Button>
+        <Button 
+          variant="ghost"
+          size="small"
           className={styles.deleteBtn}
           onClick={handleDeleteClick}
+          leftIcon={<i className="fa fa-trash" style={{ color: '#dc3545' }}></i>}
         >
-          <i className="fa fa-trash" style={{ color: '#dc3545' }}></i> {Ltext("Delete")}
-        </button>
+          {Ltext("Delete")}
+        </Button>
       </div>,
       document.body
     );
@@ -466,42 +472,41 @@ function EmailTemplate({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
         <div className={styles.emailTemplatesSection}>
           <div className={styles.emailTemplatesHeader}>
             <h2 className={styles.emailTemplatesTitle}>{Ltext("Email & SMS Templates")}</h2>
-            <button 
-              className={styles.emailSettingsBtn}
+            <Button 
+              variant="outline"
               onClick={() => {
                 setShowEmailSettings(true);
               }}
               title={Ltext("Email Settings")}
+              rightIcon={<i className="fa fa-cog"></i>}
             >
-              
               {Ltext("Settings")}
-              <span className={styles.btnIcon}><i className="fa fa-cog"></i></span>
-            </button>
+            </Button>
           </div>
 
           {/* Control Bar */}
           <div className={styles.controlBar}>
             <div className={styles.leftControls}>
-              <button 
-                className={styles.createTemplateBtn}
+              <Button 
+                variant="primary"
                 onClick={handleCreateTemplate}
+                rightIcon={<i className="fa fa-plus"></i>}
               >
-                
                 {Ltext("Create template")}
-                <span className={styles.btnIcon}><i className="fa fa-plus"></i></span>
-              </button>
+              </Button>
             </div>
 
             <div className={styles.filterControls}>
               <span className={styles.filterLabel}>{Ltext("Filter:")}</span>
               {(triggerFilter !== 'all' || searchTerm) && (
-                <button 
-                  className={styles.filterBtn}
+                <Button 
+                  variant="ghost"
+                  size="small"
                   onClick={clearFilters}
+                  leftIcon={<i className="fa fa-search" style={{ color: '#6c757d' }}></i>}
                 >
-                  <span className={styles.btnIcon}><i className="fa fa-search" style={{ color: '#6c757d' }}></i></span>
                   {Ltext("Show all")}
-                </button>
+                </Button>
               )}
               
               <select 
@@ -526,9 +531,14 @@ function EmailTemplate({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className={styles.searchInput}
                 />
-                <button className={styles.searchBtn}>
-                  <span className={styles.btnIcon}><i className="fa fa-search" style={{ color: '#6c757d' }}></i></span>
-                </button>
+                <Button 
+                  variant="ghost" 
+                  size="small"
+                  className={styles.searchBtn}
+                  type="button"
+                >
+                  <i className="fa fa-search" style={{ color: '#6c757d' }}></i>
+                </Button>
               </div>
             </div>
 
@@ -550,120 +560,124 @@ function EmailTemplate({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
               </div>
             </div>
           ) : (
-            <div className={tableStyles.tableWrapper}>
+            <div style={{padding: '20px 16px'}}>
               <Table
-                tableClassName={`${tableStyles.table} ${styles.templatesTable}`}
+                tableClassName={styles.templatesTable}
                 tableStyle={{minWidth: '800px'}}
                 rowStyle={{height: 'auto'}}
                 data={filteredTemplates}
                 getRowKey={(row) => row.id}
-                columns={[
-                  {
-                    header: Ltext("Name"),
-                    thStyle: { width: '20%' },
-                    tdStyle: { width: '20%' },
-                    render: (template) => (
-                      <div className={styles.templateName}>
-                        <span className={styles.templateIcon}>
+                  columns={[
+                    {
+                      header: Ltext("Name"),
+                      thStyle: { width: '20%' },
+                      tdStyle: { width: '20%' },
+                      render: (template) => (
+                        <div className={styles.templateName}>
+                          <span className={styles.templateIcon}>
+                            <i 
+                              className={`fa ${template.type === 'sms' ? 'fa-comment' : 'fa-envelope'}`}
+                              style={{ 
+                                color: template.type === 'sms' ? '#3F4254' : '#3F4254' 
+                              }}
+                            ></i>
+                          </span>
+                          <span className={styles.templateNameText}>{template.name}</span>
+                        </div>
+                      )
+                    },
+                    {
+                      header: Ltext("Subject"),
+                      thStyle: { width: '15%' },
+                      tdStyle: { width: '15%' },
+                      tdClassName: styles.subjectCell,
+                      render: (template) => (
+                        <div className={styles.subjectText}>
+                          {template.type === 'email' ? (template.subject || Ltext('-')) : Ltext('-')}
+                        </div>
+                      )
+                    },
+                    {
+                      header: Ltext("Content"),
+                      thStyle: { width: '30%' },
+                      tdStyle: { width: '100%', display: 'flex' },
+                      tdClassName: styles.contentCell,
+                      render: (template) => (
+                        <>
+                          <div className={styles.contentText} style={{ width: '80%' }}>
+                            {template.content && (() => {
+                              const displayContent = template.type === 'sms' ? template.content : stripHtmlTags(template.content);
+                              return (displayContent || Ltext('-'));
+                            })()}
+                          </div>
+                          {template.content && (() => {
+                            const displayContent = template.type === 'sms' ? template.content : stripHtmlTags(template.content);
+                            return displayContent.length > 100;
+                          })() && (
+                            <Button 
+                              variant="link" 
+                              size="small"
+                              className={styles.showMoreBtn}
+                              onClick={() => handleShowMore(template.type === 'sms' ? template.content : template.content)}
+                            >
+                              {Ltext("Show More")}
+                            </Button>
+                          )}
+                        </>
+                      )
+                    },
+                    {
+                      header: Ltext("Trigger"),
+                      thStyle: { width: '20%' },
+                      tdStyle: { width: '20%' },
+                      render: (template) => (
+                        <span className={styles.triggerText}>{getTriggerDisplayName(template.event, template.before_booking_unique_minute)}</span>
+                      )
+                    },
+                    {
+                      header: Ltext("Delay [min]"),
+                      thStyle: { width: '10%' },
+                      tdStyle: { width: '10%' },
+                      tdClassName: styles.delayCell,
+                      render: (template) => (
+                        <span className={styles.delayBadgeText}>
+                          {template.delay || 0} {Ltext('min')}
+                        </span>
+                      )
+                    },
+                    {
+                      header: Ltext("Active?"),
+                      thStyle: { width: '10%' },
+                      tdStyle: { width: '10%' },
+                      render: (template) => (
+                        <span className={`${styles.statusBadge} ${template.active ? styles.statusActive : styles.statusInactive}`}>
                           <i 
-                            className={`fa ${template.type === 'sms' ? 'fa-comment' : 'fa-envelope'}`}
+                            className={`fa ${template.active ? 'fa-check' : 'fa-times'}`}
                             style={{ 
-                              color: template.type === 'sms' ? '#3F4254' : '#3F4254' 
+                              color: template.active ? '#fff' : '#fff' 
                             }}
                           ></i>
                         </span>
-                        <span className={styles.templateNameText}>{template.name}</span>
-                      </div>
-                    )
-                  },
-                  {
-                    header: Ltext("Subject"),
-                    thStyle: { width: '15%' },
-                    tdStyle: { width: '15%' },
-                    tdClassName: styles.subjectCell,
-                    render: (template) => (
-                      <div className={styles.subjectText}>
-                        {template.type === 'email' ? (template.subject || Ltext('-')) : Ltext('-')}
-                      </div>
-                    )
-                  },
-                  {
-                    header: Ltext("Content"),
-                    thStyle: { width: '30%' },
-                    tdStyle: { width: '100%', display: 'flex' },
-                    tdClassName: styles.contentCell,
-                    render: (template) => (
-                      <>
-                        <div className={styles.contentText} style={{ width: '80%' }}>
-                          {template.content && (() => {
-                            const displayContent = template.type === 'sms' ? template.content : stripHtmlTags(template.content);
-                            return (displayContent || Ltext('-'));
-                          })()}
-                        </div>
-                        {template.content && (() => {
-                          const displayContent = template.type === 'sms' ? template.content : stripHtmlTags(template.content);
-                          return displayContent.length > 100;
-                        })() && (
-                          <button 
-                            className={styles.showMoreBtn}
-                            onClick={() => handleShowMore(template.type === 'sms' ? template.content : template.content)}
+                      )
+                    },
+                    {
+                      header: "",
+                      thStyle: { width: '5%' },
+                      tdStyle: { width: '5%' },
+                      render: (template) => (
+                        <div className={styles.optionsDropdown}>
+                          <Button 
+                            variant="ghost"
+                            size="small"
+                            className={`${styles.optionsBtn} ${openDropdowns[template.id] ? styles.active : ''}`}
+                            onClick={(event) => handleDropdownToggle(template.id, event)}
                           >
-                            {Ltext("Show More")}
-                          </button>
-                        )}
-                      </>
-                    )
-                  },
-                  {
-                    header: Ltext("Trigger"),
-                    thStyle: { width: '20%' },
-                    tdStyle: { width: '20%' },
-                    render: (template) => (
-                      <span className={styles.triggerText}>{getTriggerDisplayName(template.event, template.before_booking_unique_minute)}</span>
-                    )
-                  },
-                  {
-                    header: Ltext("Delay [min]"),
-                    thStyle: { width: '10%' },
-                    tdStyle: { width: '10%' },
-                    tdClassName: styles.delayCell,
-                    render: (template) => (
-                      <span className={styles.delayBadgeText}>
-                        {template.delay || 0} {Ltext('min')}
-                      </span>
-                    )
-                  },
-                  {
-                    header: Ltext("Active?"),
-                    thStyle: { width: '10%' },
-                    tdStyle: { width: '10%' },
-                    render: (template) => (
-                      <span className={`${styles.statusBadge} ${template.active ? styles.statusActive : styles.statusInactive}`}>
-                        <i 
-                          className={`fa ${template.active ? 'fa-check' : 'fa-times'}`}
-                          style={{ 
-                            color: template.active ? '#fff' : '#fff' 
-                          }}
-                        ></i>
-                      </span>
-                    )
-                  },
-                  {
-                    header: "",
-                    thStyle: { width: '5%' },
-                    tdStyle: { width: '5%' },
-                    render: (template) => (
-                      <div className={styles.optionsDropdown}>
-                        <button 
-                          className={`${styles.optionsBtn} ${openDropdowns[template.id] ? styles.active : ''}`}
-                          onClick={(event) => handleDropdownToggle(template.id, event)}
-                        >
-                          <span className={styles.optionsIcon}><i className="fa fa-ellipsis-v" style={{ color: '#6c757d' }}></i></span>
-                        </button>
-                      </div>
-                    )
-                  }
-                ]}
+                            <i className="fa fa-ellipsis-v" style={{ color: '#6c757d' }}></i>
+                          </Button>
+                        </div>
+                      )
+                    }
+                  ]}
               />
             </div>
           )}
@@ -852,8 +866,8 @@ function EmailTemplate({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
                 </div>
 
                 <div className={styles.settingsActions}>
-                  <button 
-                    className={styles.saveSettingsBtn}
+                  <Button 
+                    variant="primary"
                     onClick={async () => {
                       try {
                         setIsSubmitting(true);
@@ -898,16 +912,17 @@ function EmailTemplate({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
                       }
                     }}
                     disabled={isSubmitting}
+                    loading={isSubmitting}
+                    leftIcon={<i className="fa fa-save" style={{ color: '#fff' }}></i>}
                   >
-                    <span className={styles.btnIcon}><i className="fa fa-save" style={{ color: '#fff' }}></i></span>
                     {Ltext("Save Settings")}
-                  </button>
-                  <button 
-                    className={styles.cancelSettingsBtn}
+                  </Button>
+                  <Button 
+                    variant="secondary"
                     onClick={() => setShowEmailSettings(false)}
                   >
                     {Ltext("Cancel")}
-                  </button>
+                  </Button>
                 </div>
                 
                 {/* Error Message */}
@@ -915,13 +930,15 @@ function EmailTemplate({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
                   <div className={styles.errorMessage}>
                     <span className={styles.errorIcon}><i className="fa fa-exclamation-triangle" style={{ color: '#721c24' }}></i></span>
                     <span className={styles.errorText}>{emailSettingsError}</span>
-                    <button 
+                    <Button 
+                      variant="ghost"
+                      size="small"
                       className={styles.errorCloseBtn}
                       onClick={() => setEmailSettingsError('')}
                       title={Ltext("Close error message")}
                     >
                       <i className="fa fa-times" style={{ color: '#721c24' }}></i>
-                    </button>
+                    </Button>
                   </div>
                 )}
               </>
