@@ -1,6 +1,6 @@
 <?php
 
-define('GIBBS_VERSION', '4.5.22');
+define('GIBBS_VERSION', '4.5.23');
 require get_stylesheet_directory() . '/vendor/autoload.php';
 require get_stylesheet_directory() . '/scripts.php';
 use Jumbojett\OpenIDConnectClient;
