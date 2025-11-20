@@ -1,8 +1,9 @@
 import React from 'react';
+import tableStyles from '../assets/scss/table.module.scss';
 
 /**
- * Reusable Table component.
- * Styling is controlled by the caller via class names passed in props.
+ * Reusable Table component with built-in table module styles.
+ * All CSS from table.module.scss is applied by default.
  */
 function Table({
   columns = [],
@@ -11,6 +12,9 @@ function Table({
   tableClassName,
   tableStyle,
   rowStyle,
+  wrapperClassName,
+  wrapperStyle,
+  noWrapper = false,
 }) {
   const resolveRowKey = (item, index) => {
     if (typeof getRowKey === 'function') {
@@ -22,8 +26,13 @@ function Table({
     return index;
   };
 
-  return (
-    <table className={tableClassName} style={tableStyle}>
+  // Combine default table styles with any custom className
+  const finalTableClassName = tableClassName 
+    ? `${tableStyles.table} ${tableClassName}` 
+    : tableStyles.table;
+
+  const tableElement = (
+    <table className={finalTableClassName} style={tableStyle}>
       <thead>
         <tr>
           {columns.map((col, idx) => (
@@ -45,6 +54,22 @@ function Table({
         ))}
       </tbody>
     </table>
+  );
+
+  // If noWrapper is true, return just the table (for backward compatibility)
+  if (noWrapper) {
+    return tableElement;
+  }
+
+  // Otherwise, wrap in tableWrapper with default styles
+  const finalWrapperClassName = wrapperClassName 
+    ? `${tableStyles.tableWrapper} ${wrapperClassName}` 
+    : tableStyles.tableWrapper;
+
+  return (
+    <div className={finalWrapperClassName} style={wrapperStyle}>
+      {tableElement}
+    </div>
   );
 }
 

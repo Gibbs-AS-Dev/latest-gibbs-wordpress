@@ -3,8 +3,8 @@ import axios from 'axios';
 import { Ltext, getLanguage } from '../utils/smsLog-translations';
 import Pagination from '../components/Pagination';
 import Table from '../components/Table';
-import tableStyles from '../assets/scss/table.module.scss';
 import Modal from '../components/Modal';
+import Button from '../components/Button';
 import styles from '../assets/scss/smsLog.module.scss';
 import '../assets/scss/smsLog.scss';
 
@@ -159,12 +159,12 @@ function SmsLog({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
           <div className={styles.error}>
             <h2>{Ltext("Error")}</h2>
             <p>{error}</p>
-            <button 
-              className={styles.btn} 
+            <Button 
+              variant="primary" 
               onClick={fetchSmsLogs}
             >
               {Ltext("Retry")}
-            </button>
+            </Button>
           </div>
         </div>
       </div>  
@@ -200,9 +200,14 @@ function SmsLog({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
                   onChange={handleSearch}
                   className={styles.searchInput}
                 />
-                <button className={styles.searchBtn}>
+                <Button 
+                  variant="ghost" 
+                  size="small"
+                  className={styles.searchBtn}
+                  type="button"
+                >
                   <i className="fa fa-search"></i>
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -211,7 +216,8 @@ function SmsLog({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
             </div>
           </div>
 
-          <div className={tableStyles.tableWrapper}>
+          <div style={{padding: '20px 16px'}}>
+
             {tableLoading ? (
               <div className={styles.tableLoading}>
                 <div className={styles.spinnerSmall}></div>
@@ -219,81 +225,81 @@ function SmsLog({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
               </div>
             ) : (
               <Table
-                tableClassName={`${tableStyles.table} ${styles.smsLogTable}`}
+                tableClassName={styles.smsLogTable}
                 tableStyle={{minWidth: '800px'}}
                 rowStyle={{height: 'auto'}}
                 data={smsLogs}
                 getRowKey={(row) => row.id}
-                columns={[
-                  {
-                    header: Ltext("Date/Time"),
-                    thClassName: tableStyles.w12,
-                    thStyle: { width: '12%' },
-                    tdStyle: { width: '12%' },
-                    tdClassName: styles.dateTimeCell,
-                    render: (log) => {
-                      const updatedDate = log.updated_at ? new Date(log.updated_at) : null;
-                      const dateTimeStr = updatedDate ? updatedDate.toLocaleDateString('nb-NO', {
-                        day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Oslo'
-                      }) + ' ' + updatedDate.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Oslo' }) : '-';
-                      return <div className={styles.dateTimeText}>{dateTimeStr}</div>;
+                  columns={[
+                    {
+                      header: Ltext("Date/Time"),
+                      thStyle: { width: '12%' },
+                      tdStyle: { width: '12%' },
+                      tdClassName: styles.dateTimeCell,
+                      render: (log) => {
+                        const updatedDate = log.updated_at ? new Date(log.updated_at) : null;
+                        const dateTimeStr = updatedDate ? updatedDate.toLocaleDateString('nb-NO', {
+                          day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Oslo'
+                        }) + ' ' + updatedDate.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Oslo' }) : '-';
+                        return <div className={styles.dateTimeText}>{dateTimeStr}</div>;
+                      }
+                    },
+                    {
+                      header: Ltext("Phone Number"),
+                      thStyle: { width: '15%' },
+                      tdStyle: { width: '15%' },
+                      render: (log) => (log.country_code && log.phone_number ? `+${log.country_code} ${log.phone_number}` : (log.phone_number || '-'))
+                    },
+                    {
+                      header: Ltext("SMS Content"),
+                      thStyle: { width: '45%' },
+                      tdStyle: { width: '45%' },
+                      tdClassName: styles.messageCell,
+                      render: (log) => (
+                        <>
+                          <div className={styles.messageText}>
+                            {log.sms_content && log.sms_content.length > 100 ? `${log.sms_content.substring(0, 100)}...` : (log.sms_content || '-')}
+                          </div>
+                          {log.sms_content && log.sms_content.length > 100 && (
+                            <Button 
+                              variant="link" 
+                              size="small"
+                              className={styles.showMoreBtn} 
+                              onClick={() => handleShowMore(log.sms_content)}
+                            >
+                              {Ltext("Show More")}
+                            </Button>
+                          )}
+                        </>
+                      )
+                    },
+                    {
+                      header: Ltext("SMS Cost (kr)"),
+                      thStyle: { width: '15%' },
+                      tdStyle: { width: '15%' },
+                      tdClassName: styles.priceCell,
+                      render: (log) => (
+                        <>
+                          <span className={styles.priceBadge}>{calculateSmsPrice(log.sms_content)} kr</span>
+                          <small className={styles.smsCount}>({calculateSmsPrice(log.sms_content)} SMS)</small>
+                        </>
+                      )
+                    },
+                    {
+                      header: Ltext("Status"),
+                      thStyle: { width: '12%' },
+                      tdStyle: { width: '12%' },
+                      render: (log) => {
+                        const cls = (log.sms_status && log.sms_status.includes('accepted_at'))
+                          ? 'sent'
+                          : ((log.sms_status === 'pending' || log.sms_status === 'waiting') ? 'waiting' : 'failed');
+                        const label = (cls === 'sent') ? Ltext('Sent') : (cls === 'waiting' ? Ltext('Waiting') : Ltext('Not Delivered'));
+                        return (
+                          <span className={`${styles.statusBadge} ${getStatusColor(cls)}`}>{label}</span>
+                        );
+                      }
                     }
-                  },
-                  {
-                    header: Ltext("Phone Number"),
-                    thClassName: tableStyles.w15,
-                    thStyle: { width: '15%' },
-                    tdStyle: { width: '15%' },
-                    render: (log) => (log.country_code && log.phone_number ? `+${log.country_code} ${log.phone_number}` : (log.phone_number || '-'))
-                  },
-                  {
-                    header: Ltext("SMS Content"),
-                    thClassName: tableStyles.w45,
-                    thStyle: { width: '45%' },
-                    tdStyle: { width: '45%' },
-                    tdClassName: styles.messageCell,
-                    render: (log) => (
-                      <>
-                        <div className={styles.messageText}>
-                          {log.sms_content && log.sms_content.length > 100 ? `${log.sms_content.substring(0, 100)}...` : (log.sms_content || '-')}
-                        </div>
-                        {log.sms_content && log.sms_content.length > 100 && (
-                          <button className={styles.showMoreBtn} onClick={() => handleShowMore(log.sms_content)}>
-                            {Ltext("Show More")}
-                          </button>
-                        )}
-                      </>
-                    )
-                  },
-                  {
-                    header: Ltext("SMS Cost (kr)"),
-                    thClassName: tableStyles.w15,
-                    thStyle: { width: '15%' },
-                    tdStyle: { width: '15%' },
-                    tdClassName: styles.priceCell,
-                    render: (log) => (
-                      <>
-                        <span className={styles.priceBadge}>{calculateSmsPrice(log.sms_content)} kr</span>
-                        <small className={styles.smsCount}>({calculateSmsPrice(log.sms_content)} SMS)</small>
-                      </>
-                    )
-                  },
-                  {
-                    header: Ltext("Status"),
-                    thClassName: tableStyles.w12,
-                    thStyle: { width: '12%' },
-                    tdStyle: { width: '12%' },
-                    render: (log) => {
-                      const cls = (log.sms_status && log.sms_status.includes('accepted_at'))
-                        ? 'sent'
-                        : ((log.sms_status === 'pending' || log.sms_status === 'waiting') ? 'waiting' : 'failed');
-                      const label = (cls === 'sent') ? Ltext('Sent') : (cls === 'waiting' ? Ltext('Waiting') : Ltext('Not Delivered'));
-                      return (
-                        <span className={`${styles.statusBadge} ${getStatusColor(cls)}`}>{label}</span>
-                      );
-                    }
-                  }
-                ]}
+                  ]}
               />
             )}
           </div>

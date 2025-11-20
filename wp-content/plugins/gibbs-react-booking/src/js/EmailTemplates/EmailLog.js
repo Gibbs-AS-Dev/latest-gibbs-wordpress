@@ -3,8 +3,8 @@ import axios from 'axios';
 import { Ltext, getLanguage } from '../utils/smsLog-translations';
 import Pagination from '../components/Pagination';
 import Table from '../components/Table';
-import tableStyles from '../assets/scss/table.module.scss';
 import Modal from '../components/Modal';
+import Button from '../components/Button';
 import styles from '../assets/scss/emailLog.module.scss';
 
 function EmailLog({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
@@ -176,12 +176,12 @@ function EmailLog({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
           <div className={styles.error}>
             <h2>{Ltext("Error")}</h2>
             <p>{error}</p>
-            <button 
-              className={styles.btn} 
+            <Button 
+              variant="primary" 
               onClick={fetchEmailLogs}
             >
               {Ltext("Retry")}
-            </button>
+            </Button>
           </div>
         </div>
       </div>  
@@ -217,9 +217,14 @@ function EmailLog({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
                   onChange={handleSearch}
                   className={styles.searchInput}
                 />
-                <button className={styles.searchBtn}>
+                <Button 
+                  variant="ghost" 
+                  size="small"
+                  className={styles.searchBtn}
+                  type="button"
+                >
                   <i className="fa fa-search"></i>
-                </button>
+                </Button>
               </div>
             </div>
 
@@ -228,7 +233,7 @@ function EmailLog({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
             </div>
           </div>
 
-          <div className={tableStyles.tableWrapper}>
+          <div style={{padding: '20px 16px'}}>
             {tableLoading ? (
               <div className={styles.tableLoading}>
                 <div className={styles.spinnerSmall}></div>
@@ -236,95 +241,95 @@ function EmailLog({ page_id, apiUrl, homeUrl, user_token, owner_id }) {
               </div>
             ) : (
               <Table
-                tableClassName={`${tableStyles.table} ${styles.emailLogTable}`}
+                tableClassName={styles.emailLogTable}
                 tableStyle={{minWidth: '1000px'}}
                 rowStyle={{height: 'auto'}}
                 data={emailLogs}
                 getRowKey={(row) => row.id}
-                columns={[
-                  {
-                    header: Ltext("Date"),
-                    thClassName: tableStyles.w15,
-                    thStyle: { width: '15%' },
-                    tdClassName: styles.dateTimeCell,
-                    tdStyle: { width: '15%' },
-                    render: (log) => {
-                      const sentDate = log.sent_date ? new Date(log.sent_date) : null;
-                      const dateTimeStr = sentDate ? sentDate.toLocaleDateString('nb-NO', {
-                        day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Oslo'
-                      }) + ' ' + sentDate.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Oslo' }) : '-';
-                      return (
-                        <div className={styles.dateTimeText}>{dateTimeStr}</div>
-                      );
-                    }
-                  },
-                  {
-                    header: Ltext("Email Address"),
-                    thClassName: tableStyles.w15,
-                    thStyle: { width: '15%' },
-                    tdClassName: styles.emailCell,
-                    tdStyle: { width: '15%' },
-                    render: (log) => (
-                      <div className={styles.emailText}>{log.sent_to_email || '-'}</div>
-                    )
-                  },
-                  {
-                    header: Ltext("Subject"),
-                    thClassName: tableStyles.w20,
-                    thStyle: { width: '30%' },
-                    tdClassName: styles.subjectCell,
-                    tdStyle: { width: '30%' },
-                    render: (log) => (
-                      <div className={styles.subjectText}>{log.subject}</div>
-                    )
-                  },
-                  {
-                    header: Ltext("Email Content"),
-                    thClassName: tableStyles.w40,
-                    thStyle: { width: '30%' },
-                    tdClassName: styles.messageCell,
-                    tdStyle: { width: '30%' },
-                    render: (log) => (
-                      <>
-                        <div className={styles.messageText}>{(log.message ? stripHtml(log.message) : '-')}</div>
-                        {log.message && log.message.length > 100 && (
-                          <button className={styles.showMoreBtn} onClick={() => handleShowMore(log.message)}>
-                            {Ltext("Show More")}
-                          </button>
-                        )}
-                      </>
-                    )
-                  },
-                  {
-                    header: Ltext("Status"),
-                    thClassName: tableStyles.w10,
-                    thStyle: { width: '10%' },
-                    tdStyle: { width: '10%' },
-                    render: (log) => {
-                      const cls = (log.delivery_status == 0 || log.delivery_status == 2 || log.delivery_status == '2')
-                        ? 'failed'
-                        : ((log.delivery_status == 1 || log.delivery_status == '1') ? 'sent' : log.status);
-                      let label = Ltext('Unknown');
-                      if (log.delivery_status === 0 || log.delivery_status === '0' || log.delivery_status === 2 || log.delivery_status === '2' || log.status === 'failed' || log.status === 'stopped' || log.status === 'bounced') {
-                        if (log.status === 'failed') label = Ltext('failed');
-                        else if (log.status === 'stopped') label = Ltext('Not Sent, Requirments Not Met');
-                        else if (log.status === 'bounced') label = Ltext('bounced');
-                        else label = Ltext('Failed');
-                      } else if (log.delivery_status === 1 || log.delivery_status === '1' || log.status === 'sent' || log.status === 'delivered') {
-                        label = Ltext('Sent');
-                      } else if (log.status === 'waiting_for_sending' || log.status === 'waiting') {
-                        label = Ltext('Waiting');
-                      } else if (log.status === 'created') {
-                        label = Ltext('Created');
-                      } else if (log.status === 'sent_once') {
-                        label = Ltext('Sent Once');
+                  columns={[
+                    {
+                      header: Ltext("Date"),
+                      thStyle: { width: '15%' },
+                      tdClassName: styles.dateTimeCell,
+                      tdStyle: { width: '15%' },
+                      render: (log) => {
+                        const sentDate = log.sent_date ? new Date(log.sent_date) : null;
+                        const dateTimeStr = sentDate ? sentDate.toLocaleDateString('nb-NO', {
+                          day: '2-digit', month: '2-digit', year: 'numeric', timeZone: 'Europe/Oslo'
+                        }) + ' ' + sentDate.toLocaleTimeString('nb-NO', { hour: '2-digit', minute: '2-digit', timeZone: 'Europe/Oslo' }) : '-';
+                        return (
+                          <div className={styles.dateTimeText}>{dateTimeStr}</div>
+                        );
                       }
-                      return (
-                        <span className={`${styles.statusBadge} ${getStatusColor(cls)}`}>{label}</span>
-                      );
+                    },
+                    {
+                      header: Ltext("Email Address"),
+                      thStyle: { width: '15%' },
+                      tdClassName: styles.emailCell,
+                      tdStyle: { width: '15%' },
+                      render: (log) => (
+                        <div className={styles.emailText}>{log.sent_to_email || '-'}</div>
+                      )
+                    },
+                    {
+                      header: Ltext("Subject"),
+                      thStyle: { width: '30%' },
+                      tdClassName: styles.subjectCell,
+                      tdStyle: { width: '30%' },
+                      render: (log) => (
+                        <div className={styles.subjectText}>{log.subject}</div>
+                      )
+                    },
+                    {
+                      header: Ltext("Email Content"),
+                      thStyle: { width: '30%' },
+                      tdClassName: styles.messageCell,
+                      tdStyle: { width: '30%' },
+                      render: (log) => (
+                        <>
+                          <div className={styles.messageText}>{(log.message ? stripHtml(log.message) : '-')}</div>
+                          {log.message && log.message.length > 100 && (
+                            <Button 
+                              variant="link" 
+                              size="small"
+                              className={styles.showMoreBtn} 
+                              onClick={() => handleShowMore(log.message)}
+                            >
+                              {Ltext("Show More")}
+                            </Button>
+                          )}
+                        </>
+                      )
+                    },
+                    {
+                      header: Ltext("Status"),
+                      thStyle: { width: '10%' },
+                      tdStyle: { width: '10%' },
+                      render: (log) => {
+                        const cls = (log.delivery_status == 0 || log.delivery_status == 2 || log.delivery_status == '2')
+                          ? 'failed'
+                          : ((log.delivery_status == 1 || log.delivery_status == '1') ? 'sent' : log.status);
+                        let label = Ltext('Unknown');
+                        if (log.delivery_status === 0 || log.delivery_status === '0' || log.delivery_status === 2 || log.delivery_status === '2' || log.status === 'failed' || log.status === 'stopped' || log.status === 'bounced') {
+                          if (log.status === 'failed') label = Ltext('failed');
+                          else if (log.status === 'stopped') label = Ltext('Not Sent, Requirments Not Met');
+                          else if (log.status === 'bounced') label = Ltext('bounced');
+                          else label = Ltext('Failed');
+                        } else if (log.delivery_status === 1 || log.delivery_status === '1' || log.status === 'sent' || log.status === 'delivered') {
+                          label = Ltext('Sent');
+                        } else if (log.status === 'waiting_for_sending' || log.status === 'waiting') {
+                          label = Ltext('Waiting');
+                        } else if (log.status === 'created') {
+                          label = Ltext('Created');
+                        } else if (log.status === 'sent_once') {
+                          label = Ltext('Sent Once');
+                        }
+                        return (
+                          <span className={`${styles.statusBadge} ${getStatusColor(cls)}`}>{label}</span>
+                        );
+                      }
                     }
-                  }
-                ]}
+                  ]}
               />
             )}
           </div>

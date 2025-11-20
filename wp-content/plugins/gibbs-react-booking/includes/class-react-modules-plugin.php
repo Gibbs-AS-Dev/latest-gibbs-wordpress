@@ -823,12 +823,19 @@ class ReactModulesPlugin {
             case 'subscription_discount':
                 $api_url = RMP_PLUGIN_URL . 'server/subscriptionDiscount/subscription-discount-endpoint.php';
                 break;
+            case 'component_gallery':
+            case 'components':
+                // Component gallery doesn't need an API URL
+                $api_url = '';
+                break;
             default:
                 $api_url = '';
                 break;
         }
 
-        if(empty($api_url)){
+        // Only require API URL for components that need it
+        $components_requiring_api = array('subscription_discount');
+        if(in_array($component, $components_requiring_api) && empty($api_url)){
             return "<p>Component endpoint not configured</p>";
         }
 

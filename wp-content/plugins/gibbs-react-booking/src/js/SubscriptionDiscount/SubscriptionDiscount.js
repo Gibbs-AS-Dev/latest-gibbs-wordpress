@@ -4,9 +4,9 @@ import Select from 'react-select';
 import Table from '../components/Table';
 import Modal from '../components/Modal';
 import Pagination from '../components/Pagination';
+import Button from '../components/Button';
 import { Ltext, getLanguage } from '../utils/subscriptionDiscount-translations';
 import styles from '../assets/scss/SubscriptionDiscount.module.scss';
-import tableStyles from '../assets/scss/table.module.scss';
 import '../assets/scss/SubscriptionDiscount.scss';
 
 const INITIAL_FORM_STATE = {
@@ -641,9 +641,13 @@ function SubscriptionDiscount({ apiUrl, user_token, owner_id }) {
             <p className={styles.subtitle}>{Ltext('Manage your subscription discount codes in one place.')}</p>
           </div>
           <div className={styles.headerActions}>
-            <button className={styles.primaryButton} onClick={openCreateModal}>
-              <span>＋</span> {Ltext('Create discount')}
-            </button>
+            <Button
+              variant="primary"
+              onClick={openCreateModal}
+              leftIcon={<span>＋</span>}
+            >
+              {Ltext('Create discount')}
+            </Button>
           </div>
         </div>
 
@@ -665,38 +669,40 @@ function SubscriptionDiscount({ apiUrl, user_token, owner_id }) {
         ) : error ? (
           <div className={styles.emptyState}>
             <p>{error}</p>
-            <button className={styles.primaryButton} onClick={handleRetry}>
+            <Button variant="primary" onClick={handleRetry}>
               {Ltext('Retry')}
-            </button>
+            </Button>
           </div>
         ) : discounts.length === 0 ? (
           <div className={styles.emptyState}>{Ltext('No discounts found')}</div>
         ) : (
           <>
-            <div className={`${styles.tableWrapper} subscription-discount-root`}>
-              <Table
-                data={discounts}
-                getRowKey={(row) => row.id}
-                tableClassName={tableStyles.table}
-                columns={[
-                  {
-                    header: Ltext('Discount type'),
-                    thClassName: tableStyles.w15,
-                    render: (discount) =>
-                      discount.type === 'percentage'
-                        ? Ltext('Percentage discount')
-                        : Ltext('Amount discount')
-                  },
-                  {
-                    header: Ltext('Amount'),
-                    thClassName: tableStyles.w15,
-                    render: (discount) => <span className={styles.valueBadge}>{formatValue(discount)}</span>
-                  },
-                  {
-                    header: Ltext('Activation date'),
-                    thClassName: tableStyles.w20,
-                    render: (discount) => formatDateShort(discount.start_date)
-                  },
+            <Table
+              data={discounts}
+              getRowKey={(row) => row.id}
+              wrapperClassName="subscription-discount-root"
+              columns={[
+                {
+                  header: Ltext('Discount type'),
+                  thStyle: { width: '20%' },
+                  tdStyle: { width: '20%' },
+                  render: (discount) =>
+                    discount.type === 'percentage'
+                      ? Ltext('Percentage discount')
+                      : Ltext('Amount discount')
+                },
+                {
+                  header: Ltext('Amount'),
+                  thStyle: { width: '20%' },
+                  tdStyle: { width: '20%' },
+                  render: (discount) => <span className={styles.valueBadge}>{formatValue(discount)}</span>
+                },
+                {
+                  header: Ltext('Activation date'),
+                  thStyle: { width: '20%' },
+                  tdStyle: { width: '20%' },
+                  render: (discount) => formatDateShort(discount.start_date)
+                },
                   // {
                   //   header: Ltext('Products'),
                   //   thClassName: tableStyles.w25,
@@ -713,55 +719,53 @@ function SubscriptionDiscount({ apiUrl, user_token, owner_id }) {
                   //     return names.length ? names.join(', ') : '—';
                   //   }
                   // },
-                  {
-                    header: Ltext('Status'),
-                    thClassName: tableStyles.w10,
-                    render: (discount) => (
-                      <span className={`${styles.statusBadge} ${resolveStatusBadge(discount)}`}>
-                        {Ltext(discount.lifecycle ? discount.lifecycle.charAt(0).toUpperCase() + discount.lifecycle.slice(1) : discount.status)}
-                      </span>
-                    )
-                  },
-                  {
-                    header: Ltext('Actions'),
-                    thClassName: tableStyles.w15,
-                    render: (discount) => {
+                {
+                  header: Ltext('Status'),
+                  thStyle: { width: '10%' },
+                  tdStyle: { width: '10%' },
+                  render: (discount) => (
+                    <span className={`${styles.statusBadge} ${resolveStatusBadge(discount)}`}>
+                      {Ltext(discount.lifecycle ? discount.lifecycle.charAt(0).toUpperCase() + discount.lifecycle.slice(1) : discount.status)}
+                    </span>
+                  )
+                },
+                {
+                  header: Ltext('Actions'),
+                  thStyle: { width: '30%' },
+                  tdStyle: { width: '30%' },
+                  render: (discount) => {
                       const isActive = discount.status === 'active';
                       const isProcessing = togglingDiscountIds.has(discount.id);
-                      const buttonClassName = [
-                        styles.actionButton,
-                        isActive ? styles.deactivateButton : styles.activateButton
-                      ].join(' ');
 
                       return (
                         <div className={styles.actionGroup}>
-                          <button
-                            type="button"
-                            className={`${styles.actionButton} ${styles.editButton}`}
+                          <Button
+                            variant="outline"
+                            size="small"
                             onClick={() => openEditModal(discount)}
                             disabled={isProcessing || loading}
                           >
                             {Ltext('Edit')}
-                          </button>
-                          <button
-                            type="button"
-                            className={buttonClassName}
+                          </Button>
+                          <Button
+                            variant={isActive ? 'danger' : 'primary'}
+                            size="small"
                             onClick={() => handleToggleStatus(discount)}
                             disabled={isProcessing || loading}
+                            loading={isProcessing}
                           >
                             {isProcessing
                               ? Ltext('Updating...')
                               : isActive
                                 ? Ltext('Deactivate')
                                 : Ltext('Activate')}
-                          </button>
+                          </Button>
                         </div>
                       );
                     }
                   }
                 ]}
-              />
-            </div>
+            />
             <Pagination
               currentPage={page}
               totalPages={paginationMeta.totalPages}
@@ -889,10 +893,20 @@ function SubscriptionDiscount({ apiUrl, user_token, owner_id }) {
           </div>
 
           <div className={styles.buttonRow}>
-            <button type="button" className={styles.secondaryButton} onClick={closeModal} disabled={submitting}>
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={closeModal}
+              disabled={submitting}
+            >
               {Ltext('Cancel')}
-            </button>
-            <button type="submit" className={styles.submitButton} disabled={submitting}>
+            </Button>
+            <Button
+              type="submit"
+              variant="primary"
+              disabled={submitting}
+              loading={submitting}
+            >
               {submitting
                 ? isEditing
                   ? Ltext('Updating...')
@@ -900,7 +914,7 @@ function SubscriptionDiscount({ apiUrl, user_token, owner_id }) {
                 : isEditing
                   ? Ltext('Update')
                   : Ltext('Save')}
-            </button>
+            </Button>
           </div>
         </form>
       </Modal>
