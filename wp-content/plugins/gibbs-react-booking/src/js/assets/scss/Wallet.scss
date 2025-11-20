@@ -1,0 +1,67 @@
+// ============================================================================
+// WALLET GLOBAL STYLES
+// ============================================================================
+
+// Global wallet styles that might be needed across the application
+.rmp-wallet-container {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  
+  // Ensure proper box-sizing
+  * {
+    box-sizing: border-box;
+  }
+  
+  // Reset button styles
+  button {
+    font-family: inherit;
+  }
+  
+  // Ensure proper focus states for accessibility
+  input:focus,
+  button:focus {
+    outline: 2px solid #1a9a94;
+    outline-offset: 2px;
+  }
+  
+  // Custom scrollbar for transaction table
+  .transactionTable .tableBody::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .transactionTable .tableBody::-webkit-scrollbar-track {
+    background: #f8f9fa;
+  }
+  
+  .transactionTable .tableBody::-webkit-scrollbar-thumb {
+    background: #1a9a94;
+    border-radius: 4px;
+  }
+  
+  .transactionTable .tableBody::-webkit-scrollbar-thumb:hover {
+    background: #158a84;
+  }
+}
+
+// Print styles for wallet
+@media print {
+  .rmp-wallet-container {
+    .balanceActions,
+    .searchContainer,
+    .modalOverlay {
+      display: none !important;
+    }
+    
+    .walletContainer {
+      background: white !important;
+      color: black !important;
+      padding: 1rem !important;
+    }
+    
+    .balanceSection,
+    .transactionSection {
+      background: #f8f9fa !important;
+      border: 1px solid #dee2e6 !important;
+      margin-bottom: 1rem !important;
+    }
+  }
+} 

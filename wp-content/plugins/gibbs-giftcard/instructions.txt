@@ -1,0 +1,13 @@
+
+
+Idea of this file= 
+
+Some bried info for the AI, so it is easy for it do work. (Think that the AI does not know about anything outside of this folder)
+
+@order info 
+woocoommerce structure
+
+
+
+Booking info
+$table = $wpdb->prefix.'bookings_calendar';

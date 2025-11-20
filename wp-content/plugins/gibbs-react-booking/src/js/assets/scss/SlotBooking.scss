@@ -1,0 +1,338 @@
+/* React Modules Plugin - Styles */
+$primary-color: #007cba;
+$primary-dark: #005a87;
+$success-color: #155724;
+$success-bg: #d4edda;
+$success-border: #c3e6cb;
+$error-color: #721c24;
+$error-bg: #f8d7da;
+$error-border: #f5c6cb;
+$text-color: #333;
+$text-light: #666;
+$border-color: #e9ecef;
+$shadow-light: rgba(0, 0, 0, 0.1);
+$shadow-medium: rgba(0, 0, 0, 0.12);
+$border-radius: 8px;
+$border-radius-large: 16px;
+$transition: all 0.3s ease;
+
+// Typography Variables
+$font-family-primary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+$font-family-secondary: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+// Font Sizes
+$font-size-xs: 11px;
+$font-size-sm: 13px;
+$font-size-base: 15px;
+$font-size-md: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 20px;
+$font-size-2xl: 24px;
+$font-size-3xl: 28px;
+$font-size-4xl: 32px;
+
+// Font Weights
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+$font-weight-extrabold: 800;
+
+// Line Heights
+$line-height-tight: 1.2;
+$line-height-normal: 1.4;
+$line-height-relaxed: 1.6;
+
+.hide-slot-border .rmp-slot-booking-header {
+  border: none;
+  box-shadow: none;
+  padding: 14px;
+}
+.hide-slot-border .header_top {
+  display: none;
+}
+
+.rmp-slot-booking {
+  .react-datepicker {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    font-family: $font-family-primary;
+    width: 100%;
+    
+    &__month-container {
+      background: transparent;
+      width: 100%;
+    }
+    
+    &__header {
+      background: transparent;
+      border: none;
+      padding-top: 0;
+    }
+    
+    &__current-month {
+      font-family: $font-family-primary;
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: $text-color;
+      margin-bottom: 12px;
+      letter-spacing: -0.01em;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      line-height: $line-height-tight;
+    }
+    
+    &__day-names {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2px;
+    }
+    
+    &__day-name {
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+      font-family: $font-family-primary;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: #888;
+      margin: 0 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    
+    &__week {
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    &__day {
+      width: 40px;
+      height: 40px;
+      margin: 2px;
+      border-radius: 8px;
+      background: #e0e0e0;
+      color: #bdbdbd;
+      font-family: $font-family-primary;
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: none;
+      transition: background 0.2s, color 0.2s;
+      cursor: not-allowed;
+      
+      &:not(.react-datepicker__day--disabled) {
+        background: #fff;
+        color: $text-color;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s, border 0.2s;
+        
+        &:hover {
+          background: #009688;
+          color: #fff;
+          border: 2px solid #00796b;
+        }
+      }
+      
+      &--selected,
+      &--keyboard-selected {
+       // background: #009688 !important;
+        //color: #fff !important;
+        border: 2px solid #00796b;
+      }
+      
+      &--in-range,
+      &--in-selecting-range {
+        background: #b2dfdb !important;
+        color: #009688 !important;
+      }
+      
+      &--disabled {
+        background: #e0e0e0 !important;
+        color: #bdbdbd !important;
+        cursor: not-allowed !important;
+        opacity: 1 !important;
+      }
+      
+      &--outside-month {
+        background: #f5f5f5 !important;
+        color: #d1d1d1 !important;
+      }
+      
+      &:focus {
+        outline: none;
+        box-shadow: none;
+      }
+    }
+    
+    &__navigation {
+      top: 18px;
+      width: 44px;
+      height: 44px;
+      background: #009688;
+      border-radius: 12px;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s, box-shadow 0.2s;
+      box-shadow: 0 4px 12px rgba(0, 150, 136, 0.2);
+      cursor: pointer;
+      
+      &:hover {
+        background: #00796b;
+        box-shadow: 0 6px 20px rgba(0, 150, 136, 0.3);
+      }
+      
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(0, 150, 136, 0.3);
+      }
+      
+      &--previous {
+        position: absolute;
+        left: -8px;
+        top: -15px;
+        
+        &::after {
+          content: '';
+          display: block;
+          width: 18px;
+          height: 18px;
+          margin: 0 auto;
+          background: url('data:image/svg+xml;utf8,<svg fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg>') no-repeat center center;
+          background-size: 18px 18px;
+        }
+      }
+      
+      &--next {
+        position: absolute;
+        right: -8px;
+        top: -15px;
+        
+        &::after {
+          content: '';
+          display: block;
+          width: 18px;
+          height: 18px;
+          margin: 0 auto;
+          background: url('data:image/svg+xml;utf8,<svg fill="white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>') no-repeat center center;
+          background-size: 18px 18px;
+        }
+      }
+    }
+    
+    &__navigation-icon {
+      position: relative;
+      z-index: 1;
+      font-weight: bold;
+      display: none !important;
+      
+      &::before {
+        border-color: #fff;
+        border-width: 2px 2px 0 0;
+        height: 8px;
+        width: 8px;
+        top: 8px;
+      }
+    }
+    
+    &__triangle {
+      display: none;
+    }
+    
+    &__month {
+      margin: 0;
+    }
+    
+    &__input-container {
+      display: none;
+    }
+    
+    &__aria-live {
+      display: none;
+    }
+  }
+  .price-data{
+    margin-top: 24px;
+    border-top: 1px solid #e0e0e0;
+    background-color: #fff;
+    padding: 12px 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+      .price-data-item{
+    font-family: $font-family-primary;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    line-height: $line-height-normal;
+    .price-data-item-value{ 
+      color: #008474;
+    }
+    
+    &.loading-item {
+      .price-data-item-value {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        .loading-spinner {
+          width: 16px;
+          height: 16px;
+          border: 2px solid #e0e0e0;
+          border-top: 2px solid #008474;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+  }
+  }
+}
+// Responsive Design
+@media (max-width: 500px) {
+  .rmp-slot-booking {
+    max-width: 98vw;
+    
+    // &-header,
+    // &-card {
+    //   padding-left: 0;
+    //   padding-right: 0;
+    // }
+    
+    .react-datepicker {
+      &__day,
+      &__day-name {
+        width: 32px;
+        height: 32px;
+        line-height: 32px;
+        font-size: $font-size-sm;
+      }
+    }
+    
+    &-calendar-container {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      transform: none;
+      width: 100%;
+      max-width: none;
+      margin-top: 8px;
+      z-index: 1000;
+      
+      // Prevent viewport jumping on mobile
+      max-height: 80vh;
+      overflow-y: auto;
+      
+      // Ensure proper positioning relative to parent
+      box-sizing: border-box;
+    }
+  }
+  
+}

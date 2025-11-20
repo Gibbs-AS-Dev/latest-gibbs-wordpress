@@ -1,0 +1,32 @@
+# This .gitignore is designed to ONLY track:
+#   /wp-content/plugins/
+#   /wp-content/themes/
+#
+# It ignores all WordPress core files and other content.
+# -----------------------------------------------------------------
+
+# 1. Ignore all files and directories in the root
+/*
+
+# 2. But, DO NOT ignore the .gitignore file itself
+!/.gitignore
+
+# 3. And DO NOT ignore the wp-content directory (so Git can see inside it)
+!/wp-content/
+
+# 4. Now, ignore everything INSIDE wp-content...
+/wp-content/*
+
+# 5. ...EXCEPT for the plugins and themes directories.
+# This tells Git to track these folders and ALL files/folders inside them.
+!/wp-content/plugins/
+!/wp-content/themes/
+
+# 6. (Optional) Ignore common system files or backups
+#    that might end up inside your themes/plugins folders.
+.DS_Store
+Thumbs.db
+*.log
+*.zip
+*.sql
+php_errorlog

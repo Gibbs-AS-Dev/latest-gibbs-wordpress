@@ -1,0 +1,56 @@
+# Copyright (C) 2025 bPlugins
+# This file is distributed under the GPLv3.
+msgid ""
+msgstr ""
+"Project-Id-Version: Team Section - Block 1.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/team-section\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2025-02-17T09:34:12+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.8.1\n"
+"X-Domain: team-section\n"
+
+#. Plugin Name of the plugin
+msgid "Team Section - Block"
+msgstr ""
+
+#. Description of the plugin
+msgid "Makes background element scrolls slower than foreground content."
+msgstr ""
+
+#. Author of the plugin
+msgid "bPlugins"
+msgstr ""
+
+#. Author URI of the plugin
+msgid "http://bplugins.com"
+msgstr ""
+
+#: build/block.json
+msgctxt "block title"
+msgid "Team Section"
+msgstr ""
+
+#: build/block.json
+msgctxt "block description"
+msgid "Showcase team members in various layouts and designs."
+msgstr ""
+
+#: build/block.json
+msgctxt "block keyword"
+msgid "team"
+msgstr ""
+
+#: build/block.json
+msgctxt "block keyword"
+msgid "members"
+msgstr ""
+
+#: build/block.json
+msgctxt "block keyword"
+msgid "team members"
+msgstr ""

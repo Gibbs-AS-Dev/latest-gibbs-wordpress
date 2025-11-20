@@ -1,0 +1,455 @@
+// ============================================================================
+// SMS LOG COMPONENT STYLES - Matching Email Template Design
+// ============================================================================
+
+// Main SMS Log Wrapper - Matching email template design
+.smsLogWrapper {
+  padding: 20px;
+  // background-color: #f5f5f5;
+  min-height: 100vh;
+}
+
+.smsLogContainer {
+  // max-width: 1200px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  overflow: visible; // Allow dropdown menus to escape container bounds
+}
+
+  // Loading and Error States
+  .loading, .error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #e0e0e0;
+    border-top: 4px solid #1a9a94;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+
+  .spinnerSmall {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #ffffff;
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .error h2 {
+    color: #ff6b6b;
+    margin-bottom: 1rem;
+  }
+
+  .btn {
+    background-color: #1a9a94;
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #158a84;
+    }
+  }
+
+// SMS Log Section - Matching email template design
+.smsLogSection {
+  padding: 0px;
+}
+
+.smsLogHeader {
+  margin-bottom: 30px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 20px;
+  padding: 16px 15px;
+}
+
+.smsLogTitle {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.smsLogInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+// Control Bar Styles - Matching email template design
+.controlBar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+  padding: 19px;
+  border-radius: 8px;
+  flex-wrap: wrap;
+  gap: 17px;
+}
+
+.leftControls {
+  display: flex;
+  align-items: center;
+}
+
+.filterControls {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.filterLabel {
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.searchControls {
+  display: flex;
+  align-items: center;
+}
+
+.searchContainer {
+  position: relative;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  overflow: hidden;
+  background: white;
+}
+
+.searchInput {
+  border: none;
+  padding: 8px 12px;
+  font-size: 14px;
+  min-width: 200px;
+  
+  &:focus {
+    outline: none;
+  }
+  
+  &::placeholder {
+    color: #999;
+  }
+}
+
+.searchBtn {
+  background: #f8f9fa;
+  border: none;
+  padding: 8px 12px;
+  cursor: pointer;
+  border-left: 1px solid #dee2e6;
+  transition: background 0.2s ease;
+  
+  &:hover {
+    background: #e9ecef;
+  }
+}
+
+.displayInfo {
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.btnIcon {
+  font-size: 16px;
+  color: white;
+}
+
+.itemCount {
+  color: #1a9a94;
+  font-size: 14px;
+  white-space: nowrap;
+  opacity: 0.8;
+}
+
+// Table Loading State
+.tableLoading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+  padding: 2rem;
+  
+  .spinnerSmall {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e0e0e0;
+    border-top: 3px solid #1a9a94;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 1rem;
+  }
+  
+  p {
+    margin: 0;
+    color: #6c757d;
+    font-size: 14px;
+    font-weight: 500;
+  }
+}
+
+  // Date/Time cell styling
+  .dateTimeCell {
+    .dateTimeText {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: normal;
+      line-height: 1.4;
+      word-wrap: break-word;
+      word-break: break-word;
+    }
+  }
+
+  // Subject cell styling
+  .subjectCell {
+    .subjectText {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: normal;
+      line-height: 1.4;
+      word-wrap: break-word;
+      word-break: break-word;
+      hyphens: auto;
+    }
+  }
+
+  // Message cell styling
+  .messageCell {
+    .messageText {
+      max-width: calc(100% - 80px); // Account for button width
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: normal;
+      line-height: 1.4;
+      max-height: 2.8em; // Two lines (1.4 * 2)
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      line-clamp: 2;
+      -webkit-box-orient: vertical;
+      word-wrap: break-word;
+      display: inline-block;
+      vertical-align: middle;
+    }
+
+    // Show More button styling
+    .showMoreBtn {
+      background: linear-gradient(135deg, #1a9a94 0%, #158a84 100%);
+      color: white;
+      border: none;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-left: 8px;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      box-shadow: 0 2px 8px rgba(26, 154, 148, 0.2);
+      display: inline-block;
+      vertical-align: middle;
+      white-space: nowrap;
+
+      &:hover {
+        background: linear-gradient(135deg, #158a84 0%, #1a9a94 100%);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(26, 154, 148, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+// Popup modal styling - Matching email template design
+.popupBody {
+  padding: 20px;
+  
+  .messageInfo {
+    .messageContent {
+      margin-bottom: 20px;
+      
+      h4 {
+        margin: 0 0 10px 0;
+        color: #333;
+        font-size: 16px;
+        font-weight: 600;
+      }
+    }
+    
+    .messageDetails {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      
+      .detailRow {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+        
+        .detailLabel {
+          font-weight: 500;
+          color: #333;
+          font-size: 14px;
+        }
+        
+        .detailValue {
+          font-weight: 600;
+          color: #1a9a94;
+          font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+  // Price cell styling
+  .priceCell {
+    text-align: center;
+    
+    .priceBadge {
+      display: block;
+      background: linear-gradient(135deg, #1a9a94 0%, #158a84 100%);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 4px;
+      box-shadow: 0 2px 8px rgba(26, 154, 148, 0.2);
+    }
+    
+    .smsCount {
+      display: block;
+      color: #6c757d;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+// Enhanced status badges - Keeping original colors
+.statusBadge {
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  display: inline-block;
+  min-width: 80px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+  // Status Badges - Enhanced styles for SMS (matching booking management)
+  .statusSent {
+    background: linear-gradient(135deg, #49ca84 0%, #49ca84 100%);
+    color: white;
+    border: 1px solid rgba(40, 167, 69, 0.3);
+  }
+
+  .statusFailed {
+    background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+    color: white;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+  }
+
+  .statusWaiting {
+    background: linear-gradient(135deg, #ffc800 0%, #ffc800 100%);
+    color: white;
+    border: 1px solid rgba(253, 126, 20, 0.3);
+  }
+
+  .statusDefault {
+    background: linear-gradient(135deg, #1a9a94 0%, #158a84 100%);
+    color: white;
+    border: 1px solid rgba(26, 154, 148, 0.3);
+  }
+
+  // Responsive Design
+  @media (max-width: 768px) {
+    .smsLogContainer {
+      padding: 1rem;
+    }
+    
+    .smsLogSection {
+      padding: 1rem;
+    }
+    
+    .smsLogHeader {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .searchInput {
+      width: 100%;
+      max-width: 300px;
+    }
+    
+  }
+
+  @media (max-width: 480px) {
+    .smsLogContainer {
+      padding: 0.5rem;
+    }
+    
+    .smsLogSection {
+      padding: 0.5rem;
+    }
+    
+    .smsLogTitle {
+      font-size: 1.25rem;
+    }
+    
+    .searchInput {
+      font-size: 14px;
+      padding: 10px 12px;
+    }
+  } 

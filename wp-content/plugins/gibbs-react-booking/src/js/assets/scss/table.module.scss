@@ -1,0 +1,84 @@
+// Shared table styles
+
+.tableWrapper {
+  overflow-x: auto;
+  overflow-y: visible;
+  max-width: 100%;
+  background: #ffffff;
+  border-radius: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px 16px;
+}
+
+.table {
+  background-color: #ffffff;
+  border-radius: 0;
+  overflow: visible;
+  border: none;
+  width: 100%;
+  transform: translateZ(0);
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #ffffff;
+    table-layout: fixed;
+  }
+
+  thead {
+    background: #FCFDFE;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    border-bottom: 1px solid #dee2e6;
+  }
+
+  th {
+    padding: 16px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #343a40;
+    text-align: left;
+    text-transform: none;
+    letter-spacing: normal;
+    border: none;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #e9ecef;
+  }
+
+  td {
+    padding: 16px;
+    font-size: 14px;
+    color: #333333;
+    vertical-align: middle;
+    border: none;
+    position: relative;
+    white-space: normal;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+// Utility classes to set column widths (can be composed with per-column)
+.w5 { width: 5%; }
+.w10 { width: 10%; }
+.w12 { width: 12%; }
+.w15 { width: 15%; }
+.w20 { width: 20%; }
+.w25 { width: 25%; }
+.w30 { width: 30%; }
+.w35 { width: 35%; }
+.w40 { width: 40%; }
+.w45 { width: 45%; }
+.w50 { width: 50%; }
+
+
