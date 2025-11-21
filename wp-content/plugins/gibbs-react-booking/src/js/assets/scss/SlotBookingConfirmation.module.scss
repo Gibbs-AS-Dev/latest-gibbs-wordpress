@@ -1095,17 +1095,20 @@ $line-height-relaxed: 1.6;
 
 .socialBtnVipps {
     background: #FF5B24;
+    color: #fff;
     
     &:hover {
         background: #e64e1f;
+        color: #fff;
     }
 }
 
 .socialBtnFacebook {
     background: #3B82F6;
-    
+    color: #fff;
     &:hover {
         background: #2563eb;
+        color: #fff;
     }
 }
 
@@ -1115,14 +1118,16 @@ $line-height-relaxed: 1.6;
     
     &:hover {
         background: #c53929;
+        color: #fff;
     }
 }
 
 .socialBtnMicrosoft {
     background: #3B82F6;
-    
+    color: #fff;
     &:hover {
         background: #2563eb;
+        color: #fff;
     }
 }
 

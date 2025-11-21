@@ -73,6 +73,9 @@ class SlotBookingApi extends CoreApiHandler {
             case 'get_booking_by_id':
                 $this->getBookingById($data);
                 break;
+            case 'getExtraFields':
+                $this->getExtraFields($data);
+                break;
             case 'getListingImage':
                 $this->getListingImage($data);
                 break;
@@ -173,7 +176,7 @@ class SlotBookingApi extends CoreApiHandler {
             <script>
                 window.opener.postMessage(
                     { error: 'No response from the popup' },
-                    window.location.origin
+                    "*"
                 );
                 window.close();
             </script>
@@ -191,7 +194,7 @@ class SlotBookingApi extends CoreApiHandler {
             <script>
                 window.opener.postMessage(
                     { code: '<?php echo $data['code']; ?>' },
-                    window.location.origin
+                    "*"
                 );
                 window.close();
             </script>
@@ -697,6 +700,74 @@ class SlotBookingApi extends CoreApiHandler {
         }
 
         CoreResponse::success($payment_methods, 'Payment methods retrieved successfully');
+    }
+
+    public function getExtraFields($data) {
+        try{
+            if ( ! function_exists( 'get_current_user_id' ) ) {
+                // Try to include WordPress core if not already loaded
+                $wp_load_path = dirname( __FILE__, 6 ) . '/wp-load.php';
+                if ( file_exists( $wp_load_path ) ) {
+                    require_once( $wp_load_path );
+                }else{
+                    CoreResponse::error('WordPress core not found', 400);
+                }
+            }
+
+            
+            if(!is_user_logged_in()){
+                CoreResponse::error('User not logged in', 400);
+            }
+            $group_id = "";
+
+            $fields_data = array();
+
+            if (function_exists('advanced_fields')) {
+
+                $listing_id = $data['listing_id'];
+
+                $listing_data = $this->getDatabase()->getPost($listing_id);
+
+                if(isset($listing_data['users_groups_id']) && $listing_data['users_groups_id'] != ""){
+                   $group_id = $listing_data['users_groups_id'];
+
+                    $fields_rowssss = advanced_fields(0, $group_id, 0, array(), 0, true, "booking_summery");
+
+                    if(!empty($fields_rowssss)){
+                        $fields_data[] = $fields_rowssss;
+                    }
+                }
+            }
+
+            if(!empty($fields_data)){
+
+                $field_btn_action = "";
+
+                if($group_id != ""){
+                    $group_admin = $this->getDatabase()->getGroupAdmin($group_id);
+
+                    if($group_admin != ""){
+
+                        $user_meta_keys = array("field_btn_action");
+                        $user_meta = $this->getDatabase()->getUserMetaMultiple($group_admin, $user_meta_keys);
+                        if(isset($user_meta['field_btn_action']) && $user_meta['field_btn_action'] != ""){
+                            $field_btn_action = $user_meta['field_btn_action'];
+                        }
+                    }
+                }
+                $fields_rows = array(
+                    'fields' => $fields_data,
+                    'field_btn_action' => $field_btn_action
+                );
+            }else{
+                $fields_rows = array();
+            }
+
+            CoreResponse::success($fields_rows, 'Extra fields retrieved successfully');
+            //echo "<pre>"; print_r($fields_rows); die;
+        }catch(Exception $e){
+            CoreResponse::error('Error fetching extra fields', 400);
+        }
     }
 
     public function getListingImage($data) {

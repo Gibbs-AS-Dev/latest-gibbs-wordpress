@@ -485,7 +485,7 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
 
   useEffect(() => {
     const listener = (event) => {
-      if (event.origin !== window.location.origin) return; // security check
+      //if (event.origin !== window.location.origin) return; // security check
       if (event.data?.error) {
         if(popup){
           console.log('Popup closed due to error:', event.data.error);
@@ -646,6 +646,7 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
         if(response.data.data.listing_id){
           fetchListingImage(response.data.data.listing_id);
           fetchListingMeta(response.data.data.listing_id);
+          fetchExtraFields(response.data.data.listing_id);
         }
       } else {
         setError(Ltext(response.data.message) || Ltext("Failed to load booking confirmation"));
@@ -655,6 +656,20 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
       setError(Ltext("Error loading booking confirmation"));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchExtraFields = async (listing_id) => {
+    try {
+      const response = await axios.get(`${apiUrl}?action=getExtraFields&listing_id=${listing_id}`);
+      console.log("response", response);
+      // if (response.data.success) {
+      //   setExtraFields(response.data.data);
+      // } else {
+      //   setError(Ltext(response.data.message) || Ltext("Failed to load extra fields"));
+      // }
+    } catch (err) {
+      console.error('Error fetching extra fields:', err);
     }
   };
 
@@ -1163,14 +1178,14 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
               </form>
               
               {/* Social Login Separator */}
-              <div className={styles.socialLoginSeparator} style={{ display:  'none' }}>
+              <div className={styles.socialLoginSeparator}>
                 <span className={styles.separatorLine}></span>
                 <span className={styles.separatorText}>{Ltext("or log in with")}</span>
                 <span className={styles.separatorLine}></span>
               </div>
 
               {/* Social Login Buttons */}
-              <div className={styles.socialLoginButtons} style={{ display:  'none' }}>
+              <div className={styles.socialLoginButtons}>
                 <button 
                   type="button" 
                   className={`${styles.socialBtn} ${styles.socialBtnVipps}`}

@@ -428,6 +428,22 @@ class CoreDatabase {
     public function getTablePrefix() {
         return $this->wp_prefix;
     }
+    public function getGroupAdmin($group_id) {
+        $sql = "SELECT * FROM {$this->wp_prefix}users_groups WHERE ID = :group_id";
+        try {
+            $stmt = $this->connection->prepare($sql);
+            $stmt->bindParam(':group_id', $group_id, PDO::PARAM_INT);
+            $stmt->execute();
+            $data = $stmt->fetch();
+            if(isset($data['group_admin']) && $data['group_admin'] != ""){
+                return $data['group_admin'];
+            }
+            return "";
+        }catch (PDOException $e) {
+            return "";
+            throw new Exception('Failed to get group admin: ' . $e->getMessage());
+        }
+    }
     public function getSubscriptionDiscount($post_author, $listing_id, $cr_user_id, $subscription_product_ids) {
         $sql = "SELECT * FROM {$this->wp_prefix}posts WHERE post_author = :post_author AND post_type = 'subscriptiondiscount' AND post_status = 'publish'";
         try {
