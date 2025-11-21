@@ -245,6 +245,7 @@ function BookingContainer({ listing_id, apiUrl, homeUrl, pluginUrl, initialBooki
     // Handle waiting payment
     const handleWaitingPayment = () => {
         setCurrentView('waitingPayment');
+        setShowTimerBanner(false);
     };
     useEffect(() => {
         // setCurrentView('dibsCheckout');
