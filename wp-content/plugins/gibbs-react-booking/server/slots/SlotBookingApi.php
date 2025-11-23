@@ -715,9 +715,9 @@ class SlotBookingApi extends CoreApiHandler {
             }
 
             
-            if(!is_user_logged_in()){
-                CoreResponse::error('User not logged in', 400);
-            }
+            // if(!is_user_logged_in()){
+            //     CoreResponse::error('User not logged in', 400);
+            // }
             $group_id = "";
 
             $fields_data = array();
@@ -902,9 +902,21 @@ class SlotBookingApi extends CoreApiHandler {
         if($payment_method != "dintero" && $payment_method != "dibs_easy" && $payment_method != "cod" && $payment_method != "nets_easy"){
             CoreResponse::error('Payment method not found', 400);
         }
+
+        $extraFields = null;
+
+        if(isset($data['extraFields']) && $data['extraFields'] != "" && $data['extraFields'] != null){
+            $extraFieldsData = $data['extraFields'];
+
+            if(!empty($extraFieldsData)){
+                $extraFields = maybe_serialize($extraFieldsData);
+            }
+        }
         
 
         //$payment_data = $this->netsEasyPayment(82809,"nets_easy");
+
+       // echo "<pre>"; print_r($extraFields); die;
 
        
 
@@ -979,6 +991,7 @@ class SlotBookingApi extends CoreApiHandler {
                 'comment' =>  $comment_data,
                 'type' =>  'reservation',
                 'booking_extra_data'    =>  $booking_extra_data,
+                'fields_data' => $extraFields,
                 'price' => $priceData['org_total_price'],
             );
 

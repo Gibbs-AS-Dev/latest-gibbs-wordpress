@@ -397,6 +397,163 @@ $line-height-relaxed: 1.6;
             line-height: $line-height-normal;
         }
     }
+
+    // Extra Fields Section
+    .extraFieldsSection {
+        margin-top: 32px;
+        margin-bottom: 24px;
+
+        .sectionDivider {
+            border: none;
+            border-top: 1px solid $border-color;
+            margin: 12px 0 24px 0;
+        }
+
+        .extraFieldsCards {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .extraFieldCard {
+            // @include card-style;
+           // padding: 24px;
+            position: relative;
+           // transition: box-shadow 0.3s ease, transform 0.2s ease;
+
+            // &:hover {
+            //     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.12);
+            // }
+
+            .cardHeader {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 20px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid $border-color;
+
+                .cardTitle {
+                    font-family: $font-family-primary;
+                    font-size: $font-size-lg;
+                    font-weight: $font-weight-semibold;
+                    color: $text-color;
+                    margin: 0;
+                }
+
+                .deleteCardBtn {
+                    background: none;
+                    border: none;
+                    cursor: pointer;
+                    padding: 6px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 4px;
+                    transition: all 0.2s ease;
+                    color: #dc3545;
+
+                    &:hover {
+                        background-color: #fff5f5;
+                        transform: scale(1.1);
+                    }
+
+                    &:active {
+                        transform: scale(0.95);
+                    }
+
+                    svg {
+                        display: block;
+                    }
+                }
+            }
+
+            .cardBody {
+                display: flex;
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        .extraFieldWrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+
+            label {
+                font-family: $font-family-primary;
+                font-size: $font-size-sm;
+                font-weight: $font-weight-semibold;
+                color: $text-color;
+                margin: 0;
+
+                // &.required::after {
+                //     content: " *";
+                //     color: #dc3545;
+                // }
+            }
+
+            .extraFieldInput {
+                @include form-field;
+                width: 100%;
+            }
+
+            .checkboxGroup {
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                margin-top: 4px;
+
+                .checkboxLabel {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    font-family: $font-family-primary;
+                    font-size: $font-size-base;
+                    color: $text-color;
+                    cursor: pointer;
+                    padding: 8px;
+                    border-radius: 4px;
+                    transition: background-color 0.2s ease;
+
+                    &:hover {
+                        background-color: #f8f9fa;
+                    }
+
+                    .extraFieldCheckbox {
+                        width: 18px;
+                        height: 18px;
+                        accent-color: $primary-color;
+                        cursor: pointer;
+                        flex-shrink: 0;
+                    }
+
+                    span {
+                        user-select: none;
+                    }
+                }
+            }
+
+            .childrenFields {
+                margin-top: 16px;
+                padding: 16px;
+                padding-left: 20px;
+                border-left: 3px solid $primary-color;
+                background-color: #f8f9fa;
+                border-radius: 4px;
+            }
+        }
+
+        .addFieldBtn {
+            @include gradient-button;
+            width: 100%;
+            padding: 14px 24px;
+            font-size: $font-size-base;
+            font-weight: $font-weight-medium;
+            margin-top: 8px;
+        }
+    }
     .sectionTitlePayment {
         font-family: $font-family-primary;
         font-size: $font-size-2xl;

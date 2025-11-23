@@ -220,6 +220,10 @@ class CoreDatabase {
         if(isset($booking_data['comment']) && !empty($booking_data['comment'])){
             $data['comment'] = $booking_data['comment'];
         }
+
+        if(isset($booking_data['fields_data']) && !empty($booking_data['fields_data'])){
+            $data['fields_data'] = $booking_data['fields_data'];
+        }
         
         $columns = array_keys($data);
         $placeholders = array_map(function($column) {

@@ -76,6 +76,10 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
   const [popup, setPopup] = useState(null);
   const [popupProvider, setPopupProvider] = useState(null);
 
+  const [extraFields, setExtraFields] = useState([]);
+  const [extraFieldValues, setExtraFieldValues] = useState({});
+  const [showAddFieldBtn, setShowAddFieldBtn] = useState(false);
+
   useLayoutEffect(() => {
     if(!confirmationContainerRef.current){
       return;
@@ -662,12 +666,21 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
   const fetchExtraFields = async (listing_id) => {
     try {
       const response = await axios.get(`${apiUrl}?action=getExtraFields&listing_id=${listing_id}`);
-      console.log("response", response);
-      // if (response.data.success) {
-      //   setExtraFields(response.data.data);
-      // } else {
-      //   setError(Ltext(response.data.message) || Ltext("Failed to load extra fields"));
-      // }
+      if(response.data.success && response.data.data && response.data.data.fields){
+        const fields = response.data.data.fields;
+        setExtraFields(fields);
+
+        if(response.data.data.field_btn_action && response.data.data.field_btn_action == "true"){
+          setShowAddFieldBtn(true);
+        }else{
+          setShowAddFieldBtn(false);
+        }
+        
+        // Initialize field values for group 0
+        setExtraFieldValues(initializeGroup(0, fields[0]));
+      }else{
+        //setError(Ltext(response.data.message) || Ltext("Failed to load extra fields"));
+      }
     } catch (err) {
       console.error('Error fetching extra fields:', err);
     }
@@ -977,6 +990,10 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
       errors.paymentMethod = Ltext("Please select a payment method");
     }
 
+    // Validate extra fields
+    const extraFieldErrors = validateExtraFields();
+    Object.assign(errors, extraFieldErrors);
+
     // Set errors if any
     if (Object.keys(errors).length > 0) {
       setValidationErrors(errors);
@@ -1025,6 +1042,8 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
       termsAccepted,
       // Include chosen payment method for backend
       paymentMethod: selectedPaymentMethod,
+      // Include extra fields data in array format
+      extraFields: transformExtraFieldsToArray(),
     };
 
     submitBooking(submissionData);
@@ -1033,6 +1052,388 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
 
   const handlePrint = () => {
     window.print();
+  };
+
+  // Helper: Get field value key (supports nested children)
+  // For nested: parentPath already includes groupIndex, so we just append fieldName
+  const getFieldKey = (fieldName, groupIndex, parentPath = '') => {
+    if (parentPath) {
+      // parentPath format: "parentFieldName_groupIndex" or "grandParent_groupIndex_parent_groupIndex"
+      // For nested children, we need: "parentPath_fieldName"
+      return `${parentPath}_${fieldName}`;
+    }
+    return `${fieldName}_${groupIndex}`;
+  };
+
+  // Helper: Get all group indices from field values
+  const getGroupIndices = () => {
+    const indices = new Set();
+    Object.keys(extraFieldValues).forEach(key => {
+      const match = key.match(/_(\d+)(_|$)/);
+      if (match) {
+        indices.add(parseInt(match[1]));
+      }
+    });
+    return indices.size > 0 ? Math.max(...Array.from(indices)) + 1 : 1;
+  };
+
+  // Handle extra field value changes (supports nested children)
+  const handleExtraFieldChange = (fieldName, groupIndex, value, parentPath = '') => {
+    const key = getFieldKey(fieldName, groupIndex, parentPath);
+    setExtraFieldValues(prev => ({ ...prev, [key]: value }));
+    
+    // Clear validation error
+    const errorKey = `extraField_${fieldName}_${groupIndex}`;
+    if (validationErrors[errorKey]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[errorKey];
+        return newErrors;
+      });
+    }
+  };
+
+  // Recursively initialize field values (handles nested children)
+  const initializeFieldValues = (field, groupIndex, parentPath = '') => {
+    const values = {};
+    const fieldName = field['org-name'] || field.name;
+    const currentPath = parentPath ? `${parentPath}_${fieldName}` : `${fieldName}_${groupIndex}`;
+    values[getFieldKey(fieldName, groupIndex, parentPath)] = '';
+    
+    if (field.children && Array.isArray(field.children)) {
+      field.children.forEach((childField) => {
+        Object.assign(values, initializeFieldValues(childField, groupIndex, currentPath));
+      });
+    }
+    
+    return values;
+  };
+
+  // Initialize empty values for a group
+  const initializeGroup = (groupIndex, fieldsToUse = null) => {
+    const values = {};
+    const fields = fieldsToUse || (extraFields && extraFields[0]);
+    if (!fields) return values;
+    
+    fields.forEach((field) => {
+      Object.assign(values, initializeFieldValues(field, groupIndex));
+    });
+    return values;
+  };
+
+  // Handle adding a new field group
+  const handleAddFieldGroup = () => {
+    const newGroupIndex = getGroupIndices();
+    const newValues = initializeGroup(newGroupIndex);
+    setExtraFieldValues(prev => ({ ...prev, ...newValues }));
+  };
+
+  // Handle removing a field group
+  const handleRemoveFieldGroup = (groupIndex) => {
+    setExtraFieldValues(prev => {
+      const newValues = {};
+      Object.keys(prev).forEach(key => {
+        const match = key.match(/_(\d+)(_|$)/);
+        if (!match || parseInt(match[1]) !== groupIndex) {
+          newValues[key] = prev[key];
+        }
+      });
+      
+      // If no groups left, initialize group 0
+      const remainingGroups = new Set();
+      Object.keys(newValues).forEach(key => {
+        const match = key.match(/_(\d+)(_|$)/);
+        if (match) remainingGroups.add(parseInt(match[1]));
+      });
+      
+      if (remainingGroups.size === 0) {
+        return initializeGroup(0);
+      }
+      
+      return newValues;
+    });
+  };
+
+  // Get checkbox value for a field
+  const getCheckboxValue = (valueKey) => {
+    const checked = [];
+    Object.keys(extraFieldValues).forEach(key => {
+      if (key.startsWith(valueKey + '_') && extraFieldValues[key] === '1') {
+        checked.push(key.split('_').pop());
+      }
+    });
+    return checked.join(',');
+  };
+
+  // Recursively process field values (handles nested children)
+  const processFieldValue = (field, groupIndex, groupData, parentPath = '') => {
+    const fieldName = field['org-name'] || field.name;
+    const valueKey = getFieldKey(fieldName, groupIndex, parentPath);
+    let value = extraFieldValues[valueKey] || '';
+
+    if (field.type === 'checkbox') {
+      value = getCheckboxValue(valueKey);
+    }
+
+    let hasData = false;
+    if (field.required === 1 || value !== '') {
+      groupData[fieldName] = value;
+      hasData = true;
+    }
+
+    // Process nested children recursively
+    if (field.children && Array.isArray(field.children)) {
+      const currentPath = parentPath ? `${parentPath}_${fieldName}` : `${fieldName}_${groupIndex}`;
+      field.children.forEach((childField) => {
+        const childHasData = processFieldValue(childField, groupIndex, groupData, currentPath);
+        hasData = hasData || childHasData;
+      });
+    }
+
+    return hasData;
+  };
+
+  // Transform extra field values into array format
+  const transformExtraFieldsToArray = () => {
+    if (!extraFields || !extraFields[0]) return [];
+    
+    const groupCount = getGroupIndices();
+    const result = [];
+
+    for (let i = 0; i < groupCount; i++) {
+      const groupData = {};
+      let hasData = false;
+
+      extraFields[0].forEach((field) => {
+        const fieldHasData = processFieldValue(field, i, groupData);
+        hasData = hasData || fieldHasData;
+      });
+
+      if (hasData) result.push(groupData);
+    }
+
+    return result;
+  };
+
+  // Recursively validate fields (handles nested children)
+  const validateField = (field, groupIndex, errors, parentPath = '') => {
+    const fieldName = field['org-name'] || field.name;
+    const valueKey = getFieldKey(fieldName, groupIndex, parentPath);
+    const errorKey = `extraField_${fieldName}_${groupIndex}`;
+
+    if (field.required === 1) {
+      if (field.type === 'checkbox') {
+        const hasChecked = Object.keys(field.options || {}).some(opt => 
+          extraFieldValues[`${valueKey}_${opt}`] === '1'
+        );
+        if (!hasChecked) {
+          errors[errorKey] = `${field.label} ${Ltext("is required")}`;
+        }
+      } else if (!extraFieldValues[valueKey]?.trim()) {
+        errors[errorKey] = `${field.label} ${Ltext("is required")}`;
+      }
+    }
+
+    // Validate nested children recursively
+    if (field.children && Array.isArray(field.children)) {
+      const currentPath = parentPath ? `${parentPath}_${fieldName}` : `${fieldName}_${groupIndex}`;
+      field.children.forEach((childField) => {
+        validateField(childField, groupIndex, errors, currentPath);
+      });
+    }
+  };
+
+  // Validate extra fields
+  const validateExtraFields = () => {
+    const errors = {};
+    if (!extraFields || !extraFields[0]) return errors;
+
+    const groupCount = getGroupIndices();
+
+    for (let i = 0; i < groupCount; i++) {
+      extraFields[0].forEach((field) => {
+        validateField(field, i, errors);
+      });
+    }
+
+    return errors;
+  };
+
+  // Clear field error
+  const clearFieldError = (errorKey) => {
+    if (validationErrors[errorKey]) {
+      setValidationErrors(prev => {
+        const newErrors = { ...prev };
+        delete newErrors[errorKey];
+        return newErrors;
+      });
+    }
+  };
+
+  // Render a single field (handles nested children recursively)
+  const renderField = (field, groupIndex, parentPath = '') => {
+    const fieldName = field['org-name'] || field.name;
+    const valueKey = getFieldKey(fieldName, groupIndex, parentPath);
+    const fieldValue = extraFieldValues[valueKey] || '';
+    const isRequired = field.required === 1;
+    const errorKey = `extraField_${fieldName}_${groupIndex}`;
+    const hasError = validationErrors[errorKey];
+    const isChild = !!parentPath;
+
+    return (
+      <div key={`${field.id}_${groupIndex}_${parentPath || 'root'}_${fieldName}`} className={styles.extraFieldWrapper}>
+        <label htmlFor={valueKey} className={isRequired ? styles.required : ''}>
+          {field.label}{isRequired && '*'}
+        </label>
+        
+        {field.type === 'text' && (
+          <>
+            <input
+              type="text"
+              id={valueKey}
+              value={fieldValue}
+              onChange={(e) => {
+                handleExtraFieldChange(fieldName, groupIndex, e.target.value, parentPath);
+                clearFieldError(errorKey);
+              }}
+              className={`${styles.extraFieldInput} ${hasError ? styles.inputError : ''}`}
+              required={isRequired}
+            />
+            {hasError && <div className={styles.fieldError}>{validationErrors[errorKey]}</div>}
+          </>
+        )}
+        
+        {field.type === 'number' && (
+          <>
+            <input
+              type="number"
+              id={valueKey}
+              value={fieldValue}
+              onChange={(e) => {
+                handleExtraFieldChange(fieldName, groupIndex, e.target.value, parentPath);
+                clearFieldError(errorKey);
+              }}
+              className={`${styles.extraFieldInput} ${hasError ? styles.inputError : ''}`}
+              required={isRequired}
+            />
+            {hasError && <div className={styles.fieldError}>{validationErrors[errorKey]}</div>}
+          </>
+        )}
+        
+        {field.type === 'select' && (
+          <>
+            <select
+              id={valueKey}
+              value={fieldValue}
+              onChange={(e) => {
+                handleExtraFieldChange(fieldName, groupIndex, e.target.value, parentPath);
+                clearFieldError(errorKey);
+              }}
+              className={`${styles.extraFieldInput} ${hasError ? styles.inputError : ''}`}
+              required={isRequired}
+            >
+              <option value="">{Ltext("Velg")}</option>
+              {field.options && Object.entries(field.options).map(([optValue, optLabel]) => (
+                <option key={optValue} value={optValue}>{optLabel}</option>
+              ))}
+            </select>
+            {hasError && <div className={styles.fieldError}>{validationErrors[errorKey]}</div>}
+          </>
+        )}
+        
+        {field.type === 'checkbox' && (
+          <>
+            <div className={styles.checkboxGroup}>
+              {field.options && Object.entries(field.options).map(([optValue, optLabel]) => {
+                const checkboxKey = `${valueKey}_${optValue}`;
+                const isChecked = extraFieldValues[checkboxKey] === '1';
+                return (
+                  <label key={optValue} className={styles.checkboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={isChecked}
+                      onChange={(e) => {
+                        setExtraFieldValues(prev => ({ ...prev, [checkboxKey]: e.target.checked ? '1' : '0' }));
+                        clearFieldError(errorKey);
+                      }}
+                      className={styles.extraFieldCheckbox}
+                    />
+                    <span>{optLabel}</span>
+                  </label>
+                );
+              })}
+            </div>
+            {hasError && <div className={styles.fieldError}>{validationErrors[errorKey]}</div>}
+          </>
+        )}
+
+        {/* Render children fields recursively */}
+        {field.children && Array.isArray(field.children) && field.children.length > 0 && (
+          <div className={styles.childrenFields}>
+            {field.children.map((childField, childIndex) => {
+              const currentPath = parentPath ? `${parentPath}_${fieldName}` : `${fieldName}_${groupIndex}`;
+              return renderField(childField, groupIndex, currentPath);
+            })}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  // Render extra fields section
+  const renderExtraFields = () => {
+    if (!extraFields || !extraFields[0]) return null;
+
+    const groupCount = getGroupIndices();
+
+    return (
+      <div className={styles.extraFieldsSection}>
+        {/* <h3 className={styles.sectionTitle}>{Ltext("Annen informasjon")}</h3>
+        <hr className={styles.sectionDivider} /> */}
+        
+        <div className={styles.extraFieldsCards}>
+          {Array.from({ length: groupCount }).map((_, groupIndex) => (
+            <div key={groupIndex} className={styles.extraFieldCard}>
+              <div className={styles.cardHeader}>
+                <h4 className={styles.cardTitle}>
+                  {Ltext("Annen informasjon")} {groupCount > 1 ? `#${groupIndex + 1}` : ''}
+                </h4>
+                {groupIndex > 0 && (
+                  <button
+                    type="button"
+                    className={styles.deleteCardBtn}
+                    onClick={() => handleRemoveFieldGroup(groupIndex)}
+                    aria-label={Ltext("Delete card")}
+                    title={Ltext("Delete")}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M13.5 4.5L4.5 13.5M4.5 4.5L13.5 13.5" stroke="#dc3545" strokeWidth="2" strokeLinecap="round"/>
+                    </svg>
+                  </button>
+                )}
+              </div>
+              
+              <div className={styles.cardBody}>
+                {extraFields[0].map((field) => 
+                  renderField(field, groupIndex)
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+        
+        {/* Add button to add new field group */}
+        {showAddFieldBtn && (
+          <button
+            type="button"
+            className={styles.addFieldBtn}
+            onClick={handleAddFieldGroup}
+          >
+            {Ltext("Legg til")}
+          </button>
+        )}
+      </div>
+    );
   };
 
   // const handleBackToBooking = () => {
@@ -1576,6 +1977,8 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
                       </div>
                     </>
                   )}
+
+                  
                 </div>
               ):(
                 <>
@@ -1597,6 +2000,8 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
                   )}
                 </>
               )}
+              {/* Extra Fields Section */}
+              {renderExtraFields()}
               <div className={styles.contactSectionInnerBottom}>
                 {/* Payment Methods */}
                 <div className={styles.paymentMethodsSection}>

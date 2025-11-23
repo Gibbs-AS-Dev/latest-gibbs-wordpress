@@ -282,4 +282,19 @@ export default {
   "Change": "Change",
   "Your booking is waiting for confirmation.": "Your booking is waiting for confirmation.",
   "Your booking has been submitted and is waiting for confirmation. You will receive an email once it is confirmed.": "Your booking has been submitted and is waiting for confirmation. You will receive an email once it is confirmed.",
+  
+  // Extra fields translations
+  "Velg": "Select",
+  "Annen informasjon": "Additional Information",
+  "Legg til": "Add",
+  "Delete card": "Delete card",
+  "Please fix the following errors:": "Please fix the following errors:",
+  "No payment methods available": "No payment methods available",
+  "Loading payment methods...": "Loading payment methods...",
+  "Payment method": "Payment method",
+  "Please select a payment method": "Please select a payment method",
+  "Extra discount": "Extra discount",
+  "Subscription discount": "Subscription discount",
+  "Not selected": "Not selected",
+  "is required": "is required",
 }; 
