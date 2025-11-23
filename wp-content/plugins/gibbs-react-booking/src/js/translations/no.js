@@ -290,4 +290,19 @@ export default {
   "Enter phone number": "Skriv inn telefonnummer",
   "Your booking is waiting for confirmation.": "Din bestilling venter på bekreftelse.",
   "Your booking has been submitted and is waiting for confirmation. You will receive an email once it is confirmed.": "Din bestilling er sendt inn og venter på bekreftelse. Du vil motta en e-post når den er bekreftet.",
+  
+  // Extra fields translations
+  "Velg": "Velg",
+  "Annen informasjon": "Annen informasjon",
+  "Legg til": "Legg til",
+  "Delete card": "Slett kort",
+  "Please fix the following errors:": "Vennligst rett følgende feil:",
+  "No payment methods available": "Ingen betalingsmetoder tilgjengelig",
+  "Loading payment methods...": "Laster betalingsmetoder...",
+  "Payment method": "Betalingsmetode",
+  "Please select a payment method": "Vennligst velg en betalingsmetode",
+  "Extra discount": "Ekstra rabatt",
+  "Subscription discount": "Abonnementsrabatt",
+  "Not selected": "Ikke valgt",
+  "is required": "er påkrevd",
 }; 
