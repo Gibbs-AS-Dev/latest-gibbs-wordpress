@@ -1355,7 +1355,7 @@ const getAvailableDurations = async (slots) => {
                 if(selectedDate && selectedDate.getMonth() != currentMonth){
                   handleMonthChange(selectedDate);
                 }else{
-                  handleMonthChange(new Date());
+                  handleMonthChange(minBookDays ? new Date(Date.now() + minBookDays * 24 * 60 * 60 * 1000) : new Date());
                 }
                 setIsOpen(true);
               }}
