@@ -1312,7 +1312,7 @@ const getAvailableDurations = async (slots) => {
             padding: '10px', 
             borderRadius: '4px', 
             marginBottom: '10px',
-            fontSize: '0.9rem'
+            fontSize: '13px'
           }}>
             {error}
           </div>
@@ -1326,7 +1326,7 @@ const getAvailableDurations = async (slots) => {
             padding: '10px', 
             borderRadius: '4px', 
             marginBottom: '10px',
-            fontSize: '0.9rem'
+            fontSize: '13px'
           }}>
             {Ltext("Booking successful! You will receive a confirmation email shortly.")}
           </div>

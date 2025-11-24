@@ -52,6 +52,11 @@ $line-height-relaxed: 1.6;
 .hide-slot-border .header_top {
   display: none;
 }
+.single_listing {
+  .rmp-booking-container {
+    margin-top: 18px;
+  }
+}
 
 .rmp-slot-booking {
   .react-datepicker {

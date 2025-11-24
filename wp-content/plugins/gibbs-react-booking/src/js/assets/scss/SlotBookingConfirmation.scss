@@ -108,3 +108,12 @@
     }
   }
 }
+
+.min_confirmation_layout{
+  .react-tel-input {
+    height: 51px !important;
+    .form-control {
+      height: 51px !important;
+    }
+  }  
+}    

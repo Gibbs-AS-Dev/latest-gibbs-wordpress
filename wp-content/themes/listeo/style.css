@@ -27420,7 +27420,7 @@ li.total-costs.estimated-with-discount { color: #777; }
 .coupon-widget a.coupon-top { background: transparent; }
 
 
-select:invalid {
+/* select:invalid {
   height: 0px;
   opacity: 0 !important;
   position: absolute !important;
@@ -27429,7 +27429,7 @@ select:invalid {
 
 select:invalid[multiple] {
   margin-top: 15px;
-}
+} */
 #booking-confirmation input:invalid{
 	    border-bottom: 1px solid red;
 }

@@ -3503,6 +3503,15 @@ class Listeo_Core_Submit  {
 			}else{
 				delete_post_meta($this->listing_id,"season_discount_data");
 			}
+			if(is_array($_POST) && key_exists("activate_slotv2",$_POST)){
+				if(isset($_POST["activate_slotv2"])){	
+					update_post_meta($this->listing_id,"activate_slotv2",$_POST["activate_slotv2"]);
+				}else{
+					update_post_meta($this->listing_id,"activate_slotv2","");
+				}
+			}else{
+				update_post_meta($this->listing_id,"activate_slotv2","");
+			}
 
 
 			$org_id = $this->listing_id;
@@ -3545,6 +3554,7 @@ class Listeo_Core_Submit  {
 				update_post_meta($this->listing_id,"refund_policy",$_POST["refund_policy"]);
 
 			}
+			
 
 			
 
