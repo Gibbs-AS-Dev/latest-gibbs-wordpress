@@ -623,6 +623,27 @@ $show_field_if_booking_enable1 = "";
 			</div>
 		</div>
 
+		<?php if($section_key == "tidsluke_bookingsystem_avansert"): 
+			if(isset($data->listing_id)){
+				$activate_slotv2 = get_post_meta($data->listing_id,"activate_slotv2",true);
+			}else{
+				$activate_slotv2 = "";
+			}
+			?>
+			<div class="col-md-12">
+				<div class="form-field-activate_slotv2-container">
+					<label class="label-activate_slotv2" for="activate_slotv2">
+						<?php esc_html_e("Activate slotv2 (this is the new calendar for customers in single listing)","Gibbs"); ?>
+						<i class="tip" data-tip-content="<?php esc_html_e("Activate slotv2 (this is the new calendar for customers in single listing)","Gibbs"); ?>"><div class="tip-content"><?php esc_html_e("Activate slotv2 (this is the new calendar for customers in single listing)","Gibbs"); ?></div></i>
+					</label>
+					<div class="switch_box box_1">
+						<input type="checkbox" class="input-checkbox switch_1" name="activate_slotv2" id="activate_slotv2" placeholder="" value="on" maxlength="" <?php if($activate_slotv2 == "on"){echo "checked";}?>>
+					</div>
+				</div>
+			</div> 
+
+		<?php endif; ?>
+
 		
 	<?php endif; ?>
 

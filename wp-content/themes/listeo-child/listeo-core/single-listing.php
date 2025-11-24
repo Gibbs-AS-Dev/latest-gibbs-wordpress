@@ -472,17 +472,19 @@ if($cr_user == $post->post_author){
 
                 
 
-                    get_sidebar('listing');
+                    
 
-                    // $_booking_slots = get_post_meta(get_the_ID(),"_booking_slots",true);
+                    $activate_slotv2 = get_post_meta(get_the_ID(),"activate_slotv2",true);
 
-                    // if($_booking_slots != ""){
+                    if($activate_slotv2 == "on"){
 
-                    //     if(class_exists("ReactModulesPlugin")){
-                    //         echo do_shortcode("[slot_booking]");
-                    //     }
+                        if(class_exists("ReactModulesPlugin")){
+                            echo do_shortcode("[slot_booking listing_id=" . get_the_ID() . "]");
+                        }
 
-                    // }
+                    }else{  
+                        get_sidebar('listing');
+                    }
                 
 
             ?>

@@ -1496,7 +1496,7 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
     <div
       className={
         `${styles.confirmationContainer} bk_confirmation_container` +
-        (confirmationContainerWidth < 800 ? ' min_confirmation_container' : '')
+        (confirmationContainerWidth < 800 ? ` min_confirmation_container ${styles.minConfirmationContainer}` : '')
       }
       ref={confirmationContainerRef}
     >
