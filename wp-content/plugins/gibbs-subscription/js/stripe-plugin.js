@@ -1,6 +1,86 @@
 document.addEventListener('DOMContentLoaded', function () {
     const stripe = Stripe(stripePlugin.publishableKey);
 
+    // Handle checkout-popup button click
+    document.querySelectorAll('.checkout-popup').forEach(button => {
+        button.addEventListener('click', function (e) {
+            e.preventDefault();
+            document.getElementById('checkout-contact-modal').style.display = 'block';
+        });
+    });
+
+    // Close modal handlers
+    const checkoutModal = document.getElementById('checkout-contact-modal');
+    if (checkoutModal) {
+        const closeBtn = checkoutModal.querySelector('.checkout-modal-close');
+        const closeBtnFooter = checkoutModal.querySelector('.checkout-btn-close');
+        
+        if (closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                checkoutModal.style.display = 'none';
+            });
+        }
+        
+        if (closeBtnFooter) {
+            closeBtnFooter.addEventListener('click', function() {
+                checkoutModal.style.display = 'none';
+            });
+        }
+        
+        // Close when clicking outside the modal
+        checkoutModal.addEventListener('click', function(e) {
+            if (e.target === checkoutModal) {
+                checkoutModal.style.display = 'none';
+            }
+        });
+        
+        // Save button handler
+        const saveBtn = checkoutModal.querySelector('.checkout-btn-save');
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function() {
+                const form = document.getElementById('checkout-contact-form');
+                const formData = new FormData(form);
+                const data = {};
+                
+                formData.forEach((value, key) => {
+                    data[key] = value;
+                });
+                
+                // Show loading
+                const originalText = saveBtn.textContent;
+                saveBtn.disabled = true;
+                saveBtn.textContent = stripePlugin.savingText || 'Saving...';
+                
+                // Save contact info via AJAX
+                fetch(stripePlugin.ajaxUrl + '?action=save_checkout_contact_info', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        // Close modal and reload page to show updated button
+                        checkoutModal.style.display = 'none';
+                        window.location.reload();
+                    } else {
+                        alert(result.error || (stripePlugin.errorSavingText || 'Error saving contact information'));
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = originalText;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert(stripePlugin.errorSavingText || 'Error saving contact information');
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = originalText;
+                });
+            });
+        }
+    }
+
     document.querySelectorAll('.checkout-button').forEach(button => {
         button.addEventListener('click', function () {
             const priceId = this.dataset.priceId;
