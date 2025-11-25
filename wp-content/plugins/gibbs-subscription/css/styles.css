@@ -139,7 +139,7 @@
     opacity:.65;
     background:red §!important
 }
-.checkout-button:disabled {
+.checkout-button:disabled, .checkout-popup:disabled {
     background-color: #cccccc; /* Grey out the button */
     cursor: not-allowed;
     pointer-events: none;
