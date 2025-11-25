@@ -84,6 +84,89 @@ if($active_group_id != ""){
                     </div>
                 </div>
             <?php } ?>
+            
+            <?php if($user_management_group_id != "0"){ 
+                // Get company and contact information
+                $group_admin = get_group_admin();
+                if($group_admin != ""){
+                    $info_user_id = $group_admin;
+                }else{
+                    $info_user_id = get_current_user_id();
+                }
+                
+                $company_name = get_user_meta($info_user_id, 'billing_company', true);
+                $street_address = get_user_meta($info_user_id, 'billing_address_1', true);
+                $zip_code = get_user_meta($info_user_id, 'billing_postcode', true);
+                $city = get_user_meta($info_user_id, 'billing_city', true);
+                $organization_number = get_user_meta($info_user_id, 'company_number', true);
+                
+                $contact_name = get_user_meta($info_user_id, 'display_name', true);
+                if(empty($contact_name)){
+                    $first_name = get_user_meta($info_user_id, 'billing_first_name', true);
+                    $last_name = get_user_meta($info_user_id, 'billing_last_name', true);
+                    $contact_name = trim($first_name . ' ' . $last_name);
+                }
+                $contact_email = get_user_meta($info_user_id, 'billing_email', true);
+                $contact_phone = get_user_meta($info_user_id, 'billing_phone', true);
+                if(empty($contact_phone)){
+                    $contact_phone = get_user_meta($info_user_id, 'phone', true);
+                }
+            ?>
+            <!-- Company Information Section -->
+            <div class="section">
+                <div class="header2">
+                    <h2><?php echo __("Company Information","gibbs");?></h2>
+                </div>
+                <div class="content">
+                    <div class="form-group">
+                        <label for="company_name"><?php echo __("Company Name","gibbs");?></label>
+                        <input type="text" id="company_name" name="company_name" value="<?php echo esc_attr($company_name);?>" placeholder="<?php echo __("Company Name Inc.","gibbs");?>" />
+                    </div>
+                    <div class="form-group">
+                        <label for="street_address"><?php echo __("Street Address","gibbs");?></label>
+                        <input type="text" id="street_address" name="street_address" value="<?php echo esc_attr($street_address);?>" placeholder="<?php echo __("Street Address","gibbs");?>" />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label for="zip_code"><?php echo __("Zip Code","gibbs");?></label>
+                            <input type="text" id="zip_code" name="zip_code" value="<?php echo esc_attr($zip_code);?>" placeholder="<?php echo __("0000","gibbs");?>" />
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label for="city"><?php echo __("City","gibbs");?></label>
+                            <input type="text" id="city" name="city" value="<?php echo esc_attr($city);?>" placeholder="<?php echo __("City","gibbs");?>" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="organization_number"><?php echo __("Organization Number","gibbs");?></label>
+                        <input type="text" id="organization_number" name="organization_number" value="<?php echo esc_attr($organization_number);?>" placeholder="<?php echo __("999 999 999","gibbs");?>" />
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Contact Person Section -->
+            <div class="section">
+                <div class="header2">
+                    <h2><?php echo __("Contact Person","gibbs");?></h2>
+                </div>
+                <div class="content">
+                    <div class="form-group">
+                        <label for="contact_name"><?php echo __("Name","gibbs");?></label>
+                        <input type="text" id="contact_name" name="contact_name" value="<?php echo esc_attr($contact_name);?>" placeholder="<?php echo __("Full Name","gibbs");?>" />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label for="contact_email"><?php echo __("Email","gibbs");?></label>
+                            <input type="email" id="contact_email" name="contact_email" value="<?php echo esc_attr($contact_email);?>" placeholder="<?php echo __("contact@company.com","gibbs");?>" />
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label for="contact_phone"><?php echo __("Phone Number","gibbs");?></label>
+                            <input type="text" id="contact_phone" name="contact_phone" value="<?php echo esc_attr($contact_phone);?>" placeholder="<?php echo __("+47 000 00 000","gibbs");?>" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php } ?>
+            
             <div class="section ">
             <div class="header2 ">
                     <h2>Valuta</h2>
@@ -495,5 +578,28 @@ if($active_group_id != ""){
     
     .form-group select {
         background-color: white;
+    }
+    
+    /* Form Row for Side-by-Side Fields */
+    .form-row {
+        display: flex;
+        gap: 20px;
+        padding: 0 7px;
+    }
+    
+    .form-group-half {
+        flex: 1;
+        margin-bottom: 0;
+    }
+    
+    @media (max-width: 768px) {
+        .form-row {
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .form-group-half {
+            margin-bottom: 20px;
+        }
     }
 </style>

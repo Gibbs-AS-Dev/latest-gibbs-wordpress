@@ -161,8 +161,31 @@ $trail = get_user_meta($super_admin, 'stripe_trail', true);
                             </span>
                         <?php }else{ ?>
 
+                            <?php
+                            $group_admin = get_group_admin();
+
+                            if($group_admin != ""){
+                                $cr_user_id = $group_admin;
+                            }else{
+                                $cr_user_id = get_current_user_id();
+                            }
+
+                            $company_name = get_user_meta($cr_user_id, 'billing_company', true);
+                            $street_address = get_user_meta($cr_user_id, 'billing_address_1', true);
+                            $zip_code = get_user_meta($cr_user_id, 'billing_postcode', true);
+                            $city = get_user_meta($cr_user_id, 'billing_city', true);
+                            $organization_number = get_user_meta($cr_user_id, 'company_number', true);
+                            $contact_name = get_user_meta($cr_user_id, 'display_name', true);
+                            $contact_email = get_user_meta($cr_user_id, 'billing_email', true);
+                            $contact_phone = get_user_meta($cr_user_id, 'billing_phone', true);
+
+                            $existCompanyData = true;
+                            
+                            if($company_name == ""){
+                                $existCompanyData = false;
+                            } ?>
                             <span class="load-div">
-                                <button class="checkout-button <?php if($disable_btn == true){ echo 'btn-primary.disabled';}?>" data-price-id="<?php echo esc_attr($start_price_id); ?>" data-package-id="<?php echo $package["ID"]; ?>" <?php if($disable_btn == true){ echo "disabled";}?> <?php if(isset($active_sub->pricer->product) && $active_sub->pricer->product == $this->stripe_custom_plan_product_id){  echo "disabled";}?>>
+                                <button class="<?php if($existCompanyData == true){ echo 'checkout-button';}else{ echo 'checkout-popup';}?> <?php if($disable_btn == true){ echo 'btn-primary.disabled';}?>" data-price-id="<?php echo esc_attr($start_price_id); ?>" data-package-id="<?php echo $package["ID"]; ?>" <?php if($disable_btn == true){ echo "disabled";}?> <?php if(isset($active_sub->pricer->product) && $active_sub->pricer->product == $this->stripe_custom_plan_product_id){  echo "disabled";}?>>
                                      <?php echo __("Aktiver","gibbs");?>
                                 </button>
                                 <span class="loading spinner" style="display: none;width:20px;height:20px;"></span>
@@ -278,6 +301,61 @@ $trail = get_user_meta($super_admin, 'stripe_trail', true);
     
 </div>
 
+<!-- Checkout Contact Info Modal -->
+<div id="checkout-contact-modal" class="checkout-modal" style="display: none;">
+    <div class="checkout-modal-content">
+        <div class="checkout-modal-header">
+            <h2><?php echo __("Company Information","gibbs");?></h2>
+            <span class="checkout-modal-close">&times;</span>
+        </div>
+        <div class="checkout-modal-body">
+            <form id="checkout-contact-form">
+                <?php
+                $group_admin = get_group_admin();
+                if($group_admin != ""){
+                    $cr_user_id = $group_admin;
+                }else{
+                    $cr_user_id = get_current_user_id();
+                }
+                
+                $company_name = get_user_meta($cr_user_id, 'billing_company', true);
+                $street_address = get_user_meta($cr_user_id, 'billing_address_1', true);
+                $zip_code = get_user_meta($cr_user_id, 'billing_postcode', true);
+                $city = get_user_meta($cr_user_id, 'billing_city', true);
+                $organization_number = get_user_meta($cr_user_id, 'company_number', true);
+                
+                ?>
+                
+                <div class="checkout-form-group">
+                    <label for="checkout_company_name"><?php echo __("Company Name","gibbs");?></label>
+                    <input type="text" id="checkout_company_name" name="company_name" value="<?php echo esc_attr($company_name);?>" placeholder="<?php echo __("Company Name Inc.","gibbs");?>" />
+                </div>
+                <div class="checkout-form-group">
+                    <label for="checkout_street_address"><?php echo __("Street Address","gibbs");?></label>
+                    <input type="text" id="checkout_street_address" name="street_address" value="<?php echo esc_attr($street_address);?>" placeholder="<?php echo __("Street Address","gibbs");?>" />
+                </div>
+                <div class="checkout-form-row">
+                    <div class="checkout-form-group checkout-form-group-half">
+                        <label for="checkout_zip_code"><?php echo __("Zip Code","gibbs");?></label>
+                        <input type="text" id="checkout_zip_code" name="zip_code" value="<?php echo esc_attr($zip_code);?>" placeholder="<?php echo __("0000","gibbs");?>" />
+                    </div>
+                    <div class="checkout-form-group checkout-form-group-half">
+                        <label for="checkout_city"><?php echo __("City","gibbs");?></label>
+                        <input type="text" id="checkout_city" name="city" value="<?php echo esc_attr($city);?>" placeholder="<?php echo __("City","gibbs");?>" />
+                    </div>
+                </div>
+                <div class="checkout-form-group">
+                    <label for="checkout_organization_number"><?php echo __("Organization Number","gibbs");?></label>
+                    <input type="text" id="checkout_organization_number" name="organization_number" value="<?php echo esc_attr($organization_number);?>" placeholder="<?php echo __("999 999 999","gibbs");?>" />
+                </div>
+            </form>
+        </div>
+        <div class="checkout-modal-footer">
+            <button type="button" class="checkout-btn-close"><?php echo __("Close","gibbs");?></button>
+            <button type="button" class="checkout-btn-save"><?php echo __("Save","gibbs");?></button>
+        </div>
+    </div>
+</div>
 
 <script>
     jQuery(".load-div").find("a").click(function(){

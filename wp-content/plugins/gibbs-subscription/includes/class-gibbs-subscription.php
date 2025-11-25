@@ -43,6 +43,8 @@ class Class_Gibbs_Subscription
         // Add actions
         add_action('wp_ajax_create_checkout_session', [$this, 'create_checkout_session']);
         add_action('wp_ajax_nopriv_create_checkout_session', [$this, 'create_checkout_session']);
+        add_action('wp_ajax_save_checkout_contact_info', [$this, 'save_checkout_contact_info']);
+        add_action('wp_ajax_nopriv_save_checkout_contact_info', [$this, 'save_checkout_contact_info']);
         add_action('wp_enqueue_scripts', [$this, 'enqueue_scripts']);
         add_action('rest_api_init', [$this, 'register_webhook']);
         add_action('wp_ajax_update_subscription', [$this, 'update_subscription']);
@@ -633,6 +635,8 @@ class Class_Gibbs_Subscription
         wp_localize_script('stripe-plugin-js', 'stripePlugin', [
             'ajaxUrl' => admin_url('admin-ajax.php'),
             'publishableKey' => $this->publishableKey,
+            'savingText' => __("Saving...", "gibbs"),
+            'errorSavingText' => __("Error saving contact information", "gibbs"),
         ]);
     }
 
@@ -640,6 +644,22 @@ class Class_Gibbs_Subscription
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
             $package_id = $data['package_id']; 
+
+            $group_admin = get_group_admin();
+            if($group_admin != ""){
+                $user_id = $group_admin;
+            }else{
+                $user_id = get_current_user_id();
+            }
+
+            $company_name = get_user_meta($user_id, 'billing_company', true);
+            $organization_number = get_user_meta($user_id, 'company_number', true);
+            $zip_code = get_user_meta($user_id, 'billing_postcode', true);
+            $city = get_user_meta($user_id, 'billing_city', true);
+            $street_address = get_user_meta($user_id, 'billing_address_1', true);
+
+
+
             $user_id = $this->get_super_admin();
             $user_data = get_userdata($user_id);
             $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
@@ -674,6 +694,16 @@ class Class_Gibbs_Subscription
                     $customer = $this->stripe->customers->create([
                         'name' => $user_data->display_name,
                         'email' => $user_data->user_email,
+                        'business_name' => $company_name,
+                        'address' => [
+                            'line1' => $street_address,
+                            'postal_code' => $zip_code,
+                            'city' => $city,
+                        ],
+                        'metadata' => [
+                            'company_name' => $company_name,
+                            'organization_number' => $organization_number,
+                        ],
                     ]);
                     update_user_meta($user_id, 'stripe_customer_id', $customer->id);
                     $stripe_customer_id = $customer->id;
@@ -709,7 +739,7 @@ class Class_Gibbs_Subscription
                     }else{
                       $sub_dataa = [
                             'trial_settings' => ['end_behavior' => ['missing_payment_method' => 'cancel']],
-                            'trial_period_days' => 30,
+                            'trial_period_days' => 7,
                       ];
                     }
 
@@ -741,6 +771,44 @@ class Class_Gibbs_Subscription
             } catch (Exception $e) {
                 echo json_encode(['error' => $e->getMessage()]);
             }
+            wp_die();
+        }
+    }
+
+    public function save_checkout_contact_info() {
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $data = json_decode(file_get_contents('php://input'), true);
+
+            $group_admin = get_group_admin();
+            if($group_admin != ""){
+                $user_id = $group_admin;
+            }else{
+                $user_id = get_current_user_id();
+            }
+            
+            if (!$user_id) {
+                echo json_encode(['success' => false, 'error' => __("User not found", "gibbs")]);
+                wp_die();
+            }
+            
+            // Save Company Information
+            if(isset($data['company_name'])){
+                update_user_meta($user_id, 'billing_company', sanitize_text_field($data['company_name']));
+            }
+            if(isset($data['street_address'])){
+                update_user_meta($user_id, 'billing_address_1', sanitize_text_field($data['street_address']));
+            }
+            if(isset($data['zip_code'])){
+                update_user_meta($user_id, 'billing_postcode', sanitize_text_field($data['zip_code']));
+            }
+            if(isset($data['city'])){
+                update_user_meta($user_id, 'billing_city', sanitize_text_field($data['city']));
+            }
+            if(isset($data['organization_number'])){
+                update_user_meta($user_id, 'company_number', sanitize_text_field($data['organization_number']));
+            }
+            
+            echo json_encode(['success' => true]);
             wp_die();
         }
     }

@@ -191,6 +191,7 @@ class ReactModulesPlugin {
     }
     public function register_plugin_templates($templates) {
         $templates['page-react-template.php'] = 'React Booking Template';
+        $templates['page-react-view.php'] = 'React View Template';
         return $templates;
     }
     
@@ -203,8 +204,29 @@ class ReactModulesPlugin {
                     return $plugin_template;
                 }
             }
+            if ($template_slug === 'page-react-view.php') {
+
+                $plugin_template = RMP_PLUGIN_PATH . 'templates/react-view-template.php';
+                if (file_exists($plugin_template)) {
+                    return $plugin_template;
+                }
+            }
         }
         return $template;
+    }
+
+    public function react_header() {
+
+        ob_start();
+        require_once RMP_PLUGIN_PATH . 'templates/react-header.php';
+        $content = ob_get_clean();
+        return $content;
+    }
+    public function react_footer() {
+        ob_start();
+        require_once RMP_PLUGIN_PATH . 'templates/react-footer.php';
+        $content = ob_get_clean();
+        return $content;
     }
 
     public function enqueue_scripts() {

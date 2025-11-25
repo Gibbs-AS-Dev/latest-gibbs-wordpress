@@ -215,6 +215,24 @@ jQuery(document).ready(function ($) {
     }
     $('#sms_content').on('input keyup change', updateSmsCounter);
     updateSmsCounter();
+
+    // Prevent forward slash (/) and backslash (\) from being entered
+    $('#sms_content').on('keydown', function(e) {
+        // Check if the key pressed is forward slash or backslash
+        if (e.key === '/' || e.key === '\\' || e.key === '"' || e.key === "'" || e.key === '`') {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // Also filter out slashes on input (handles paste events)
+    $('#sms_content').on('input', function() {
+        var value = $(this).val();
+        var filteredValue = value.replace(/[\/\\]/g, '');
+        if (value !== filteredValue) {
+            $(this).val(filteredValue);
+        }
+    });
 });
 
 </script>
