@@ -232,6 +232,9 @@ function SlotBooking({ listing_id, apiUrl, homeUrl, setPrevBookingData, prevBook
   const [maxBookDays, setMaxBookDays] = useState(null);
   const [minBookDays, setMinBookDays] = useState(null);
 
+  const [hideQuantity, setHideQuantity] = useState(false);
+  const [hidePriceDiv, setHidePriceDiv] = useState(false);
+
   // ============================================================================
   // CALENDAR UTILITIES
   // ============================================================================
@@ -1082,6 +1085,12 @@ const getAvailableDurations = async (slots) => {
           if(response.data.data.min_book_days && response.data.data.min_book_days != ""){
             setMinBookDays(parseInt(response.data.data.min_book_days));
           }
+          if(response.data.data.hide_quantity && response.data.data.hide_quantity == "on"){
+            setHideQuantity(true);
+          }
+          if(response.data.data.hide_price_div && response.data.data.hide_price_div == "on"){
+            setHidePriceDiv(true);
+          }
         } else {
           throw new Error(response.data.message || 'Failed to fetch available dates');
         }
@@ -1486,6 +1495,8 @@ const getAvailableDurations = async (slots) => {
             slotPriceType={slotPriceType}
             selectedSlot={selectedSlot}
             taxPercentage={taxPercentage}
+            hideQuantity={hideQuantity}
+            hidePriceDiv={hidePriceDiv}
           />
         )}
 
@@ -1521,6 +1532,7 @@ const getAvailableDurations = async (slots) => {
               setQuantityOpen(!quantityOpen)
             }}
             quantityDropdownRef={quantityDropdownRef}
+            hideQuantity={hideQuantity}
           />
         )}
 
@@ -1697,72 +1709,74 @@ const getAvailableDurations = async (slots) => {
             </div>
 
             {/* Price Data */}
-            <div className={styles.priceData}>
-              {/* {priceData.totalPrice && priceData.totalPrice > 0 ? (
-                <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
-                  <span className={styles.priceDataItemLabel}>{Ltext("Slot price")} {priceData.adults > 1 && priceData.price_type != "all_slot_price" && "("+priceData.adults+" "+Ltext("Adults")+")"}</span>
-                  <span className={styles.priceDataItemValue}>{priceData.totalPrice} kr</span>
-                </div>
-              ):''}
-              {priceData?.tax > 0 ? (
-                <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
-                  <span className={styles.priceDataItemLabel}>{Ltext("Tax")} ({Ltext("Included")})</span>
-                  <span className={styles.priceDataItemValue}>{priceData.tax} kr</span>
-                </div>
-              ):''} */}
-              {priceData.services.length > 0 ? (
-                <>
-                  {priceData.services.map((srv, idx) => (
-                    <div 
-                      key={idx} 
-                      className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}
-                    >
-                      <span className={styles.priceDataItemLabel}>
-                        {/* Show service name and, if countable and quantity > 1, "(xN)" */}
-                        {srv.name}
-                        {srv.quantity > 1 ? ` (x${srv.quantity})` : ''}
-                      </span>
-                      <span className={styles.priceDataItemValue}>
-                        {srv.price ? Math.round(srv.price) : Math.round(srv.service_price)} kr 
-                        {/* {srv.tax > 0  ? "("+Ltext("Included Tax")+")" : ""} */}
-                      </span>
-                    </div>
-                  ))}
-                </>
-              ):''}
-              
-              {/* {priceData.services.length > 0 && priceData.total_service_price && priceData.total_service_price > 0 ? (
-                <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
-                  <span className={styles.priceDataItemLabel}>{Ltext("Service Price")}</span>
-                  <span className={styles.priceDataItemValue}>{priceData.total_service_price} kr ({Ltext("Included Tax")})</span>
-                </div>
-              ):''} */}
-              {couponApplied && priceData.coupon_discount && priceData.coupon_discount > 0 ? (
-                <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`} style={{ color: '#2e7d32' }}>
-                  <span className={styles.priceDataItemLabel}>{Ltext("Coupon discount")}</span>
-                  <span className={styles.priceDataItemValue}>-{priceData.coupon_discount} kr</span>
-                </div>
-              ):''}
+            {!hidePriceDiv && (
+              <div className={styles.priceData}>
+                {/* {priceData.totalPrice && priceData.totalPrice > 0 ? (
+                  <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
+                    <span className={styles.priceDataItemLabel}>{Ltext("Slot price")} {priceData.adults > 1 && priceData.price_type != "all_slot_price" && "("+priceData.adults+" "+Ltext("Adults")+")"}</span>
+                    <span className={styles.priceDataItemValue}>{priceData.totalPrice} kr</span>
+                  </div>
+                ):''}
+                {priceData?.tax > 0 ? (
+                  <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
+                    <span className={styles.priceDataItemLabel}>{Ltext("Tax")} ({Ltext("Included")})</span>
+                    <span className={styles.priceDataItemValue}>{priceData.tax} kr</span>
+                  </div>
+                ):''} */}
+                {priceData.services.length > 0 ? (
+                  <>
+                    {priceData.services.map((srv, idx) => (
+                      <div 
+                        key={idx} 
+                        className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}
+                      >
+                        <span className={styles.priceDataItemLabel}>
+                          {/* Show service name and, if countable and quantity > 1, "(xN)" */}
+                          {srv.name}
+                          {srv.quantity > 1 ? ` (x${srv.quantity})` : ''}
+                        </span>
+                        <span className={styles.priceDataItemValue}>
+                          {srv.price ? Math.round(srv.price) : Math.round(srv.service_price)} kr 
+                          {/* {srv.tax > 0  ? "("+Ltext("Included Tax")+")" : ""} */}
+                        </span>
+                      </div>
+                    ))}
+                  </>
+                ):''}
+                
+                {/* {priceData.services.length > 0 && priceData.total_service_price && priceData.total_service_price > 0 ? (
+                  <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
+                    <span className={styles.priceDataItemLabel}>{Ltext("Service Price")}</span>
+                    <span className={styles.priceDataItemValue}>{priceData.total_service_price} kr ({Ltext("Included Tax")})</span>
+                  </div>
+                ):''} */}
+                {couponApplied && priceData.coupon_discount && priceData.coupon_discount > 0 ? (
+                  <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`} style={{ color: '#2e7d32' }}>
+                    <span className={styles.priceDataItemLabel}>{Ltext("Coupon discount")}</span>
+                    <span className={styles.priceDataItemValue}>-{priceData.coupon_discount} kr</span>
+                  </div>
+                ):''}
 
-              {priceData.season_discount && priceData.season_discount > 0 ? (
-                <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
-                  <span className={styles.priceDataItemLabel}>{Ltext("Extra discount")}</span>
-                  <span className={styles.priceDataItemValue}>-{priceData.season_discount} kr</span>
-                </div>
-              ):''}
+                {priceData.season_discount && priceData.season_discount > 0 ? (
+                  <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
+                    <span className={styles.priceDataItemLabel}>{Ltext("Extra discount")}</span>
+                    <span className={styles.priceDataItemValue}>-{priceData.season_discount} kr</span>
+                  </div>
+                ):''}
 
-              {priceData.org_total_price && priceData.org_total_price > 0 ? (
-                <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
-                  <span className={styles.priceDataItemLabel}>{Ltext("Total price")}</span>
-                  <span className={styles.priceDataItemValue}>{priceData.org_total_price} kr</span>
-                </div>
-              ):(priceData && priceData.org_total_price === 0 && (
-                <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
-                  <span className={styles.priceDataItemLabel}>{Ltext("Total price")}</span>
-                  <span className={styles.priceDataItemValue}>{Ltext("Free")}</span>
-                </div>
-              ))}
-            </div>  
+                {priceData.org_total_price && priceData.org_total_price > 0 ? (
+                  <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
+                    <span className={styles.priceDataItemLabel}>{Ltext("Total price")}</span>
+                    <span className={styles.priceDataItemValue}>{priceData.org_total_price} kr</span>
+                  </div>
+                ):(priceData && priceData.org_total_price === 0 && (
+                  <div className={`${styles.priceDataItem} ${styles.dFlex} ${styles.justifyContentBetween} ${styles.alignItemsCenter}`}>
+                    <span className={styles.priceDataItemLabel}>{Ltext("Total price")}</span>
+                    <span className={styles.priceDataItemValue}>{Ltext("Free")}</span>
+                  </div>
+                ))}
+              </div> 
+            )}
           </>
         )}
         {priceDataLoading && (
@@ -1969,7 +1983,9 @@ const TimeSlotsDropdown = ({
   timeSlotsDropdownRef,
   slotPriceType = "slot_price",
   selectedSlot = null,
-  taxPercentage = 0
+  taxPercentage = 0,
+  hideQuantity = false,
+  hidePriceDiv = false
 }) => {
   if (!slots || slots.length === 0) {
     return null;
@@ -2027,12 +2043,18 @@ const TimeSlotsDropdown = ({
                       : `${DAY_NAMES[slot.from_day]} ${slot.from_time} - ${DAY_NAMES[slot.to_day]} ${slot.to_time}`}
                   </div>
                   {/* <div>{displayPriceTax} kr {taxPercentage && taxPercentage > 0 ? "("+Ltext("Inc. Tax")+")" : ""}</div> */}
-                  <div>{displayPriceTax} kr</div>
-                  <div>
-                    {slot.slots && slot.slots > 1 ? <>
-                      {(slotPriceType !== "all_slot_price") ? slot.remaining_slots + "/" + slot.slots + " " + Ltext("Available") : ""}
-                    </> : ""}
-                  </div>
+                  {!hidePriceDiv ? (
+                    <div>{displayPriceTax} kr</div>
+                  ) : (
+                    <div></div>
+                  )}
+                  {!hideQuantity && (
+                    <div>
+                      {slot.slots && slot.slots > 1 ? <>
+                        {(slotPriceType !== "all_slot_price") ? slot.remaining_slots + "/" + slot.slots + " " + Ltext("Available") : ""}
+                      </> : ""}
+                    </div>
+                  )}
                 </div>
               );
             })}
@@ -2138,10 +2160,11 @@ const QuantityDropdown = ({
   onQuantitySelect, 
   isOpen, 
   onToggle, 
-  quantityDropdownRef 
+  quantityDropdownRef,
+  hideQuantity = false
 }) => {
   return (
-    <div className={styles.quantityDropdownContainer} ref={quantityDropdownRef}>
+    <div className={styles.quantityDropdownContainer} ref={quantityDropdownRef} style={{ display: hideQuantity ? 'none' : 'block' }}>
       <div className={`${styles.quantityDropdown} ${isOpen ? styles.activeQuantityDropdown : ''}`.trim()}>
         <div className={styles.quantityHeader} onClick={onToggle}>
           <div className={styles.quantityHeaderLeft}>
