@@ -2273,7 +2273,9 @@ class SlotBookingApi extends CoreApiHandler {
                 "_tax",
                 "_guest_slot",
                 "_max_book_days",
-                "_min_book_days"
+                "_min_book_days",
+                "_show_hide_amount",
+                "_hide_price_div"
             );
 
             $getPostMetaMultiple = $this->getDatabase()->getPostMetaMultiple($listing_id, $meta_keys);
@@ -2315,6 +2317,8 @@ class SlotBookingApi extends CoreApiHandler {
                 'taxPercentage' => $getPostMetaMultiple["_tax"],
                 'max_book_days' => $getPostMetaMultiple["_max_book_days"],
                 'min_book_days' => $getPostMetaMultiple["_min_book_days"],
+                'hide_quantity' => $getPostMetaMultiple["_show_hide_amount"],
+                'hide_price_div' => $getPostMetaMultiple["_hide_price_div"],
                 'guest_slot' => (isset($getPostMetaMultiple["_guest_slot"])?strtolower($getPostMetaMultiple["_guest_slot"]):'')
             );
 
@@ -2554,10 +2558,17 @@ class SlotBookingApi extends CoreApiHandler {
             "season_status",
             "season_discount_data",
             "_count_per_guest",
-            "_guest_slot"
+            "_guest_slot",
+            "_show_hide_amount",
+            "_hide_price_div"
         );
 
+        
+
         $getPostMetaMultiple = $this->getDatabase()->getPostMetaMultiple($listing_id, $meta_keys);
+
+        $hide_quantity =  $getPostMetaMultiple["_show_hide_amount"];
+        $hide_price_div = $getPostMetaMultiple["_hide_price_div"];
 
         $booking_slots = $getPostMetaMultiple["_booking_slots"];
 
@@ -2762,7 +2773,9 @@ class SlotBookingApi extends CoreApiHandler {
             'season_discount' => round($season_discount),
             'season_discount_data' => $season_discount_data,
             'slot_label' => $slot_label,
-            'subscription_discount' => round($subscription_discount)
+            'subscription_discount' => round($subscription_discount),
+            'hide_quantity' => $hide_quantity,
+            'hide_price_div' => $hide_price_div
         );
 
         if($return_access){

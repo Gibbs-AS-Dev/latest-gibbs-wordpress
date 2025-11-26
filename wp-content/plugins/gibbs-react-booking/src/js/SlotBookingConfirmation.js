@@ -80,6 +80,9 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
   const [extraFieldValues, setExtraFieldValues] = useState({});
   const [showAddFieldBtn, setShowAddFieldBtn] = useState(false);
 
+  const [hideQuantity, setHideQuantity] = useState(false);
+  const [hidePriceDiv, setHidePriceDiv] = useState(false);
+
   useLayoutEffect(() => {
     if(!confirmationContainerRef.current){
       return;
@@ -651,6 +654,12 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
           fetchListingImage(response.data.data.listing_id);
           fetchListingMeta(response.data.data.listing_id);
           fetchExtraFields(response.data.data.listing_id);
+        }
+        if(response.data.data?.hide_quantity == "on"){
+          setHideQuantity(true);
+        }
+        if(response.data.data?.hide_price_div == "on"){
+          setHidePriceDiv(true);
         }
       } else {
         setError(Ltext(response.data.message) || Ltext("Failed to load booking confirmation"));
@@ -2211,98 +2220,107 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
               }
             </span>
           </div>
-
-          <div className={styles.summaryItem}>
-            <span className={styles.summaryLabel}>{Ltext("Quantity")}</span>
-            <span className={styles.summaryValue}>{bookingData.adults || 1}</span>
-          </div>
-
-          <div className={styles.summaryItem}>
-            {bookingData.slot_label && bookingData.slot_label !== "" ? (
-              <span className={styles.summaryLabel}>{bookingData.slot_label}</span>
-            ) : (
-              <span className={styles.summaryLabel} style={{width: "70%"}}>{Ltext("Price (excl. VAT)")}</span>
-            )}
-            <span className={styles.summaryValue}>{bookingData.totalPrice} kr</span>
-          </div>
-
-          {/* {bookingData.tax && bookingData.tax > 0 ? (
+          {!hideQuantity ? (
             <div className={styles.summaryItem}>
-              <span className={styles.summaryLabel} style={{width: "70%"}}>{Ltext("Tax")} ({Ltext("Included")})</span>
-              <span className={styles.summaryValue}>{bookingData.tax} kr</span>
+              <span className={styles.summaryLabel}>{Ltext("Quantity")}</span>
+              <span className={styles.summaryValue}>{bookingData.adults || 1}</span>
             </div>
-          ):(
-            <></>
-          )} */}
-
-          {/* Services */}
-          {bookingData.services && bookingData.services.length > 0 ? (
-            <div className={styles.servicesList}>
-              {bookingData.services.map((service, index) => (
-                <div key={index} className={styles.serviceItem}>
-                  <span className={styles.serviceName}>
-                    {service.name}
-                    {service.quantity > 1 && ` (*${service.quantity})`}
-                  </span>
-                    <span className={styles.servicePrice}>
-                    {Math.round(service.price)} kr 
-                    {/* {Ltext("(incl. VAT)")} */}
-                  </span>
-                </div>
-              ))}
-            </div>
-          ):(
+          ) : (
             <></>
           )}
-
-
-          {bookingData.coupon_discount > 0 ? (
+          
+          {!hidePriceDiv ? (
             <>
-              
               <div className={styles.summaryItem}>
-                <span className={styles.summaryLabel}>{Ltext("Total amount")} {Ltext("(incl. VAT)")}</span>
-                <span className={styles.summaryValue}>{Number(bookingData.org_total_price) + Number(bookingData.coupon_discount)} kr</span>
+                {bookingData.slot_label && bookingData.slot_label !== "" ? (
+                  <span className={styles.summaryLabel}>{bookingData.slot_label}</span>
+                ) : (
+                  <span className={styles.summaryLabel} style={{width: "70%"}}>{Ltext("Price (excl. VAT)")}</span>
+                )}
+                <span className={styles.summaryValue}>{bookingData.totalPrice} kr</span>
               </div>
-              <div className={styles.summaryItem}>
-                <span className={styles.summaryLabel}>{Ltext("Discount")}</span>
-                <span className={styles.summaryValue}>-{bookingData.coupon_discount} kr</span>
-              </div>
-              {bookingData.season_discount && bookingData.season_discount > 0 ? (
+
+              {/* {bookingData.tax && bookingData.tax > 0 ? (
                 <div className={styles.summaryItem}>
-                  <span className={styles.summaryLabel}>{Ltext("Extra discount")}</span>
-                  <span className={styles.summaryValue}>-{bookingData.season_discount} kr</span>
+                  <span className={styles.summaryLabel} style={{width: "70%"}}>{Ltext("Tax")} ({Ltext("Included")})</span>
+                  <span className={styles.summaryValue}>{bookingData.tax} kr</span>
                 </div>
-              ):''}
-              {bookingData.subscription_discount && bookingData.subscription_discount > 0 ? (
-                <div className={styles.summaryItem}>
-                  <span className={styles.summaryLabel}>{Ltext("Subscription discount")}</span>
-                  <span className={styles.summaryValue}>-{bookingData.subscription_discount} kr</span>
+              ):(
+                <></>
+              )} */}
+
+              {/* Services */}
+              {bookingData.services && bookingData.services.length > 0 ? (
+                <div className={styles.servicesList}>
+                  {bookingData.services.map((service, index) => (
+                    <div key={index} className={styles.serviceItem}>
+                      <span className={styles.serviceName}>
+                        {service.name}
+                        {service.quantity > 1 && ` (*${service.quantity})`}
+                      </span>
+                        <span className={styles.servicePrice}>
+                        {Math.round(service.price)} kr 
+                        {/* {Ltext("(incl. VAT)")} */}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-              ):''}
-              <div className={`${styles.summaryItem} ${styles.total}`}>
-                <span className={styles.summaryLabel} style={{width: "70%"}}>{Ltext("Total Price")} {Ltext("(incl. VAT)")}</span>
-                <span className={styles.summaryValue} style={{width: "30%"}}>{bookingData.org_total_price} kr</span>
-              </div>
+              ):(
+                <></>
+              )}
+
+
+              {bookingData.coupon_discount > 0 ? (
+                <>
+                  
+                  <div className={styles.summaryItem}>
+                    <span className={styles.summaryLabel}>{Ltext("Total amount")} {Ltext("(incl. VAT)")}</span>
+                    <span className={styles.summaryValue}>{Number(bookingData.org_total_price) + Number(bookingData.coupon_discount)} kr</span>
+                  </div>
+                  <div className={styles.summaryItem}>
+                    <span className={styles.summaryLabel}>{Ltext("Discount")}</span>
+                    <span className={styles.summaryValue}>-{bookingData.coupon_discount} kr</span>
+                  </div>
+                  {bookingData.season_discount && bookingData.season_discount > 0 ? (
+                    <div className={styles.summaryItem}>
+                      <span className={styles.summaryLabel}>{Ltext("Extra discount")}</span>
+                      <span className={styles.summaryValue}>-{bookingData.season_discount} kr</span>
+                    </div>
+                  ):''}
+                  {bookingData.subscription_discount && bookingData.subscription_discount > 0 ? (
+                    <div className={styles.summaryItem}>
+                      <span className={styles.summaryLabel}>{Ltext("Subscription discount")}</span>
+                      <span className={styles.summaryValue}>-{bookingData.subscription_discount} kr</span>
+                    </div>
+                  ):''}
+                  <div className={`${styles.summaryItem} ${styles.total}`}>
+                    <span className={styles.summaryLabel} style={{width: "70%"}}>{Ltext("Total Price")} {Ltext("(incl. VAT)")}</span>
+                    <span className={styles.summaryValue} style={{width: "30%"}}>{bookingData.org_total_price} kr</span>
+                  </div>
+                </>
+              ):(
+                <>  
+                {bookingData.season_discount && bookingData.season_discount > 0 ? (
+                    <div className={styles.summaryItem}>
+                      <span className={styles.summaryLabel}>{Ltext("Extra discount")}</span>
+                      <span className={styles.summaryValue}>-{bookingData.season_discount} kr</span>
+                    </div>
+                  ):''}
+                {bookingData.subscription_discount && bookingData.subscription_discount > 0 ? (
+                  <div className={styles.summaryItem}>
+                    <span className={styles.summaryLabel}>{Ltext("Subscription discount")}</span>
+                    <span className={styles.summaryValue}>-{bookingData.subscription_discount} kr</span>
+                  </div>
+                ):''}
+                <div className={`${styles.summaryItem} ${styles.total}`}>
+                  <span className={styles.summaryLabel} style={{width: "70%"}}>{Ltext("Total Price")} {Ltext("(incl. VAT)")}</span>
+                  <span className={styles.summaryValue} style={{width: "30%"}}>{bookingData.org_total_price} kr</span>
+                </div>
+                </>
+              )}
             </>
-          ):(
-            <>  
-            {bookingData.season_discount && bookingData.season_discount > 0 ? (
-                <div className={styles.summaryItem}>
-                  <span className={styles.summaryLabel}>{Ltext("Extra discount")}</span>
-                  <span className={styles.summaryValue}>-{bookingData.season_discount} kr</span>
-                </div>
-              ):''}
-            {bookingData.subscription_discount && bookingData.subscription_discount > 0 ? (
-              <div className={styles.summaryItem}>
-                <span className={styles.summaryLabel}>{Ltext("Subscription discount")}</span>
-                <span className={styles.summaryValue}>-{bookingData.subscription_discount} kr</span>
-              </div>
-            ):''}
-            <div className={`${styles.summaryItem} ${styles.total}`}>
-              <span className={styles.summaryLabel} style={{width: "70%"}}>{Ltext("Total Price")} {Ltext("(incl. VAT)")}</span>
-              <span className={styles.summaryValue} style={{width: "30%"}}>{bookingData.org_total_price} kr</span>
-            </div>
-            </>
+          ) : (
+            <></>
           )}
         </div>
       </div>

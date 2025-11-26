@@ -1314,6 +1314,13 @@ class Gibbs_Booking_Calendar {
                         $rulesss["UNTIL"] = date("Y-m-d", strtotime("+300 days", strtotime($res->date_start)));
                     }
 
+                    
+
+                    if(isset($rulesss['POS']) && $rulesss['POS'] != ""){
+                      $rulesss['BYSETPOS'] = $rulesss['POS'];
+                    }
+                    unset($rulesss['POS']);
+
                     $rrule = new RRule($rulesss);
 
                     $exp_dates = array();
