@@ -1,0 +1,336 @@
+// Sidebar Styles
+$sidebar-bg: #1e3a5f;
+$sidebar-bg-dark: #162f4f;
+$sidebar-width: 280px;
+$sidebar-width-collapsed: 64px;
+$text-white: #ffffff;
+$text-light: rgba(255, 255, 255, 0.8);
+$primary-color: #1a9a94;
+$active-bg: rgba(26, 154, 148, 0.2);
+$hover-bg: rgba(255, 255, 255, 0.1);
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: $sidebar-width;
+  background-color: $sidebar-bg;
+  transition: transform 0.3s ease, width 0.3s ease;
+  z-index: 999;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+
+  &.open {
+    transform: translateX(0);
+    width: $sidebar-width;
+  }
+
+  &.closed {
+    transform: translateX(0);
+    width: $sidebar-width-collapsed;
+
+    .nav {
+      .logoContainer {
+        padding: 20px 12px;
+        justify-content: center;
+        position: relative;
+
+        .logo {
+          flex: 0;
+          .logoText {
+            display: none;
+          }
+        }
+
+        .menuToggle {
+          position: absolute;
+          right: 12px;
+          top: 50%;
+          transform: translateY(-50%);
+        }
+      }
+    }
+
+    .menuLink {
+      justify-content: center;
+      padding: 12px;
+
+      .menuLabel,
+      .submenuArrow,
+      .badge {
+        display: none;
+      }
+    }
+
+    .submenuList {
+      display: none;
+    }
+  }
+
+  .nav {
+    padding: 0;
+    height: 100%;
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+
+    .logoContainer {
+      padding: 20px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-shrink: 0;
+
+      .logo {
+        display: flex;
+        gap: 8px;
+        text-decoration: none;
+        color: $text-white;
+        font-weight: 600;
+        font-size: 18px;
+        transition: all 0.2s;
+        flex: 1;
+
+        &:hover {
+          opacity: 0.8;
+        }
+
+        img {
+          height: 47px;
+          width: auto;
+          max-width: 100%;
+        }
+
+        svg {
+          width: 24px;
+          height: 24px;
+          flex-shrink: 0;
+        }
+
+        .logoText {
+          white-space: nowrap;
+          overflow: hidden;
+          transition: opacity 0.3s ease;
+        }
+      }
+
+      .menuToggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        border-radius: 4px;
+        color: $text-white;
+        transition: background-color 0.2s;
+        flex-shrink: 0;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+
+    .menuList {
+      padding: 16px 0;
+      flex: 1;
+      overflow-y: auto;
+      list-style: none;
+      margin: 0;
+      padding: 0;
+
+      .menuItem {
+        margin: 0;
+        padding: 0;
+
+        .menuLink {
+          display: flex;
+          align-items: center;
+          width: 100%;
+          padding: 12px 20px;
+          background: transparent;
+          border: none;
+          color: $text-light;
+          text-decoration: none;
+          cursor: pointer;
+          transition: all 0.2s;
+          position: relative;
+          gap: 12px;
+          font-size: 14px;
+
+          &:hover {
+            background-color: $hover-bg;
+            color: $text-white;
+          }
+
+          &.active {
+            background-color: $active-bg;
+            color: $text-white;
+            border-left: 3px solid $primary-color;
+
+            .menuIcon {
+              color: $primary-color;
+            }
+          }
+
+          .menuIcon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            flex-shrink: 0;
+            color: inherit;
+
+            .iconEmoji {
+              font-size: 18px;
+              line-height: 1;
+            }
+
+            .iconText {
+              font-size: 16px;
+              line-height: 1;
+            }
+          }
+
+          .menuLabel {
+            flex: 1;
+            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
+
+          .submenuArrow {
+            width: 12px;
+            height: 12px;
+            opacity: 0.7;
+            flex-shrink: 0;
+            transition: transform 0.3s ease;
+
+            &.rotated {
+              transform: rotate(180deg);
+            }
+          }
+
+          &.expanded {
+            .submenuArrow {
+              transform: rotate(180deg);
+            }
+          }
+
+          .badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background-color: #4caf50;
+            color: white;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            flex-shrink: 0;
+          }
+        }
+
+        .submenuList {
+          list-style: none;
+          margin: 0;
+          padding: 0;
+          background-color: $sidebar-bg-dark;
+          overflow: hidden;
+          animation: slideDown 0.3s ease;
+
+          .submenuItem {
+            margin: 0;
+            padding: 0;
+
+            .menuLink {
+              padding-left: 52px; // Indent submenu items
+              font-size: 13px;
+
+              &:hover {
+                background-color: rgba(255, 255, 255, 0.05);
+              }
+
+              &.active {
+                background-color: $active-bg;
+                border-left: 3px solid $primary-color;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Scrollbar styling
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $sidebar-bg-dark;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 500px;
+    opacity: 1;
+  }
+}
+
+// Mobile responsive
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    width: $sidebar-width;
+    z-index: 1001;
+
+    &.open {
+      transform: translateX(0);
+    }
+
+    &.closed {
+      transform: translateX(-100%);
+    }
+
+    .nav {
+      .logoContainer {
+        .menuToggle {
+          display: none; // Hide toggle in sidebar on mobile
+        }
+      }
+    }
+  }
+}
+

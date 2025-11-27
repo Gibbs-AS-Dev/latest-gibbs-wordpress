@@ -124,7 +124,7 @@ wp_localize_script( 'phone-js', 'mySiteData', array(
         if("<?php echo $redirect;?>" != ""){
             redirecturl = "<?php echo $redirect;?>";
         }
-        debugger;
+        //debugger;
         redirecturl = redirecturl.replaceAll("<?php echo get_option('siteurl');?>","");
 
         redirecturl = "<?php echo get_option('siteurl');?>"+redirecturl;
