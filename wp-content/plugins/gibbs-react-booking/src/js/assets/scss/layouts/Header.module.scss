@@ -1,0 +1,264 @@
+// Header Styles
+$header-bg: #f5f5f5;
+$primary-color: #1a9a94;
+$text-dark: #333;
+$text-light: #666;
+$border-color: #e0e0e0;
+$sidebar-width: 280px;
+$sidebar-width-collapsed: 64px;
+
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background-color: $header-bg;
+  border-bottom: 1px solid $border-color;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  z-index: 1000;
+  transition: left 0.3s ease;
+
+  &.sidebarOpen {
+    left: $sidebar-width;
+  }
+
+  &.sidebarClosed {
+    left: $sidebar-width-collapsed;
+  }
+
+  &.noSidebar {
+    left: 0;
+  }
+
+  .headerLeft {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 0 0 auto;
+
+    .logo {
+      display: flex;
+      gap: 8px;
+      text-decoration: none;
+      color: $primary-color;
+      font-weight: 600;
+      font-size: 18px;
+
+      img {
+        height: 47px;
+        width: auto;
+      }
+
+      svg {
+        width: 24px;
+        height: 24px;
+      }
+
+      span {
+        color: $primary-color;
+      }
+
+      &:hover {
+        opacity: 0.8;
+      }
+    }
+
+    .menuToggle {
+      display: none; // Hidden on desktop, shown on mobile
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      border-radius: 4px;
+      color: $text-dark;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      svg {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  .headerCenter {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    .pageTitle {
+      font-size: 24px;
+      font-weight: 700;
+      color: $text-dark;
+      margin: 0;
+    }
+  }
+
+  .headerRight {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 0 0 auto;
+
+    .languageSwitcher {
+      position: relative;
+
+      .langButton {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 12px;
+        border: 1px solid $border-color;
+        background: white;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          border-color: $primary-color;
+        }
+
+        .flag {
+          font-size: 18px;
+        }
+
+        svg {
+          width: 12px;
+          height: 12px;
+        }
+      }
+
+      .langOverlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 998;
+      }
+
+      .langDropdown {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        background: white;
+        border: 1px solid $border-color;
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 999;
+        min-width: 150px;
+        overflow: hidden;
+
+        .langOption {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          width: 100%;
+          padding: 12px 16px;
+          border: none;
+          background: transparent;
+          cursor: pointer;
+          text-align: left;
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: #f5f5f5;
+          }
+
+          .flag {
+            font-size: 18px;
+          }
+        }
+      }
+    }
+
+    .userInfo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background-color 0.2s;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      .userText {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+
+        .userName {
+          font-size: 14px;
+          font-weight: 600;
+          color: $text-dark;
+          line-height: 1.2;
+        }
+
+        .userAccount {
+          font-size: 12px;
+          color: $text-light;
+          line-height: 1.2;
+        }
+      }
+
+      .userAvatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: $primary-color;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .header {
+    padding: 0 16px;
+    left: 0 !important; // Header always starts from left on mobile
+
+    .headerLeft {
+      .menuToggle {
+        display: flex; // Show toggle in header on mobile
+      }
+    }
+
+    .headerCenter {
+      .pageTitle {
+        font-size: 18px;
+      }
+    }
+
+    .headerRight {
+      .userInfo {
+        .userText {
+          display: none;
+        }
+      }
+    }
+  }
+}
+

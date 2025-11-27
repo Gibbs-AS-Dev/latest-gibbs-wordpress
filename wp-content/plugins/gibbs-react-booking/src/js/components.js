@@ -457,4 +457,4 @@ if (document.readyState === 'loading') {
 // Also initialize for dynamically loaded content
 if (typeof jQuery !== 'undefined') {
     jQuery(document).on('ajaxComplete', initializeReactModules);
-} 
+}

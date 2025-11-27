@@ -6,6 +6,9 @@ class Gibbs_Register_Login
     public static function action_init()
     {
 
+        add_action('gibbs_new_user_notification', ['Gibbs_Register_Login', 'gibbs_new_user_notification_function'], 10, 2);
+
+
         add_action('wp_enqueue_scripts', array('Gibbs_Register_Login', 'enqueue_scripts'));
 
         add_action('wp_ajax_gibbsajaxlogin', array('Gibbs_Register_Login', 'gibbsajaxlogin'));
@@ -23,6 +26,16 @@ class Gibbs_Register_Login
 
 
 
+    }
+
+    public function gibbs_new_user_notification_function($user_id, $password){
+
+        $file  = ABSPATH . 'cron_log_dummy.txt';
+        $current_time = time();
+        $message = "[$current_time] User ID: $user_id";
+        file_put_contents($file, $message . PHP_EOL, FILE_APPEND);
+
+        wp_new_user_notification( $user_id, $password,'both' );
     }
 
     public function login_with_code(){
@@ -310,7 +323,6 @@ class Gibbs_Register_Login
     private function register_user( $email, $user_login, $first_name, $last_name, $role, $password) {
         $errors = new WP_Error();
 
-
      
         // Email address is used as both username and email. It is also the only
         // parameter we need to validate
@@ -368,10 +380,15 @@ class Gibbs_Register_Login
         //  }
         // }
         if ( ! is_wp_error( $user_id ) ) {
-            wp_new_user_notification( $user_id, $password,'both' );
+            //wp_new_user_notification( $user_id, $password,'both' );
             wp_set_current_user($user_id); // set the current wp user
             wp_set_auth_cookie($user_id);
-            
+
+            as_enqueue_async_action(
+                'gibbs_new_user_notification',
+                ['user_id' => $user_id, 'password' => $password],
+                'gibbs' // custom group if you want
+            );
         }
         
      

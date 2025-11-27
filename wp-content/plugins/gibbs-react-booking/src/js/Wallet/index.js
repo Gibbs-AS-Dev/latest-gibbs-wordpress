@@ -5,7 +5,6 @@ import SmsLogContainer from './SmsLog';
 
 
 
-
 // Booking Container Component - handles both booking and confirmation states
 function WalletContainer({ page_id, apiUrl, homeUrl, user_token = null }) {
     const [currentView, setCurrentView] = useState('wallet');

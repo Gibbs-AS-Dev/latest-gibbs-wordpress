@@ -1,6 +1,6 @@
 <?php
 
-define('GIBBS_VERSION', '4.5.43');
+define('GIBBS_VERSION', '4.5.44');
 require get_stylesheet_directory() . '/vendor/autoload.php';
 require get_stylesheet_directory() . '/scripts.php';
 use Jumbojett\OpenIDConnectClient;
@@ -8777,3 +8777,4 @@ add_action('wp_ajax_activate_user_profile', 'activate_user_profile');
 add_action('wp_ajax_nopriv_activate_user_profile', 'activate_user_profile');
 
 add_filter('disable_ihaf_header', '__return_true');
+
