@@ -46,19 +46,19 @@ $all_joined_groups_results = $wpdb->get_results(
 	<!-- Recent Activity -->
 	<div class="col-lg-12 col-md-12">
 		<div class="user-dashboard-card with-icons margin-top-20" style="position: relative;">
-          <h4>Get started as rental admin</h4>
+          <h4><?php echo __("Get started as rental admin","gibbs");?></h4>
           <div class="content-user-dash">
               <div class="box-main">
                 <div class="box-inner">
-                    <span>1. Create user</span>
+                    <span>1. <?php echo __("Create user","gibbs");?></span>
 					<span><i class="fa-solid fa-circle-check"></i></span>
                 </div>
 				<div class="box-inner">
-                    <span>2. Create usergroup</span>
+                    <span>2. <?php echo __("Create usergroup","gibbs");?></span>
 					<?php if(empty($all_joined_groups_results)){ 
 						
 						?>
-					  <span class="listing_top_div"><button class="button btn btn-primary">Fill out</button></span>
+					  <span class="listing_top_div"><button class="button btn btn-primary"><?php echo __("Fill out","gibbs");?></button></span>
 					<?php }else{ 
 						$step2 = true;
 						?>
@@ -69,9 +69,9 @@ $all_joined_groups_results = $wpdb->get_results(
 				$active_package = get_user_meta(get_current_user_id(), 'license_status', true);
 				?>
 				<div class="box-inner">
-                    <span>3. Select package</span>
+                    <span>3. <?php echo __("Select package","gibbs");?></span>
 					<?php if($active_package != "active"){ ?>
-					  <span><a href="/packages"><button class="btn btn-primary">Select</button></a></span>
+					  <span><a href="/packages"><button class="btn btn-primary"><?php echo __("Select","gibbs");?></button></a></span>
 					<?php }else{ 
 						$step3 = true;
 						?>
@@ -83,9 +83,9 @@ $all_joined_groups_results = $wpdb->get_results(
 				$get_listing_count  = $Class_Gibbs_Subscription->get_listing_count();
 				?>
 				<div class="box-inner">
-                    <span>4. Create your first listing</span>
+                    <span>4. <?php echo __("Create your first listing","gibbs");?></span>
 					<?php if($get_listing_count < 1){ ?>
-						<span><a href="/my-listings/"><button class="btn btn-primary">Create listing</button></a></span>
+						<span><a href="/my-listings/"><button class="btn btn-primary"><?php echo __("Create listing","gibbs");?></button></a></span>
 					<?php }else{ 
 						$step4 = true;
 						?>
@@ -108,9 +108,9 @@ $all_joined_groups_results = $wpdb->get_results(
 				$saldo = get_user_meta($current_user->ID, 'listeo_core_bank_details', true);
 				?>
 				<div class="box-inner">
-                    <span>5. Provide payout account number</span>
+                    <span>5. <?php echo __("Provide payout account number","gibbs");?></span>
 					<?php if($saldo == ""){ ?>
-						<span><a href="/saldo/?popup-saldo=true"><button class="btn btn-primary">Add</button></a></span>
+						<span><a href="/saldo/?popup-saldo=true"><button class="btn btn-primary"><?php echo __("Add","gibbs");?></button></a></span>
 					<?php }else{ 
 						$step5 = true;
 						?>
