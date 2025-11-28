@@ -122,7 +122,7 @@ $step4 =false;
 	<div class="col-lg-12 col-md-12">
 		<div class="user-dashboard-card with-icons margin-top-20" style="position: relative;">
 			<div class="d-flex justify-content-space-between inner-ur">
-			    <h4>Kom igang som utleier</h4>
+			    <h4><?php echo __("Get started as rental admin","gibbs");?></h4>
 				<div class="slide-tab"><i class="fa fa-chevron-up up-arrow" ></i><i class="fa fa-chevron-down down-arrow" style="display: none;"></i></div>
 			</div>
           
@@ -130,20 +130,20 @@ $step4 =false;
               <div class="box-main">
                 <div class="box-inner">
 				<div>
-					<h4>1. Register deg på gibbs.no</h4> 
-                    <p> Du har allerede gjort et stort skrit frem til automatiske bookinger</p>
+					<h4>1. <?php echo __("Register on gibbs.no","gibbs");?></h4> 
+                    <p><?php echo __("You have already taken a big step towards automatic bookings","gibbs");?></p>
 					</div>
 					<span><i class="fa-solid fa-circle-check"></i></span>
                 </div>
 				<div class="box-inner">
 				<div>
-					<h4>2. Opprett avdeling</h4> 
-                    <p>Sett opp hvor bookingvarsler skal sendes, og håndter brukertilganger</p>
+					<h4>2. <?php echo __("Create department","gibbs");?></h4> 
+                    <p><?php echo __("Set up where booking notifications should be sent, and manage user access","gibbs");?></p>
 					</div>
 					<?php if(empty($all_joined_groups_results)){ 
 						$ative_steps = true;
 						?>
-					  <span class="listing_top_div"><button class="button btn btn-primary">Opprett avdeling</button></span>
+					  <span class="listing_top_div"><button class="button btn btn-primary"><?php echo __("Create department","gibbs");?></button></span>
 					<?php }else{ 
 						$step2 = true;
 						?>
@@ -155,13 +155,13 @@ $step4 =false;
 				?>
 				<div class="box-inner">
 				<div>
-					<h4>3. Velg pakke</h4> 
-                    <p>Hva ønsker du å bruke sytemet til? Kun automatiske bookinger,og eller automatisk adgang og varme/lys styring?</p>
+					<h4>3. <?php echo __("Select package","gibbs");?></h4> 
+                    <p><?php echo __("What do you want to use the system for? Only automatic bookings, or automatic access and heating/light control?","gibbs");?></p>
 					</div>
 					<?php if($active_package != "active"){
 						$ative_steps = true;
 						 ?>
-					  <span><button onclick="location.href='/packages'" class="button btn btn-primary" <?php if($step2 == false){ echo "disabled";}?>>Velg</button></span>
+					  <span><button onclick="location.href='/packages'" class="button btn btn-primary" <?php if($step2 == false){ echo "disabled";}?>><?php echo __("Select","gibbs");?></button></span>
 					<?php }else{ 
 						$step3 = true;
 						?>
@@ -174,14 +174,14 @@ $step4 =false;
 				?>
 				<div class="box-inner">
 					<div>
-					<h4>4. Publiser din første annone/utleieobjekt</h4> 
-                    <p>Så snart den er publisert, er du klar for å ta imot bookinger</p>
+					<h4>4. <?php echo __("Publish your first advertisement/rental object","gibbs");?></h4> 
+                    <p><?php echo __("As soon as it is published, you are ready to receive bookings","gibbs");?></p>
 					</div>
 					
 					<?php if($get_listing_count < 1){ 
 						$ative_steps = true;
 						?>
-						<span><button onclick="location.href='/my-listings/add-listings/'" class="button btn btn-primary" <?php if($step3 == false){ echo "disabled";}?>>Opprett</button></span>
+						<span><button onclick="location.href='/my-listings/add-listings/'" class="button btn btn-primary" <?php if($step3 == false){ echo "disabled";}?>><?php echo __("Create","gibbs");?></button></span>
 					<?php }else{ 
 						$step4 = true;
 						?>
@@ -204,16 +204,16 @@ $step4 =false;
 				?>
 				<div class="box-inner">
 				<div>
-				<h4><strong>5. Legg til utbetalings informasjon</strong></h4>
+				<h4><strong>5. <?php echo __("Add payout information","gibbs");?></strong></h4>
 
-					<p>Legg til ditt konto nummer for å ta imot penger av dine bookinger</p>
+					<p><?php echo __("Add your account number to receive money from your bookings","gibbs");?></p>
 				</div>
 					
 						<?php if($saldo == ""){ 
 							$ative_steps = true;
 						?>
 							<span>
-									<button onclick="location.href='/saldo/?popup-saldo=true'" class="button btn btn-primary" <?php if($step4 == false){ echo "disabled";}?>>Legg til</button>
+									<button onclick="location.href='/saldo/?popup-saldo=true'" class="button btn btn-primary" <?php if($step4 == false){ echo "disabled";}?>><?php echo __("Add","gibbs");?></button>
 								
 							</span>
 						<?php } else { 
