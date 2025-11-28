@@ -645,12 +645,7 @@ class Class_Gibbs_Subscription
             $data = json_decode(file_get_contents('php://input'), true);
             $package_id = $data['package_id']; 
 
-            $group_admin = get_group_admin();
-            if($group_admin != ""){
-                $user_id = $group_admin;
-            }else{
-                $user_id = get_current_user_id();
-            }
+            $user_id = $this->get_super_admin();
 
             $company_name = get_user_meta($user_id, 'billing_company', true);
             $organization_number = get_user_meta($user_id, 'company_number', true);
@@ -660,7 +655,7 @@ class Class_Gibbs_Subscription
 
 
 
-            $user_id = $this->get_super_admin();
+            
             $user_data = get_userdata($user_id);
             $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
 
@@ -779,33 +774,39 @@ class Class_Gibbs_Subscription
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
 
-            $group_admin = get_group_admin();
-            if($group_admin != ""){
-                $user_id = $group_admin;
+            if(class_exists('Class_Gibbs_Subscription')){
+                $Class_Gibbs_Subscription = new Class_Gibbs_Subscription();
+        
+                $super_admin = $Class_Gibbs_Subscription->get_super_admin();
+                if($super_admin != ""){
+                    $info_user_id = $super_admin;
+                }else{
+                    $info_user_id = get_current_user_id();
+                }
             }else{
-                $user_id = get_current_user_id();
+                $info_user_id = get_current_user_id();
             }
             
-            if (!$user_id) {
+            if (!$info_user_id) {
                 echo json_encode(['success' => false, 'error' => __("User not found", "gibbs")]);
                 wp_die();
             }
             
             // Save Company Information
             if(isset($data['company_name'])){
-                update_user_meta($user_id, 'billing_company', sanitize_text_field($data['company_name']));
+                update_user_meta($info_user_id, 'billing_company', sanitize_text_field($data['company_name']));
             }
             if(isset($data['street_address'])){
-                update_user_meta($user_id, 'billing_address_1', sanitize_text_field($data['street_address']));
+                update_user_meta($info_user_id, 'billing_address_1', sanitize_text_field($data['street_address']));
             }
             if(isset($data['zip_code'])){
-                update_user_meta($user_id, 'billing_postcode', sanitize_text_field($data['zip_code']));
+                update_user_meta($info_user_id, 'billing_postcode', sanitize_text_field($data['zip_code']));
             }
             if(isset($data['city'])){
-                update_user_meta($user_id, 'billing_city', sanitize_text_field($data['city']));
+                update_user_meta($info_user_id, 'billing_city', sanitize_text_field($data['city']));
             }
             if(isset($data['organization_number'])){
-                update_user_meta($user_id, 'company_number', sanitize_text_field($data['organization_number']));
+                update_user_meta($info_user_id, 'company_number', sanitize_text_field($data['organization_number']));
             }
             
             echo json_encode(['success' => true]);

@@ -1,6 +1,6 @@
 <?php
 
-define('GIBBS_VERSION', '4.5.46');
+define('GIBBS_VERSION', '4.5.47');
 require get_stylesheet_directory() . '/vendor/autoload.php';
 require get_stylesheet_directory() . '/scripts.php';
 use Jumbojett\OpenIDConnectClient;
@@ -8009,33 +8009,47 @@ function save_settings(){
     update_user_meta( $currency_user_id, 'currency', $_POST["currency"] );
     update_user_meta( $currency_user_id, 'admin_emails', $_POST["admin_emails"] );
 
+
+    if(class_exists('Class_Gibbs_Subscription')){
+        $Class_Gibbs_Subscription = new Class_Gibbs_Subscription();
+
+        $super_admin = $Class_Gibbs_Subscription->get_super_admin();
+        if($super_admin != ""){
+            $info_user_id = $super_admin;
+        }else{
+            $info_user_id = get_current_user_id();
+        }
+    }else{
+        $info_user_id = get_current_user_id();
+    }
+
     // Save Company Information
     if(isset($_POST["company_name"])){
-        update_user_meta( $currency_user_id, 'billing_company', sanitize_text_field($_POST["company_name"]) );
+        update_user_meta( $info_user_id, 'billing_company', sanitize_text_field($_POST["company_name"]) );
     }
     if(isset($_POST["street_address"])){
-        update_user_meta( $currency_user_id, 'billing_address_1', sanitize_text_field($_POST["street_address"]) );
+        update_user_meta( $info_user_id, 'billing_address_1', sanitize_text_field($_POST["street_address"]) );
     }
     if(isset($_POST["zip_code"])){
-        update_user_meta( $currency_user_id, 'billing_postcode', sanitize_text_field($_POST["zip_code"]) );
+        update_user_meta( $info_user_id, 'billing_postcode', sanitize_text_field($_POST["zip_code"]) );
     }
     if(isset($_POST["city"])){
-        update_user_meta( $currency_user_id, 'billing_city', sanitize_text_field($_POST["city"]) );
+        update_user_meta( $info_user_id, 'billing_city', sanitize_text_field($_POST["city"]) );
     }
     if(isset($_POST["organization_number"])){
-        update_user_meta( $currency_user_id, 'company_number', sanitize_text_field($_POST["organization_number"]) );
+        update_user_meta( $info_user_id, 'company_number', sanitize_text_field($_POST["organization_number"]) );
     }
     
     // Save Contact Person Information
     if(isset($_POST["contact_name"])){
-        update_user_meta( $currency_user_id, 'display_name', sanitize_text_field($_POST["contact_name"]) );
-        wp_update_user(array('ID' => $currency_user_id, 'display_name' => sanitize_text_field($_POST["contact_name"])));
+        update_user_meta( $info_user_id, 'display_name', sanitize_text_field($_POST["contact_name"]) );
+        wp_update_user(array('ID' => $info_user_id, 'display_name' => sanitize_text_field($_POST["contact_name"])));
     }
     if(isset($_POST["contact_email"])){
-        update_user_meta( $currency_user_id, 'billing_email', sanitize_email($_POST["contact_email"]) );
+        update_user_meta( $info_user_id, 'billing_email', sanitize_email($_POST["contact_email"]) );
     }
     if(isset($_POST["contact_phone"])){
-        update_user_meta( $currency_user_id, 'billing_phone', sanitize_text_field($_POST["contact_phone"]) );
+        update_user_meta( $info_user_id, 'billing_phone', sanitize_text_field($_POST["contact_phone"]) );
     }
 
     // if(isset($_POST["dintero_payment_checkbox"]) && $_POST["dintero_payment_checkbox"] == "on"){
