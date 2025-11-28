@@ -74,20 +74,20 @@ jQuery(document).ready(function($) {
             <div class="season-price-row" data-row="${rowNum}">
                 <div class="row">
                     <div class="col-md-3">
-                        <label for="season_name_${rowNum}"><?php echo __("Season Name","gibbs");?></label>
-                        <input type="text" name="season_name[]" id="season_name_${rowNum}" placeholder="<?php echo __("Season name","gibbs");?>" class="form-control" value="${seasonName}">
+                        <label for="season_name_${rowNum}"><?php echo __("Sesong Navn","gibbs");?></label>
+                        <input type="text" name="season_name[]" id="season_name_${rowNum}" placeholder="<?php echo __("Sesong Navn","gibbs");?>" class="form-control" value="${seasonName}">
                     </div>
                     <div class="col-md-3">
-                        <label for="season_price_percent_${rowNum}"><?php echo __("Sesongpris","gibbs");?> %</label>
-                        <input type="number" name="season_price_percent[]" id="season_price_percent_${rowNum}" placeholder="<?php echo __("Season Price","gibbs");?> %" class="form-control" step="0.01" min="-100" max="100" value="${seasonPercent}">
+                        <label for="season_price_percent_${rowNum}"><?php echo __("Sesong Pris","gibbs");?> %</label>
+                        <input type="number" name="season_price_percent[]" id="season_price_percent_${rowNum}" placeholder="<?php echo __("Sesong Pris","gibbs");?> %" class="form-control" step="0.01" min="-100" max="100" value="${seasonPercent}">
                     </div>
                     <div class="col-md-2">
-                        <label for="season_price_from_${rowNum}"><?php echo __("Fra dato","gibbs");?></label>
-                        <input type="date" name="season_price_from[]" id="season_price_from_${rowNum}" placeholder="<?php echo __("Fra dato","gibbs");?>" class="form-control" value="${seasonFrom}">
+                        <label for="season_price_from_${rowNum}"><?php echo __("Fra Dato","gibbs");?></label>
+                        <input type="date" name="season_price_from[]" id="season_price_from_${rowNum}" placeholder="<?php echo __("Fra Dato","gibbs");?>" class="form-control" value="${seasonFrom}">
                     </div>
                     <div class="col-md-2">
-                        <label for="season_price_to_${rowNum}"><?php echo __("Til dato","gibbs");?></label>
-                        <input type="date" name="season_price_to[]" id="season_price_to_${rowNum}" placeholder="<?php echo __("Til dato","gibbs");?>" class="form-control" value="${seasonTo}">
+                        <label for="season_price_to_${rowNum}"><?php echo __("Til Dato","gibbs");?></label>
+                        <input type="date" name="season_price_to[]" id="season_price_to_${rowNum}" placeholder="<?php echo __("Til Dato","gibbs");?>" class="form-control" value="${seasonTo}">
                     </div>
                     <div class="col-md-2 d-flex">
                         <div class="show-hide-checkbox-wrapper">
