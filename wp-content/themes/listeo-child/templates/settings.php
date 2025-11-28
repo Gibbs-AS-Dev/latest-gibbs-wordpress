@@ -86,10 +86,18 @@ if($active_group_id != ""){
             <?php } ?>
             
             <?php if($user_management_group_id != "0"){ 
-                // Get company and contact information
-                $group_admin = get_group_admin();
-                if($group_admin != ""){
-                    $info_user_id = $group_admin;
+
+                
+
+                if(class_exists('Class_Gibbs_Subscription')){
+                    $Class_Gibbs_Subscription = new Class_Gibbs_Subscription();
+
+                    $super_admin = $Class_Gibbs_Subscription->get_super_admin();
+                    if($super_admin != ""){
+                        $info_user_id = $super_admin;
+                    }else{
+                        $info_user_id = get_current_user_id();
+                    }
                 }else{
                     $info_user_id = get_current_user_id();
                 }

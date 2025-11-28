@@ -56,6 +56,19 @@ if(isset($active_sub->pricer->product) && $active_sub->pricer->product == $this-
     $disable_stripe_dashboard = true;
 }
 $trail = get_user_meta($super_admin, 'stripe_trail', true);
+
+if(class_exists('Class_Gibbs_Subscription')){
+    $Class_Gibbs_Subscription = new Class_Gibbs_Subscription();
+
+    $super_admin = $Class_Gibbs_Subscription->get_super_admin();
+    if($super_admin != ""){
+        $info_user_id = $super_admin;
+    }else{
+        $info_user_id = get_current_user_id();
+    }
+}else{
+    $info_user_id = get_current_user_id();
+}
 //echo "<pre>"; print_r($active_sub); die;
 ?>
 <div class="package-view">
@@ -162,22 +175,8 @@ $trail = get_user_meta($super_admin, 'stripe_trail', true);
                         <?php }else{ ?>
 
                             <?php
-                            $group_admin = get_group_admin();
 
-                            if($group_admin != ""){
-                                $cr_user_id = $group_admin;
-                            }else{
-                                $cr_user_id = get_current_user_id();
-                            }
-
-                            $company_name = get_user_meta($cr_user_id, 'billing_company', true);
-                            $street_address = get_user_meta($cr_user_id, 'billing_address_1', true);
-                            $zip_code = get_user_meta($cr_user_id, 'billing_postcode', true);
-                            $city = get_user_meta($cr_user_id, 'billing_city', true);
-                            $organization_number = get_user_meta($cr_user_id, 'company_number', true);
-                            $contact_name = get_user_meta($cr_user_id, 'display_name', true);
-                            $contact_email = get_user_meta($cr_user_id, 'billing_email', true);
-                            $contact_phone = get_user_meta($cr_user_id, 'billing_phone', true);
+                            $company_name = get_user_meta($info_user_id, 'billing_company', true);
 
                             $existCompanyData = true;
                             
@@ -311,18 +310,13 @@ $trail = get_user_meta($super_admin, 'stripe_trail', true);
         <div class="checkout-modal-body">
             <form id="checkout-contact-form">
                 <?php
-                $group_admin = get_group_admin();
-                if($group_admin != ""){
-                    $cr_user_id = $group_admin;
-                }else{
-                    $cr_user_id = get_current_user_id();
-                }
                 
-                $company_name = get_user_meta($cr_user_id, 'billing_company', true);
-                $street_address = get_user_meta($cr_user_id, 'billing_address_1', true);
-                $zip_code = get_user_meta($cr_user_id, 'billing_postcode', true);
-                $city = get_user_meta($cr_user_id, 'billing_city', true);
-                $organization_number = get_user_meta($cr_user_id, 'company_number', true);
+                
+                $company_name = get_user_meta($info_user_id, 'billing_company', true);
+                $street_address = get_user_meta($info_user_id, 'billing_address_1', true);
+                $zip_code = get_user_meta($info_user_id, 'billing_postcode', true);
+                $city = get_user_meta($info_user_id, 'billing_city', true);
+                $organization_number = get_user_meta($info_user_id, 'company_number', true);
                 
                 ?>
                 
