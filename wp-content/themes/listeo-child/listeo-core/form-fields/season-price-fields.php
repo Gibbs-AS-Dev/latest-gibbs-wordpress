@@ -20,8 +20,8 @@ if($season_discount_data != ""){
 ?>
 <div class="add-listing-section row menu switcher-on season-price-wrapper" style="">	
     <div class="add-listing-headline template_div_main switcher-on">
-        <h3>Season price</h3>
-        <p>Only available for new version of slots (In testing)</p>
+        <h3><?php echo __("Season price","gibbs");?></h3>
+        <p><?php echo __("Only available for new version of slots (In testing)","gibbs");?></p>
         <label class="switch" style="right: 19px;">
             <input id="season_status" name="season_status" type="checkbox" <?php if($season_status == "on"){echo "checked";}?>>
             <span class="slider round"></span>
@@ -37,7 +37,7 @@ if($season_discount_data != ""){
             <div class="row mt-3">
                 <div class="col-md-12">
                     <button type="button" class="btn btn-secondary" id="add-season-price">
-                        Add more
+                        <?php echo __("Add more","gibbs");?>
                     </button>
                 </div>
             </div>
@@ -57,7 +57,7 @@ jQuery(document).ready(function($) {
     function createSeasonPriceRow(rowNum, seasonData = null) {
         const isFirstRow = rowNum === 0;
         const deleteButton = isFirstRow ? '' : `<div class="delete-season-price-wrapper">
-            <label style="visibility: hidden;">Delete</label>
+            <label style="visibility: hidden;"><?php echo __("Delete","gibbs");?></label>
             <div class="select-input disabled-first-option delete-season-price">
                 <i class="fa fa-times"></i>
             </div>
@@ -74,24 +74,24 @@ jQuery(document).ready(function($) {
             <div class="season-price-row" data-row="${rowNum}">
                 <div class="row">
                     <div class="col-md-3">
-                        <label for="season_name_${rowNum}">Season Name</label>
-                        <input type="text" name="season_name[]" id="season_name_${rowNum}" placeholder="Season name" class="form-control" value="${seasonName}">
+                        <label for="season_name_${rowNum}"><?php echo __("Season Name","gibbs");?></label>
+                        <input type="text" name="season_name[]" id="season_name_${rowNum}" placeholder="<?php echo __("Season name","gibbs");?>" class="form-control" value="${seasonName}">
                     </div>
                     <div class="col-md-3">
-                        <label for="season_price_percent_${rowNum}">Season Price %</label>
-                        <input type="number" name="season_price_percent[]" id="season_price_percent_${rowNum}" placeholder="Season Price %" class="form-control" step="0.01" min="-100" max="100" value="${seasonPercent}">
+                        <label for="season_price_percent_${rowNum}"><?php echo __("Season Price %","gibbs");?></label>
+                        <input type="number" name="season_price_percent[]" id="season_price_percent_${rowNum}" placeholder="<?php echo __("Season Price %","gibbs");?>" class="form-control" step="0.01" min="-100" max="100" value="${seasonPercent}">
                     </div>
                     <div class="col-md-2">
-                        <label for="season_price_from_${rowNum}">From Date</label>
-                        <input type="date" name="season_price_from[]" id="season_price_from_${rowNum}" placeholder="From date" class="form-control" value="${seasonFrom}">
+                        <label for="season_price_from_${rowNum}"><?php echo __("From Date","gibbs");?></label>
+                        <input type="date" name="season_price_from[]" id="season_price_from_${rowNum}" placeholder="<?php echo __("From date","gibbs");?>" class="form-control" value="${seasonFrom}">
                     </div>
                     <div class="col-md-2">
-                        <label for="season_price_to_${rowNum}">To Date</label>
-                        <input type="date" name="season_price_to[]" id="season_price_to_${rowNum}" placeholder="To date" class="form-control" value="${seasonTo}">
+                        <label for="season_price_to_${rowNum}"><?php echo __("To Date","gibbs");?></label>
+                        <input type="date" name="season_price_to[]" id="season_price_to_${rowNum}" placeholder="<?php echo __("To date","gibbs");?>" class="form-control" value="${seasonTo}">
                     </div>
                     <div class="col-md-2 d-flex">
                         <div class="show-hide-checkbox-wrapper">
-                            <label class="show-hide-label">Active/Inactive</label>
+                            <label class="show-hide-label"><?php echo __("Active/Inactive","gibbs");?></label>
                             <label class="switch switch-sm" style="top: 47px;left: 30px;">
                                 <input type="checkbox" id="season_price_active_${rowNum}" class="season-price-checkbox" ${seasonActive}>
                                 <span class="slider round"></span>
