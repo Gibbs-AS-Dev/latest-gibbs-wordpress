@@ -497,53 +497,46 @@
 }
 
 .licenseBadge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 5px;
+  border-radius: 2px; // pill shape
+  font-size: 12px;
   font-weight: 500;
+  line-height: 1;
   white-space: nowrap;
+  border: 1px solid transparent;
 }
 
 .badgeCustomPlan {
-  background: #9333ea;
-  color: #ffffff;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
+  background: #f3e8ff;
+  color: #6d28d9;
+  border-color: #e9d5ff;
 }
 
 .badgeTrial {
-  background: #fbbf24;
-  color: #ffffff;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
+  background: #fef3c7;
+  color: #b45309;
+  border-color: #fde68a;
 }
 
 .badgeNoLicense {
-  background: #ef4444;
-  color: #ffffff;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
+  background: #fee2e2;
+  color: #b91c1c;
+  border-color: #fecaca;
 }
 
 .badgeStandard {
-  background: #3b82f6;
-  color: #ffffff;
-  padding: 4px 12px;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
 }
 
 .badgeDefault {
-  background: #e2e8f0;
-  color: #475569;
+  background: #e5e7eb;
+  color: #4b5563;
+  border-color: #d1d5db;
 }
 
 

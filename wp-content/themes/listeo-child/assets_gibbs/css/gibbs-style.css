@@ -5119,7 +5119,11 @@ form#listeo_core-search-form {
     margin-top: 6px;
 }
 
+input[type="radio"] {
+  accent-color: #008474; /* Any color you want */
+}
 
+/* 
 input[type='radio']:after {
     width: 17px;
     height: 17px;
@@ -5144,7 +5148,7 @@ input[type='radio']:checked:after {
     display: inline-block;
     visibility: visible;
     border: 1px solid #008474;
-}
+} */
 
 .modal-header svg{
     padding-right: 6px;
@@ -6243,7 +6247,7 @@ label.cal_checkbox {
     margin: 0px;
     font-weight: bold;
 }
-
+/* 
 .payment-tab input[type='radio']:checked:after {
     width: 20px;
     height: 19px;
@@ -6264,7 +6268,7 @@ label.cal_checkbox {
 
     background-color: #d1d3d100;
     border: 2px #00000000 solid;
-}
+} */
 
 .listeo-dialog .mfp-close, #sign-in-dialog .mfp-close, #small-dialog .mfp-close {
     top: 12%;

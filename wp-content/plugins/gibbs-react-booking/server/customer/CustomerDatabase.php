@@ -93,8 +93,9 @@ class CustomerDatabase {
         $offset = ($page - 1) * $perPage;
 
         // Validate sort column
-        $allowedSortColumns = ['name', 'created_at', 'superadmin', 'group_admin', 'type_of_form'];
-        $sortBy = in_array($sortBy, $allowedSortColumns) ? $sortBy : 'superadmin';
+        $allowedSortColumns = ['name', 'created_at', 'superadmin', 'group_admin', 'type_of_form', 'email'];
+        $sortBy = in_array($sortBy, $allowedSortColumns) ? $sortBy : 'id';
+        
 
         // Build where conditions for subquery
         $baseWhereConditions = ["superadmin IS NOT NULL AND superadmin != 0"];
@@ -102,18 +103,25 @@ class CustomerDatabase {
         if ($tab === 'stripe') {
             $baseWhereConditions[] = "EXISTS (
                 SELECT 1 
-                FROM {$this->wp_prefix}usermeta um 
-                WHERE um.user_id = superadmin 
-                  AND um.meta_key = 'subscription_id' 
-                  AND um.meta_value != ''
+                FROM {$this->wp_prefix}usermeta um_sid
+                WHERE um_sid.user_id = superadmin 
+                  AND um_sid.meta_key = 'subscription_id' 
+                  AND um_sid.meta_value != ''
+            ) 
+            AND NOT EXISTS (
+                SELECT 1 
+                FROM {$this->wp_prefix}usermeta um_sid
+                WHERE um_sid.user_id = superadmin 
+                  AND um_sid.meta_key = 'subscription_type' 
+                  AND um_sid.meta_value = 'invoice'
             )";
         }else if ($tab === 'invoice') {
             $baseWhereConditions[] = "EXISTS (
                 SELECT 1 
                 FROM {$this->wp_prefix}usermeta um 
                 WHERE um.user_id = superadmin 
-                  AND um.meta_key = 'subscription_id' 
-                  AND (um.meta_value = '' OR um.meta_value IS NULL)
+                  AND um.meta_key = 'subscription_type' 
+                  AND um.meta_value = 'invoice'
             )";
         }
         // Apply license status filter (active/inactive) based on usermeta 'license_status'
@@ -195,9 +203,11 @@ class CustomerDatabase {
         // Using subquery to get one record per unique superadmin (using MIN id to get first record)
         $sortColumn = $sortBy === 'name' ? 'ug.name' : 
                      ($sortBy === 'created_at' ? 'ug.created_at' : 
-                     ($sortBy === 'superadmin' ? 'ug.superadmin' : 
+                     ($sortBy === 'superadmin' ? 'u.display_name' : 
+                     ($sortBy === 'id' ? 'ug.superadmin' : 
                      ($sortBy === 'group_admin' ? 'ug.group_admin' : 
-                     ($sortBy === 'type_of_form' ? 'ug.type_of_form' : 'ug.name'))));
+                     ($sortBy === 'email' ? 'u.user_email' : 
+                     ($sortBy === 'type_of_form' ? 'ug.type_of_form' : 'ug.name'))))));
         
         $sql = "SELECT 
             ug.id,

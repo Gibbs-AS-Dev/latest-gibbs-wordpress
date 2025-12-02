@@ -3429,7 +3429,7 @@ form#listeo_core-search-form {
     margin-top: 6px;
 }
 
-
+/* 
 input[type='radio']:after {
     width: 17px;
     height: 17px;
@@ -3454,7 +3454,7 @@ input[type='radio']:checked:after {
     display: inline-block;
     visibility: visible;
     border: 1px solid #008474;
-}
+} */
 
 .modal-header svg{
     padding-right: 6px;
@@ -4567,7 +4567,7 @@ label.cal_checkbox {
     font-weight: bold;
 }
 
-.payment-tab input[type='radio']:checked:after {
+/* .payment-tab input[type='radio']:checked:after {
     width: 20px;
     height: 19px;
     border-radius: 15px;
@@ -4579,15 +4579,15 @@ label.cal_checkbox {
     visibility: visible;
     border: 1px solid #008474;
     z-index: 10;
-}
+} */
 
 
-
+/* 
 .payment-tab input[type='radio']:after {
 
     background-color: #d1d3d100;
     border: 2px #00000000 solid;
-}
+} */
 
 .listeo-dialog .mfp-close, #sign-in-dialog .mfp-close, #small-dialog .mfp-close {
     top: 12%;
