@@ -8,6 +8,9 @@
   border-radius: 0;
   // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   // padding: 20px 16px;
+  // &:hover {
+  //   overflow-x: auto;
+  // }
 }
 
 .table {
@@ -46,8 +49,13 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    cursor: pointer;
+    cursor: default;
     transition: background-color 0.2s ease;
+
+    // Sortable columns have pointer cursor
+    .sortableHeader {
+      cursor: pointer;
+    }
   }
 
   tbody tr {
@@ -80,5 +88,25 @@
 .w40 { width: 40%; }
 .w45 { width: 45%; }
 .w50 { width: 50%; }
+
+// Sortable header styles
+.sortableHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  user-select: none;
+  
+  &:hover {
+    color: #111827;
+  }
+}
+
+.sortIcon {
+  font-size: 12px;
+  color: #64748b;
+  margin-left: 4px;
+  font-weight: 400;
+}
 
 

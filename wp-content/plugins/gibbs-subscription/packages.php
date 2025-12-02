@@ -312,35 +312,35 @@ if(class_exists('Class_Gibbs_Subscription')){
                 <?php
                 
                 
-                $company_name = get_user_meta($info_user_id, 'billing_company', true);
-                $street_address = get_user_meta($info_user_id, 'billing_address_1', true);
-                $zip_code = get_user_meta($info_user_id, 'billing_postcode', true);
-                $city = get_user_meta($info_user_id, 'billing_city', true);
-                $organization_number = get_user_meta($info_user_id, 'company_number', true);
+                $company_name = get_user_meta($info_user_id, 'package_company_name', true);
+                $street_address = get_user_meta($info_user_id, 'package_street_address', true);
+                $zip_code = get_user_meta($info_user_id, 'package_zip_code', true);
+                $city = get_user_meta($info_user_id, 'package_city', true);
+                $organization_number = get_user_meta($info_user_id, 'package_organization_number', true);
                 
                 ?>
                 
                 <div class="checkout-form-group">
                     <label for="checkout_company_name"><?php echo __("Company Name","gibbs");?></label>
-                    <input type="text" id="checkout_company_name" name="company_name" value="<?php echo esc_attr($company_name);?>" placeholder="<?php echo __("Company Name Inc.","gibbs");?>" />
+                    <input type="text" id="checkout_company_name" name="package_company_name" value="<?php echo esc_attr($company_name);?>" placeholder="<?php echo __("Company Name Inc.","gibbs");?>" />
                 </div>
                 <div class="checkout-form-group">
                     <label for="checkout_street_address"><?php echo __("Street Address","gibbs");?></label>
-                    <input type="text" id="checkout_street_address" name="street_address" value="<?php echo esc_attr($street_address);?>" placeholder="<?php echo __("Street Address","gibbs");?>" />
+                    <input type="text" id="checkout_street_address" name="package_street_address" value="<?php echo esc_attr($street_address);?>" placeholder="<?php echo __("Street Address","gibbs");?>" />
                 </div>
                 <div class="checkout-form-row">
                     <div class="checkout-form-group checkout-form-group-half">
                         <label for="checkout_zip_code"><?php echo __("Zip Code","gibbs");?></label>
-                        <input type="text" id="checkout_zip_code" name="zip_code" value="<?php echo esc_attr($zip_code);?>" placeholder="<?php echo __("0000","gibbs");?>" />
+                        <input type="text" id="checkout_zip_code" name="package_zip_code" value="<?php echo esc_attr($zip_code);?>" placeholder="<?php echo __("0000","gibbs");?>" />
                     </div>
                     <div class="checkout-form-group checkout-form-group-half">
                         <label for="checkout_city"><?php echo __("City","gibbs");?></label>
-                        <input type="text" id="checkout_city" name="city" value="<?php echo esc_attr($city);?>" placeholder="<?php echo __("City","gibbs");?>" />
+                        <input type="text" id="checkout_city" name="package_city" value="<?php echo esc_attr($city);?>" placeholder="<?php echo __("City","gibbs");?>" />
                     </div>
                 </div>
                 <div class="checkout-form-group">
                     <label for="checkout_organization_number"><?php echo __("Organization Number","gibbs");?></label>
-                    <input type="text" id="checkout_organization_number" name="organization_number" value="<?php echo esc_attr($organization_number);?>" placeholder="<?php echo __("999 999 999","gibbs");?>" />
+                    <input type="text" id="checkout_organization_number" name="package_organization_number" value="<?php echo esc_attr($organization_number);?>" placeholder="<?php echo __("999 999 999","gibbs");?>" />
                 </div>
             </form>
         </div>

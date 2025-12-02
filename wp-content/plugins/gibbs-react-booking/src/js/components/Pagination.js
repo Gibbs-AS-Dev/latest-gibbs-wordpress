@@ -15,7 +15,7 @@ function Pagination({
 
   const renderPageNumbers = () => {
     const pages = [];
-    const maxVisiblePages = 5;
+    const maxVisiblePages = 10;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
@@ -36,7 +36,7 @@ function Pagination({
         </button>
       );
       if (startPage > 2) {
-        pages.push(<span key="ellipsis1" className={styles.ellipsis}>...</span>);
+        pages.push(<button key="ellipsis1" className={styles.pageButton}>...</button>);
       }
     }
 
@@ -58,7 +58,7 @@ function Pagination({
     // Last page
     if (endPage < totalPages) {
       if (endPage < totalPages - 1) {
-        pages.push(<span key="ellipsis2" className={styles.ellipsis}>...</span>);
+        pages.push(<button key="ellipsis2" className={styles.pageButton}>...</button>);
       }
       pages.push(
         <button
@@ -87,11 +87,8 @@ function Pagination({
     <div className={`${styles.gibbsPagination} ${className}`}>
       {showInfo && (
         <div className={styles.paginationInfo}>
-          <span className={styles.pageInfo}>
-            {Ltext("Page")} {currentPage} {Ltext("of")} {totalPages}
-          </span>
           <span className={styles.itemInfo}>
-            {Ltext("Showing")} {start}-{end} {Ltext("of")} {totalItems} {Ltext("items")}
+            {Ltext("Showing")} {start} {Ltext("to")} {end} {Ltext("of")} {totalItems} {Ltext("results")}
           </span>
         </div>
       )}
@@ -103,10 +100,7 @@ function Pagination({
           className={`${styles.navButton} ${styles.prevButton} ${currentPage === 1 ? styles.disabled : ''}`}
           aria-label={Ltext("Previous page")}
         >
-          {/* <svg className={styles.chevronLeft} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M15 18l-6-6 6-6" />
-          </svg> */}
-          {Ltext("Previous")}
+          <i className="fa fa-chevron-left"></i>
         </button>
 
         <div className={styles.pageNumbers}>
@@ -119,10 +113,7 @@ function Pagination({
           className={`${styles.navButton} ${styles.nextButton} ${currentPage === totalPages ? styles.disabled : ''}`}
           aria-label={Ltext("Next page")}
         >
-          {Ltext("Next")}
-          {/* <svg className={styles.chevronRight} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M9 18l6-6-6-6" />
-          </svg> */}
+          <i className="fa fa-chevron-right"></i>
         </button>
       </div>
     </div>

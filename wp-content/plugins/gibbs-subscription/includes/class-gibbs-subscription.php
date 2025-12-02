@@ -793,20 +793,20 @@ class Class_Gibbs_Subscription
             }
             
             // Save Company Information
-            if(isset($data['company_name'])){
-                update_user_meta($info_user_id, 'billing_company', sanitize_text_field($data['company_name']));
+            if(isset($data['package_company_name'])){
+                update_user_meta($info_user_id, 'package_company_name', sanitize_text_field($data['package_company_name']));
             }
-            if(isset($data['street_address'])){
-                update_user_meta($info_user_id, 'billing_address_1', sanitize_text_field($data['street_address']));
+            if(isset($data['package_street_address'])){
+                update_user_meta($info_user_id, 'package_street_address', sanitize_text_field($data['package_street_address']));
             }
-            if(isset($data['zip_code'])){
-                update_user_meta($info_user_id, 'billing_postcode', sanitize_text_field($data['zip_code']));
+            if(isset($data['package_zip_code'])){
+                update_user_meta($info_user_id, 'package_zip_code', sanitize_text_field($data['package_zip_code']));
             }
-            if(isset($data['city'])){
-                update_user_meta($info_user_id, 'billing_city', sanitize_text_field($data['city']));
+            if(isset($data['package_city'])){
+                update_user_meta($info_user_id, 'package_city', sanitize_text_field($data['package_city']));
             }
-            if(isset($data['organization_number'])){
-                update_user_meta($info_user_id, 'company_number', sanitize_text_field($data['organization_number']));
+            if(isset($data['package_organization_number'])){
+                update_user_meta($info_user_id, 'package_organization_number', sanitize_text_field($data['package_organization_number']));
             }
             
             echo json_encode(['success' => true]);
