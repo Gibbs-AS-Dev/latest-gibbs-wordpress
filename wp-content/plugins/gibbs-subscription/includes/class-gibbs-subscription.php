@@ -1018,9 +1018,14 @@ class Class_Gibbs_Subscription
                                         update_user_meta($user->ID, 'license_status', "active");
                                         update_user_meta($user->ID, 'stripe_trail', "true");
                                         update_user_meta($user->ID, 'subscription_id', $subscription->id);
+                                        if(isset($subscription->plan) && isset($subscription->plan["amount"]) && $subscription->plan["amount"] < 1){
+                                            update_user_meta($user->ID, 'subscription_type', "invoice");
+                                        }else{
+                                            update_user_meta($user->ID, 'subscription_type', "paid");
+                                        }
+                                        $this->updatePackage($user->ID, $subscription);
+
                                         $this->update_group_licence($user->ID,1);
-    
-                                    
                                 }else{
                                     update_user_meta($user->ID, 'license_status', "inactive");
                                     update_user_meta($user->ID, 'subscription_id', "");
@@ -1078,6 +1083,37 @@ class Class_Gibbs_Subscription
         }
 
         return new WP_REST_Response(['status' => 'success'], 200);
+    }
+
+    public function updatePackage($user_id, $subscription) {
+        global $wpdb;
+
+        if(isset($subscription->plan) && isset($subscription->plan["product"]) && $subscription->plan["product"] != ""){
+
+            $stripe_product_id = $subscription->plan["product"];
+
+            $query = $wpdb->prepare(
+                "select * from {$wpdb->prefix}posts where post_type = 'stripe-packages' AND post_status = 'publish'",
+                $stripe_product_id
+            );
+            $packages = $wpdb->get_results($query);
+
+            $package_id = "";
+            if($packages){
+                foreach($packages as $package){
+                    $stripe_product_id_package = get_post_meta($package->ID, 'stripe_product_id', true);
+                    if($stripe_product_id_package == $stripe_product_id){
+
+                        $package_id = $package->ID;
+                        break;
+                    }
+                }
+            }
+            if($package_id != ""){
+                update_user_meta($user_id, 'package_id', $package_id);
+            }
+        }
+
     }
 
     // Helper function to get user by Stripe customer ID

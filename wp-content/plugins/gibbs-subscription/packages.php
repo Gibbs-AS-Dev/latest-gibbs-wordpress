@@ -176,7 +176,7 @@ if(class_exists('Class_Gibbs_Subscription')){
 
                             <?php
 
-                            $company_name = get_user_meta($info_user_id, 'billing_company', true);
+                            $company_name = get_user_meta($info_user_id, 'package_company_name', true);
 
                             $existCompanyData = true;
                             

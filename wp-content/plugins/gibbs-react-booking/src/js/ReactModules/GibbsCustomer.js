@@ -55,6 +55,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
 
     setLoading(true);
     setError(null);
+    setPaginationMeta({ total: 0, totalPages: 1 });
 
     try {
       const params = {
@@ -312,6 +313,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
     {
       key: 'email',
       header: 'EMAIL',
+      sortable: true,
       thStyle: { width: '12%' },
       render: (row) => row.email || '—'
     },
@@ -319,7 +321,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
       key: 'phone',
       header: 'PHONE',
       thStyle: { width: '8%' },
-      render: (row) => (row.country_code ? row.country_code + ' ' + row.phone : row.phone) || '—'
+      render: (row) => (row.country_code && row.phone != '' ? row.country_code + ' ' + row.phone : row.phone || '—')
     },
     {
       key: 'gibbs_licenses',
@@ -418,9 +420,10 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
       }
     },
     {
-      key: 'created',
+      key: 'created_at',
       header: 'CREATED',
       thStyle: { width: '10%' },
+      sortable: true,
       render: (row) => formatDate(row.created_at || row.created)
     },
     {
@@ -603,7 +606,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
                             { key: 'email', label: 'EMAIL' },
                             { key: 'phone', label: 'PHONE' },
                             { key: 'gibbs_licenses', label: 'GIBBS LICENSES' },
-                            { key: 'created', label: 'CREATED' },
+                            { key: 'created_at', label: 'CREATED' },
                             { key: 'stripe_license', label: 'STRIPE LICENSE' },
                             { key: 'payment', label: 'PAYMENT' },
                             { key: 'next_invoice', label: 'NEXT INVOICE' }
