@@ -1,6 +1,6 @@
 <?php
 
-define('GIBBS_VERSION', '4.5.47');
+define('GIBBS_VERSION', '4.5.49');
 require get_stylesheet_directory() . '/vendor/autoload.php';
 require get_stylesheet_directory() . '/scripts.php';
 use Jumbojett\OpenIDConnectClient;
@@ -8023,33 +8023,33 @@ function save_settings(){
         $info_user_id = get_current_user_id();
     }
 
+
     // Save Company Information
-    if(isset($_POST["company_name"])){
-        update_user_meta( $info_user_id, 'billing_company', sanitize_text_field($_POST["company_name"]) );
+    if(isset($_POST["package_company_name"])){
+        update_user_meta( $info_user_id, 'package_company_name', sanitize_text_field($_POST["package_company_name"]) );
     }
-    if(isset($_POST["street_address"])){
-        update_user_meta( $info_user_id, 'billing_address_1', sanitize_text_field($_POST["street_address"]) );
+    if(isset($_POST["package_street_address"])){
+        update_user_meta( $info_user_id, 'package_street_address', sanitize_text_field($_POST["package_street_address"]) );
     }
-    if(isset($_POST["zip_code"])){
-        update_user_meta( $info_user_id, 'billing_postcode', sanitize_text_field($_POST["zip_code"]) );
+    if(isset($_POST["package_zip_code"])){
+        update_user_meta( $info_user_id, 'package_zip_code', sanitize_text_field($_POST["package_zip_code"]) );
     }
-    if(isset($_POST["city"])){
-        update_user_meta( $info_user_id, 'billing_city', sanitize_text_field($_POST["city"]) );
+    if(isset($_POST["package_city"])){
+        update_user_meta( $info_user_id, 'package_city', sanitize_text_field($_POST["package_city"]) );
     }
-    if(isset($_POST["organization_number"])){
-        update_user_meta( $info_user_id, 'company_number', sanitize_text_field($_POST["organization_number"]) );
+    if(isset($_POST["package_organization_number"])){
+        update_user_meta( $info_user_id, 'package_organization_number', sanitize_text_field($_POST["package_organization_number"]) );
     }
     
     // Save Contact Person Information
-    if(isset($_POST["contact_name"])){
-        update_user_meta( $info_user_id, 'display_name', sanitize_text_field($_POST["contact_name"]) );
-        wp_update_user(array('ID' => $info_user_id, 'display_name' => sanitize_text_field($_POST["contact_name"])));
+    if(isset($_POST["package_contact_name"])){
+        update_user_meta( $info_user_id, 'package_contact_name', sanitize_text_field($_POST["package_contact_name"]) );
     }
-    if(isset($_POST["contact_email"])){
-        update_user_meta( $info_user_id, 'billing_email', sanitize_email($_POST["contact_email"]) );
+    if(isset($_POST["package_contact_email"])){
+        update_user_meta( $info_user_id, 'package_contact_email', sanitize_email($_POST["package_contact_email"]) );
     }
-    if(isset($_POST["contact_phone"])){
-        update_user_meta( $info_user_id, 'billing_phone', sanitize_text_field($_POST["contact_phone"]) );
+    if(isset($_POST["package_contact_phone"])){
+        update_user_meta( $info_user_id, 'package_contact_phone', sanitize_text_field($_POST["package_contact_phone"]) );
     }
 
     // if(isset($_POST["dintero_payment_checkbox"]) && $_POST["dintero_payment_checkbox"] == "on"){
@@ -8186,9 +8186,16 @@ function save_gibbs_email_log($email_data, $order_id) {
     }
 }
 
-add_action( 'wp_mail_smtp_mailcatcher_send_after', "process_log_save_data", 99, 2 );
+add_action('process_log_save_data_async', 'process_log_save_data_async');
 
-function process_log_save_data( $mailer, $mailcatcher ) {
+function process_log_save_data_async() {
+    
+
+    // $file  = ABSPATH . "wpmail.txt";
+    // $myfile = fopen($file, "a");
+    // $text = "process_log_save_data_async started: ".date("Y-m-d H:i:s")." \r\n";
+    // fwrite($myfile, $text);
+    // fclose($myfile);
 
     global $wpdb;
 
@@ -8200,15 +8207,42 @@ function process_log_save_data( $mailer, $mailcatcher ) {
     $query = "
         SELECT * FROM $wpmailsmtp_emails_log_table 
         ORDER BY id DESC
-        LIMIT 10
+        LIMIT 5
     ";
     
     $results = $wpdb->get_results($query);
-    
+
+    $ids = array_map(function($item) {
+        return $item->id;
+    }, $results);
+
+    $gibbs_email_log_table = $wpdb->prefix . 'gibbs_email_log';
+
+
+    $already_processed_ids = array();
+
+
+    if(!empty($ids)){
+
+        $ids_string = implode(',', $ids);
+        // Query to get the last 5 emails sent
+        $query2 = "
+            SELECT wpmail_log_id FROM $gibbs_email_log_table where wpmail_log_id IN ($ids_string);
+        ";
+
+        $already_processed_ids = $wpdb->get_col($query2);
+    }
 
    
 
     foreach($results as $result){
+
+
+        if(!empty($already_processed_ids)){
+            if(in_array($result->id, $already_processed_ids)){
+                continue;
+            }
+        }
 
         $headers = json_decode($result->headers);
 
@@ -8259,8 +8293,24 @@ function process_log_save_data( $mailer, $mailcatcher ) {
             save_gibbs_email_log($result,$order_id);
         }
     }
-    return $mailer;
+}
 
+add_action( 'wp_mail_smtp_mailcatcher_send_after', "process_log_save_data", 99, 2 );
+
+function process_log_save_data( $mailer, $mailcatcher ) {
+
+    //process_log_save_data_async();
+    
+
+    //echo "<pre>"; print_r($mailer); die;
+
+    as_enqueue_async_action(
+        'process_log_save_data_async',
+        ['process_log_save_data_async' => "true"],
+        'gibbs' // custom group if you want
+    );
+
+    return $mailer;
   //  echo "<pre>"; print_r($results); die;
 }
 

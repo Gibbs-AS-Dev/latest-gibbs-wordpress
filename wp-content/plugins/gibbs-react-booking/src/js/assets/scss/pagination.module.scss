@@ -1,35 +1,20 @@
 // Pagination Component Styles
 .gibbsPagination {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 18px;
-  // Pagination Component Styles
-  .paginationContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 1rem;
-    margin: 2rem 0;
-    padding: 1rem;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  gap: 1rem;
 
-    @media (min-width: 768px) {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: center;
-    }
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .paginationInfo {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: center;
-
-    @media (min-width: 768px) {
-      text-align: left;
-      gap: 0.25rem;
-    }
+    align-items: center;
   }
 
   .pageInfo {
@@ -40,178 +25,132 @@
 
   .itemInfo {
     font-size: 0.875rem;
-    color: #9ca3af;
+    color: #6b7280;
   }
 
   .paginationControls {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    justify-content: right;
+    gap: 0;
+    padding: 0px;
+    background: #ffffff;
   }
 
   .pageNumbers {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0;
   }
 
   // Navigation Buttons (Previous/Next)
   .navButton {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    border: none;
+    justify-content: center;
+    border: 1px solid #e5e7eb;
     background: #ffffff;
-    color: #374151;
-    border-radius: 6px;
-    font-size: 0.875rem;
+    color: #6b7280;
+    font-size: 1rem;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    font-family: Source Sans Pro;
-    font-weight: bold;
-    border-radius: 5px;
-    padding: 2px 12px;
-    margin: 0px 1px;
-    color: #008474;
-    text-decoration: none;
+    padding: 6px 10px;
+    min-width: 38px;
+    height: 38px;
+    border-radius: 0;
+    margin: 0;
+    margin-left: -1px;
+
+    &:first-child {
+      margin-left: 0;
+      border-top-left-radius: 4px;
+      border-bottom-left-radius: 4px;
+    }
+
+    &:last-child {
+      border-top-right-radius: 4px;
+      border-bottom-right-radius: 4px;
+    }
 
     &:hover:not(.disabled) {
-      background: #158a84;
-      border-color: #158a84;
-      color: #fff;
+      background: #f3f4f6;
+      color: #374151;
     }
 
     &:active:not(.disabled) {
-      background: #f3f4f6;
-      transform: translateY(1px);
+      background: #e5e7eb;
     }
 
     &.disabled {
-      opacity: 0.5;
+      opacity: 0.6;
       cursor: not-allowed;
-      background: #f9fafb;
       color: #9ca3af;
-    }
-
-    // Chevron icons
-    svg {
-      width: 16px;
-      height: 16px;
-      transition: transform 0.2s ease;
-    }
-
-    &:hover:not(.disabled) svg {
-      transform: scale(1.1);
+      background: #f9fafb;
     }
   }
 
-  .prevButton {
-    .chevronLeft {
-      order: -1;
-    }
-  }
-
-  .nextButton {
-    .chevronRight {
-      order: 1;
-    }
-  }
 
   // Page Number Buttons
   .pageButton {
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 40px;
-    border: none;
+    min-width: 38px;
+    height: 38px;
+    border: 1px solid #e5e7eb;
     background: #ffffff;
-    color: #374151;
-    border-radius: 6px;
+    color: #6b7280;
     font-size: 0.875rem;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    text-decoration: none;
-    font-family: Source Sans Pro;
-    font-weight: bold;
-    border-radius: 5px;
-    padding: 2px 12px;
-    margin: 0px 1px;
-    color: #008474;
-    text-decoration: none;
+    padding: 0 8px;
+    border-radius: 0;
+    margin-left: -1px;
 
     &:hover:not(.active) {
-      background: #158a84;
-      border-color: #158a84;
-      color: #fff;
-      transform: translateY(-1px);
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      background: #f3f4f6;
+      color: #374151;
     }
 
     &:active:not(.active) {
-      transform: translateY(0);
-      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+      background: #e5e7eb;
     }
 
     &.active {
-      background: #158a84;
-      border-color: #158a84;
-      color: #ffffff;
-      font-weight: 600;
-      box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
-
-      &:hover {
-        background: #158a84;
-        border-color: #158a84;
-      }
+      background: #1a9a9438;
+      border: 1px solid #1a9a94;
+      color: #1a9a94;
+      font-weight: 500;
+      z-index: 1;
+      position: relative;
     }
   }
 
-  // Ellipsis
-  .ellipsis {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 40px;
-    height: 40px;
-    color: #9ca3af;
-    font-weight: 500;
-    user-select: none;
-  }
 
   // Responsive Design
   @media (max-width: 640px) {
-    .paginationContainer {
-      padding: 0.75rem;
-      margin: 1rem 0;
-    }
-
     .paginationControls {
-      gap: 0.25rem;
+      padding: 2px;
     }
 
     .navButton {
-      padding: 0.5rem 0.75rem;
-      font-size: 0.8rem;
-      min-height: 36px;
-
-      span {
-        display: none; // Hide text on mobile, show only icons
-      }
+      padding: 4px 8px;
+      font-size: 0.9rem;
+      min-width: 28px;
+      height: 28px;
     }
 
     .pageButton {
-      min-width: 36px;
-      height: 36px;
-      padding: 0 0.5rem;
+      min-width: 28px;
+      height: 28px;
+      padding: 0 6px;
       font-size: 0.8rem;
     }
 
     .ellipsis {
-      min-width: 36px;
-      height: 36px;
+      min-width: 28px;
+      height: 28px;
     }
 
     .paginationInfo {
@@ -259,27 +198,17 @@
   }
 
   // Focus states for accessibility
-  .navButton:focus,
-  .pageButton:focus {
-    outline: 2px solid #158a84;
-    outline-offset: 2px;
-  }
+  // .navButton:focus,
+  // .pageButton:focus {
+  //   outline: 2px solid #158a84;
+  //   outline-offset: 2px;
+  // }
 
-  // Loading state (optional)
-  .paginationContainer.loading {
-    opacity: 0.7;
-    pointer-events: none;
-
-    .navButton,
-    .pageButton {
-      cursor: not-allowed;
-    }
-  }
 
   // Animation for page transitions
-  .pageButton {
-    animation: fadeIn 0.2s ease-in-out;
-  }
+  // .pageButton {
+  //   animation: fadeIn 0.2s ease-in-out;
+  // }
 
   @keyframes fadeIn {
     from {

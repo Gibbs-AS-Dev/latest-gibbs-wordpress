@@ -666,10 +666,6 @@
 // Responsive Design
 // Debug: This media query should work at 768px and below
 @media (max-width: 768px) {
-  // Force responsive behavior
-  html, body {
-    overflow-x: auto !important;
-  }
   
   .walletContainer {
     padding: 1rem !important;
