@@ -1,0 +1,34 @@
+name: Pull latest changes on server with no errors
+
+on:
+  push:
+    branches: [gibbs.no]  # Trigger the workflow on push to the `gibbs.no` branch
+
+jobs:
+  pull:
+    name: Pull latest changes on server (with no errors)
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository (for context)
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Install sshpass for password-based SSH login
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      # Step 3: Run git pull on the remote server (ignore errors)
+      - name: Run git pull on the remote server (ignore errors)
+        run: |
+          # SSH into the server and run the git pull command with conflict resolution
+          sshpass -p "${{ secrets.SERVER_PASSWORD }}" ssh -o StrictHostKeyChecking=no -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USERNAME }}@${{ secrets.SERVER_HOST }} "
+            cd /var/www/vhosts/gibbs.no/httpdocs && 
+            git fetch origin && 
+            git reset --hard origin/gibbs.no && 
+            git pull origin gibbs.no"  # This resets the local changes to match the remote branch
+        env:
+          SERVER_PASSWORD: ${{ secrets.SERVER_PASSWORD }}
+          SERVER_PORT: ${{ secrets.SERVER_PORT }}  # Set the SSH port
+          SERVER_USERNAME: ${{ secrets.SERVER_USERNAME }}  # SSH username
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}  # Server IP or hostname

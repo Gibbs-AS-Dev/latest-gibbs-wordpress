@@ -22,8 +22,10 @@
 !/wp-content/plugins/
 !/wp-content/themes/
 
+
 /wp-content/plugins/gibbs-react-booking/node_modules
 /wp-content/plugins/gibbs-react-booking/node_modules/*
+
 
 # 6. (Optional) Ignore common system files or backups
 #    that might end up inside your themes/plugins folders.
