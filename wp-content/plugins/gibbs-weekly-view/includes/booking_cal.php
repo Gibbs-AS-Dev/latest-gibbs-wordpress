@@ -1321,8 +1321,19 @@ class Gibbs_Booking_Calendar {
                     }
                     unset($rulesss['POS']);
 
-                    $rrule = new RRule($rulesss);
+                    if(isset($rulesss['DAY']) && $rulesss['DAY'] != ""){
+                      $rulesss['BYMONTHDAY'] = explode(",", $rulesss['DAY']);
+                    }
+                    unset($rulesss['DAY']);
+                    if(isset($rulesss['MONTH']) && $rulesss['MONTH'] != ""){
+                      $rulesss['BYMONTH'] = explode(",", $rulesss['MONTH']);
+                    }
+                    unset($rulesss['MONTH']);
 
+                   
+
+                    $rrule = new RRule($rulesss);
+                    //echo "<pre>"; print_r($rulesss); die;
                     $exp_dates = array();
 
                     $recurrenceException = $res->recurrenceException;
