@@ -5308,44 +5308,50 @@ function blz_add_recipient( $recipient, $order, $wc_email ){
     
     $emailss= array();
 
+    $owner_disabled = false;
+
     if(isset($booking->listing_id)){
         $postData = get_post($booking->listing_id);
 
-        $admin_emails = get_user_meta($postData->post_author, 'admin_emails', true);
+       
 
-        if($admin_emails != ""){
-            $admin_emails = array_map('trim', explode(",", $admin_emails));
-            $emailss = array_merge($emailss, $admin_emails);
-        }
+        $disbaled_send_mail_owner = get_post_meta($booking->listing_id, "disbaled_send_mail_for_owner",true);
 
-        $disbaled_send_mail_owner = get_post_meta($booking->listing_id, "listeo_disbaled_send_mail_for_owner",true);
+        $listeo_disbaled_send_mail_for_owner = get_post_meta($booking->listing_id, "listeo_disbaled_send_mail_for_owner",true);
 
-        if( $disbaled_send_mail_owner == "on"){
+        if( $disbaled_send_mail_owner == "on" || $listeo_disbaled_send_mail_for_owner == "on"){
 
-            $recipient = "";
+            $owner_disabled = true;
+        }else{
+            $admin_emails = get_user_meta($postData->post_author, 'admin_emails', true);
 
-           // echo "<pre>"; print_r($recipient); die;
+            if($admin_emails != ""){
+                $admin_emails = array_map('trim', explode(",", $admin_emails));
+                $emailss = array_merge($emailss, $admin_emails);
+            }
 
-            return $recipient; 
         }
 
     }
     
 
     # Iterating through each order items (WC_Order_Item_Product objects in WC 3+)
-    foreach ( $order->get_items() as $item_id => $item_values ) {
 
-       
+    if(!$owner_disabled){
+        foreach ( $order->get_items() as $item_id => $item_values ) {
 
-        $product_id = $item_values->get_product_id();
+        
 
-        $post_obj    = get_post( $product_id ); // The WP_Post object
-        $post_author = $post_obj->post_author; // <=== The post author ID
+            $product_id = $item_values->get_product_id();
 
-        $userrr = get_user_by("ID",$post_author);
+            $post_obj    = get_post( $product_id ); // The WP_Post object
+            $post_author = $post_obj->post_author; // <=== The post author ID
 
-        $emailss[] = $userrr->user_email; 
-       
+            $userrr = get_user_by("ID",$post_author);
+
+            $emailss[] = $userrr->user_email; 
+        
+        }
     }
     //echo "<pre>"; print_r($emailss); die;
 
