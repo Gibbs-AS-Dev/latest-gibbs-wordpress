@@ -145,9 +145,9 @@ if($active_group_id != ""){
                     </div>
                     <div class="form-row">
                         <div class="form-group form-group-half">
-                            <label for="company_industry"><?php echo __("Industry","gibbs");?></label>
+                            <label for="company_industry"><?php echo __("Organization type","gibbs");?></label>
                             <select id="company_industry" name="company_industry">
-                                <option value=""><?php echo __("Select Industry","gibbs");?></option>
+                                <option value=""><?php echo __("Select Organization type","gibbs");?></option>
                                 <?php foreach($industries as $industry){ ?>
                                     <option value="<?php echo $industry;?>" <?php if($company_industry == $industry){?>selected<?php }?>><?php echo __($industry,"gibbs");?></option>
                                 <?php } ?>
