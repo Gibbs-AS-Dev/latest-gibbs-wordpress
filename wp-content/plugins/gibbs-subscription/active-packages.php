@@ -1,7 +1,13 @@
 <?php
 $user_id = $this->get_super_admin();
 
-$stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+//$stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+$mode = get_option('stripe_mode');
+if($mode == "test"){
+    $stripe_customer_id = get_user_meta($user_id, 'stripe_test_customer_id', true);
+}else{
+    $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+}
 
 // Get user's subscriptions
 if ($stripe_customer_id) {

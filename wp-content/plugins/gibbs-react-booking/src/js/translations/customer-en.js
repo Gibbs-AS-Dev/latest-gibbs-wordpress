@@ -1,0 +1,127 @@
+export default {
+  // General
+  "Cancel": "Cancel",
+  "Save": "Save",
+  "Edit": "Edit",
+  "Delete": "Delete",
+  "Register": "Register",
+  "Retry": "Retry",
+  "Loading...": "Loading...",
+  "Error": "Error",
+  "Success": "Success",
+  
+  // Create Customer Modal
+  "Add New Customer": "Add New Customer",
+  "Superadmin Information": "Superadmin Information",
+  "First Name": "First Name",
+  "Last Name": "Last Name",
+  "Email": "Email",
+  "Phone": "Phone",
+  "Country Code": "Country Code",
+  "Ola": "Ola",
+  "Nordmann": "Nordmann",
+  "900 00 000": "900 00 000",
+  
+  // Company Information
+  "Company Information": "Company Information",
+  "Company Name": "Company Name",
+  "Company Email": "Company Email",
+  "Industry": "Industry",
+  "Organization type": "Organization type",
+  "Country": "Country",
+  "Select Industry": "Select Industry",
+  "Select Country": "Select Country",
+  "Phone Number": "Phone Number",
+  "Organization Number": "Organization Number",
+  "Street Address": "Street Address",
+  "Zip": "Zip",
+  "City": "City",
+  
+  // Group Information
+  "Group information": "Group information",
+  "Group Name": "Group Name",
+  
+  // Package Information
+  "Package Information": "Package Information",
+  "Package": "Package",
+  "Select Package": "Select Package",
+  
+  // Edit Customer
+  "Company & Superadmin": "Company & Superadmin",
+  "Change Superadmin": "Change Superadmin",
+  "Search for superadmin...": "Search for superadmin...",
+  "Select": "Select",
+  "Confirm Selection": "Confirm Selection",
+  "Are you sure you want to proceed with selecting this superadmin?": "Are you sure you want to proceed with selecting this superadmin?",
+  "Name:": "Name:",
+  "Email:": "Email:",
+  "Confirm": "Confirm",
+  "Loading customer data...": "Loading customer data...",
+  "Failed to fetch customer data": "Failed to fetch customer data",
+  "Failed to update customer": "Failed to update customer",
+  "Failed to change superadmin": "Failed to change superadmin",
+  
+  // Edit Usergroup
+  "Edit Usergroup": "Edit Usergroup",
+  "Usergroup Name": "Usergroup Name",
+  "Email CC": "Email CC",
+  "cc@example.com": "cc@example.com",
+  "Loading usergroup data...": "Loading usergroup data...",
+  "Failed to update usergroup": "Failed to update usergroup",
+  
+  // Gibbs Customer Main
+  "Active": "Active",
+  "Invoice": "Invoice",
+  "Stripe": "Stripe",
+  "Inactive": "Inactive",
+  "All": "All",
+  "New Customer": "New Customer",
+  "Search by name, email...": "Search by name, email...",
+  "Filter": "Filter",
+  "All Countries": "All Countries",
+  "All Industries": "All Industries",
+  "Clear": "Clear",
+  "Settings": "Settings",
+  "Select columns": "Select columns",
+  "Show rows": "Show rows",
+  "rows": "rows",
+  "Loading customers...": "Loading customers...",
+  "No customers found": "No customers found",
+  "Failed to load customers": "Failed to load customers",
+  
+  // Table Headers
+  "COMPANY NAME": "COMPANY NAME",
+  "SUPERADMIN": "SUPERADMIN",
+  "EMAIL": "EMAIL",
+  "PHONE": "PHONE",
+  "COUNTRY": "COUNTRY",
+  "INDUSTRY": "INDUSTRY",
+  "MRR": "MRR",
+  "ARR": "ARR",
+  "GIBBS LICENSES": "GIBBS LICENSES",
+  "CREATED": "CREATED",
+  "STRIPE LICENSE": "STRIPE LICENSE",
+  "PAYMENT": "PAYMENT",
+  "NEXT INVOICE": "NEXT INVOICE",
+  "EDIT": "EDIT",
+  
+  // Table Content
+  "Usergroup": "Usergroup",
+  "Usergroups": "Usergroups",
+  "0 Usergroups": "0 Usergroups",
+  "Select licenses": "Select licenses",
+  "Auto-bill": "Auto-bill",
+  
+  // Error Messages
+  "Failed to create customer": "Failed to create customer",
+  "Please fill out this field.": "Please fill out this field.",
+  "Please enter a valid amount.": "Please enter a valid amount.",
+  "An error occurred while adding funds": "An error occurred while adding funds",
+  "Error loading wallet data": "Error loading wallet data",
+  "Failed to load transactions": "Failed to load transactions",
+  "Error loading transactions": "Error loading transactions",
+  "Displaying": "Displaying",
+  "transactions": "transactions",
+  "Filter:": "Filter:"
+};
+

@@ -11,8 +11,25 @@
     flex-direction: column;
   }
 }
+.booking_phone_input_container {
+  .react-tel-input {
+    .form-control {
+      border-right: 0 !important;
+      border-bottom-right-radius: 0 !important;
+      border-top-right-radius: 0 !important;
+    }
+  }
+}
+body .react_phone_input_container {
+  .react-tel-input {
+    .form-control {
+      padding: 6px 0px 6px 43px !important;
+    }
+  }
+}
 .react-tel-input {
   width: 100%;
+
   
   .form-control {
     width: 100% !important;
@@ -23,14 +40,17 @@
     font-size: 16px !important;
     transition: border-color 0.3s ease !important;
     box-sizing: border-box !important;
-    border-right: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    border-top-right-radius: 0 !important;
+    
     
     &:focus {
       outline: none !important;
-      border-color: #1a9a94 !important;
-      box-shadow: 0 0 0 3px rgba(26, 154, 148, 0.1) !important;
+      border-color: none !important;
+      box-shadow: none !important;
+    }
+    &:active {
+      outline: none !important;
+      border-color: none !important;
+      box-shadow: none !important;
     }
 
     // Error state for phone input
@@ -51,9 +71,9 @@
     border-radius: 8px 0 0 8px !important;
     background-color: #f8f9fa !important;
     
-    &.open {
-      border-color: #1a9a94 !important;
-    }
+    // &.open {
+    //   border-color: #1a9a94 !important;
+    // }
     
     &:hover {
       background-color: #e9ecef !important;

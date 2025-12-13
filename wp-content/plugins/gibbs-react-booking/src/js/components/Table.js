@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import tableStyles from '../assets/scss/table.module.scss';
 
 /**
@@ -25,6 +25,7 @@ import tableStyles from '../assets/scss/table.module.scss';
  * @param {Boolean} props.noWrapper - If true, don't wrap table in div
  * @param {Function} props.onRowMouseEnter - Callback: (row, rowIndex) => void
  * @param {Function} props.onRowMouseLeave - Callback: (row, rowIndex) => void
+ * @param {Boolean} props.enableDragScroll - If true, enable horizontal drag-to-scroll on the wrapper
  */
 function Table({
   columns = [],
@@ -40,7 +41,72 @@ function Table({
   noWrapper = false,
   onRowMouseEnter,
   onRowMouseLeave,
+  enableDragScroll = true,
 }) {
+  const wrapperRef = useRef(null);
+  const topScrollRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStartX, setDragStartX] = useState(0);
+  const [dragScrollLeft, setDragScrollLeft] = useState(0);
+  const [topScrollWidth, setTopScrollWidth] = useState(0);
+
+  useEffect(() => {
+    if (wrapperRef.current) {
+      setTopScrollWidth(wrapperRef.current.scrollWidth || wrapperRef.current.clientWidth);
+    }
+  }, [columns, data]);
+
+  const handleMouseDown = (e) => {
+    if (!enableDragScroll || !wrapperRef.current) return;
+
+    // Only start drag if clicking on the table container, not on interactive elements
+    if (
+      e.target.tagName === 'BUTTON' ||
+      e.target.closest('button') ||
+      e.target.closest('input') ||
+      e.target.closest('a') ||
+      e.target.closest('select') ||
+      e.target.closest('[data-sortable="true"]')
+    ) {
+      return;
+    }
+
+    const scrollableElement = wrapperRef.current;
+    setIsDragging(true);
+    const rect = scrollableElement.getBoundingClientRect();
+    setDragStartX(e.pageX - rect.left);
+    setDragScrollLeft(scrollableElement.scrollLeft);
+  };
+
+  const handleMouseMove = (e) => {
+    if (!enableDragScroll || !isDragging || !wrapperRef.current) return;
+    e.preventDefault();
+    const scrollableElement = wrapperRef.current;
+    const rect = scrollableElement.getBoundingClientRect();
+    const x = e.pageX - rect.left;
+    const walk = (x - dragStartX) * 2; // Scroll speed multiplier
+    scrollableElement.scrollLeft = dragScrollLeft - walk;
+  };
+
+  const stopDragging = () => {
+    if (!isDragging) return;
+    setIsDragging(false);
+  };
+
+  const handleWrapperScroll = () => {
+    if (!wrapperRef.current || !topScrollRef.current) return;
+    if (topScrollRef.current.scrollLeft !== wrapperRef.current.scrollLeft) {
+      topScrollRef.current.scrollLeft = wrapperRef.current.scrollLeft;
+    }
+  };
+
+  const handleTopScroll = () => {
+    if (!wrapperRef.current || !topScrollRef.current) return;
+    if (wrapperRef.current.scrollLeft !== topScrollRef.current.scrollLeft) {
+      wrapperRef.current.scrollLeft = topScrollRef.current.scrollLeft;
+    }
+  };
+
   const resolveRowKey = (item, index) => {
     if (typeof getRowKey === 'function') {
       return getRowKey(item, index);
@@ -150,12 +216,36 @@ function Table({
 
   // Otherwise, wrap in tableWrapper with default styles
   const finalWrapperClassName = wrapperClassName 
-    ? `${tableStyles.tableWrapper} ${wrapperClassName}` 
-    : tableStyles.tableWrapper;
+    ? `${tableStyles.tableBodyScroll} ${wrapperClassName}` 
+    : tableStyles.tableBodyScroll;
 
   return (
-    <div className={finalWrapperClassName} style={wrapperStyle}>
-      {tableElement}
+    <div className={tableStyles.tableWrapper}>
+      <div
+        ref={topScrollRef}
+        className={tableStyles.tableTopScroll}
+        onScroll={handleTopScroll}
+      >
+        <div
+          style={{
+            width: topScrollWidth,
+            height: 1,
+          }}
+        />
+      </div>
+      <div
+        ref={wrapperRef}
+        className={finalWrapperClassName}
+        style={wrapperStyle}
+        onScroll={handleWrapperScroll}
+        onMouseDown={enableDragScroll ? handleMouseDown : undefined}
+        onMouseMove={enableDragScroll ? handleMouseMove : undefined}
+        onMouseUp={enableDragScroll ? stopDragging : undefined}
+        onMouseLeave={enableDragScroll ? stopDragging : undefined}
+      >
+        {tableElement}
+      </div>
+     
     </div>
   );
 }

@@ -33,7 +33,7 @@
       tbody {
       tr {
         transition: background-color 0.2s ease;
-        border-bottom: 1px solid #f3f4f6;
+        border-bottom: 1px solid #ccccccba;
         background-color: #ffffff;
 
 
@@ -51,6 +51,12 @@
         white-space: nowrap;
         line-height: 1.4;
       }
+    }
+  }
+  @media (max-width: 480px) {
+    th, td {
+      min-width: 149px !important;
+      white-space: break-spaces !important;
     }
   }
 }

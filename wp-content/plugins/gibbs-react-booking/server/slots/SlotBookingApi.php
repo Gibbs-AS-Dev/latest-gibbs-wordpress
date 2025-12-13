@@ -2275,7 +2275,8 @@ class SlotBookingApi extends CoreApiHandler {
                 "_max_book_days",
                 "_min_book_days",
                 "_show_hide_amount",
-                "_hide_price_div"
+                "_hide_price_div",
+                "slotv2_hide_calender"
             );
 
             $getPostMetaMultiple = $this->getDatabase()->getPostMetaMultiple($listing_id, $meta_keys);
@@ -2319,6 +2320,7 @@ class SlotBookingApi extends CoreApiHandler {
                 'min_book_days' => $getPostMetaMultiple["_min_book_days"],
                 'hide_quantity' => $getPostMetaMultiple["_show_hide_amount"],
                 'hide_price_div' => $getPostMetaMultiple["_hide_price_div"],
+                'slotv2_hide_calender' => $getPostMetaMultiple["slotv2_hide_calender"],
                 'guest_slot' => (isset($getPostMetaMultiple["_guest_slot"])?strtolower($getPostMetaMultiple["_guest_slot"]):'')
             );
 

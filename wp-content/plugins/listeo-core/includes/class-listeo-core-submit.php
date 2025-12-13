@@ -3513,6 +3513,16 @@ class Listeo_Core_Submit  {
 				update_post_meta($this->listing_id,"activate_slotv2","");
 			}
 
+			if(is_array($_POST) && key_exists("slotv2_hide_calender",$_POST)){
+				if(isset($_POST["slotv2_hide_calender"])){	
+					update_post_meta($this->listing_id,"slotv2_hide_calender",$_POST["slotv2_hide_calender"]);
+				}else{
+					update_post_meta($this->listing_id,"slotv2_hide_calender","");
+				}
+			}else{
+				update_post_meta($this->listing_id,"slotv2_hide_calender","");
+			}
+
 
 			$org_id = $this->listing_id;
 

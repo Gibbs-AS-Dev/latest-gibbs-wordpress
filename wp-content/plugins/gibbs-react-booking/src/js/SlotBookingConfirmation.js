@@ -1748,7 +1748,7 @@ function SlotBookingConfirmation({ userLoggedIn, bookingToken, apiUrl, cr_user_i
 
                     <div className={styles.formGroup}>
                       <label htmlFor="phone" className="required">{Ltext("Phone")}</label>
-                      <div className={styles.phoneInputContainer}>
+                      <div className={`${styles.phoneInputContainer} booking_phone_input_container`}>
                         <PhoneInput
                           country={'no'}
                           value={countryCode}

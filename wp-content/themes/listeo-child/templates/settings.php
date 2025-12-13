@@ -102,15 +102,30 @@ if($active_group_id != ""){
                     $info_user_id = get_current_user_id();
                 }
                 
-                $company_name = get_user_meta($info_user_id, 'package_company_name', true);
-                $street_address = get_user_meta($info_user_id, 'package_street_address', true);
-                $zip_code = get_user_meta($info_user_id, 'package_zip_code', true);
-                $city = get_user_meta($info_user_id, 'package_city', true);
-                $organization_number = get_user_meta($info_user_id, 'package_organization_number', true);
+                $company_company_name = get_user_meta($info_user_id, 'company_company_name', true);
+                $company_email = get_user_meta($info_user_id, 'company_email', true);
+                $company_industry = get_user_meta($info_user_id, 'company_industry', true);
+                $company_street_address = get_user_meta($info_user_id, 'company_street_address', true);
+                $company_zip_code = get_user_meta($info_user_id, 'company_zip_code', true);
+                $company_city = get_user_meta($info_user_id, 'company_city', true);
+                $company_organization_number = get_user_meta($info_user_id, 'company_organization_number', true);
                 
-                $contact_name = get_user_meta($info_user_id, 'package_contact_name', true);
-                $contact_email = get_user_meta($info_user_id, 'package_contact_email', true);
-                $contact_phone = get_user_meta($info_user_id, 'package_contact_phone', true);
+                $company_country_code = get_user_meta($info_user_id, 'company_country_code', true);
+                $company_phone = get_user_meta($info_user_id, 'company_phone', true);
+                $company_country = get_user_meta($info_user_id, 'company_country', true);
+
+                $countries = get_countries();
+                $industries = get_industries();
+
+                if($company_country == ""){
+                    $company_country = "NO";
+                }
+                if($company_country_code == ""){
+                    $company_country_code = "+47";
+                }
+
+
+
             ?>
             <!-- Company Information Section -->
             <div class="section">
@@ -118,53 +133,90 @@ if($active_group_id != ""){
                     <h2><?php echo __("Company Information","gibbs");?></h2>
                 </div>
                 <div class="content">
-                    <div class="form-group">
-                        <label for="company_name"><?php echo __("Company Name","gibbs");?></label>
-                        <input type="text" id="company_name" name="package_company_name" value="<?php echo esc_attr($company_name);?>" placeholder="<?php echo __("Company Name Inc.","gibbs");?>" />
-                    </div>
-                    <div class="form-group">
-                        <label for="street_address"><?php echo __("Street Address","gibbs");?></label>
-                        <input type="text" id="street_address" name="package_street_address" value="<?php echo esc_attr($street_address);?>" placeholder="<?php echo __("Street Address","gibbs");?>" />
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label for="company_company_name"><?php echo __("Company Name","gibbs");?> *</label>
+                            <input type="text" id="company_company_name" name="company_company_name" value="<?php echo esc_attr($company_company_name);?>" required placeholder="<?php echo __("Company Name Inc.","gibbs");?>" />
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label for="company_email"><?php echo __("Company Email","gibbs");?> *</label>
+                            <input type="email" id="company_email" name="company_email" value="<?php echo esc_attr($company_email);?>" required placeholder="<?php echo __("contact@company.com","gibbs");?>" />
+                        </div>
                     </div>
                     <div class="form-row">
                         <div class="form-group form-group-half">
-                            <label for="zip_code"><?php echo __("Zip Code","gibbs");?></label>
-                            <input type="text" id="zip_code" name="package_zip_code" value="<?php echo esc_attr($zip_code);?>" placeholder="<?php echo __("0000","gibbs");?>" />
+                            <label for="company_industry"><?php echo __("Industry","gibbs");?></label>
+                            <select id="company_industry" name="company_industry">
+                                <option value=""><?php echo __("Select Industry","gibbs");?></option>
+                                <?php foreach($industries as $industry){ ?>
+                                    <option value="<?php echo $industry;?>" <?php if($company_industry == $industry){?>selected<?php }?>><?php echo __($industry,"gibbs");?></option>
+                                <?php } ?>
+                            </select>
                         </div>
                         <div class="form-group form-group-half">
-                            <label for="city"><?php echo __("City","gibbs");?></label>
-                            <input type="text" id="city" name="package_city" value="<?php echo esc_attr($city);?>" placeholder="<?php echo __("City","gibbs");?>" />
+                            <label for="company_country"><?php echo __("Country","gibbs");?> *</label>
+                            <select id="company_country" name="company_country" onchange="updateCountryCode(jQuery(this).find('option:selected').data('phone-code'))" required>
+                                <?php foreach($countries as $country){ ?>
+                                    <option value="<?php echo $country['code'];?>" <?php if($company_country == $country['code']){?>selected<?php }?> data-phone-code="<?php echo $country['phone'];?>"><?php echo $country['name'];?></option>
+                                <?php } ?>
+                            </select>   
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label for="company_country_code"><?php echo __("Country Code","gibbs");?> *</label>
+                            <input type="text" id="company_country_code" name="company_country_code" value="<?php echo esc_attr($company_country_code);?>" required placeholder="<?php echo __("+47","gibbs");?>" readonly />
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label for="company_phone"><?php echo __("Phone Number","gibbs");?> *</label>
+                            <input type="text" id="company_phone" name="company_phone" value="<?php echo esc_attr($company_phone);?>" required placeholder="<?php echo __("000 00 000","gibbs");?>" />
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label for="company_organization_number"><?php echo __("Organization Number","gibbs");?></label>
+                            <input type="text" id="company_organization_number" name="company_organization_number" value="<?php echo esc_attr($company_organization_number);?>" placeholder="<?php echo __("999 999 999","gibbs");?>" />
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="organization_number"><?php echo __("Organization Number","gibbs");?></label>
-                        <input type="text" id="organization_number" name="package_organization_number" value="<?php echo esc_attr($organization_number);?>" placeholder="<?php echo __("999 999 999","gibbs");?>" />
+                        <label for="company_street_address"><?php echo __("Street Address","gibbs");?></label>
+                        <input type="text" id="company_street_address" name="company_street_address" value="<?php echo esc_attr($company_street_address);?>" placeholder="<?php echo __("Street Address","gibbs");?>" />
                     </div>
+                    <div class="form-row">
+                        <div class="form-group form-group-half">
+                            <label for="company_zip_code"><?php echo __("Zip Code","gibbs");?></label>
+                            <input type="text" id="company_zip_code" name="company_zip_code" value="<?php echo esc_attr($company_zip_code);?>" placeholder="<?php echo __("0000","gibbs");?>" />
+                        </div>
+                        <div class="form-group form-group-half">
+                            <label for="company_city"><?php echo __("City","gibbs");?></label>
+                            <input type="text" id="company_city" name="company_city" value="<?php echo esc_attr($company_city);?>" placeholder="<?php echo __("City","gibbs");?>" />
+                        </div>
+                    </div>
+                    
+                    
                 </div>
             </div>
             
             <!-- Contact Person Section -->
-            <div class="section">
+            <!-- <div class="section">
                 <div class="header2">
                     <h2><?php echo __("Contact Person","gibbs");?></h2>
                 </div>
                 <div class="content">
                     <div class="form-group">
-                        <label for="contact_name"><?php echo __("Name","gibbs");?></label>
-                        <input type="text" id="contact_name" name="package_contact_name" value="<?php echo esc_attr($contact_name);?>" placeholder="<?php echo __("Full Name","gibbs");?>" />
+                        <label for="contact_name"><?php echo __("Name","gibbs");?> *</label>
+                        <input type="text" id="contact_name" name="package_contact_name" value="<?php echo esc_attr($contact_name);?>" required placeholder="<?php echo __("Full Name","gibbs");?>" />
                     </div>
                     <div class="form-row">
                         <div class="form-group form-group-half">
-                            <label for="contact_email"><?php echo __("Email","gibbs");?></label>
-                            <input type="email" id="contact_email" name="package_contact_email" value="<?php echo esc_attr($contact_email);?>" placeholder="<?php echo __("contact@company.com","gibbs");?>" />
+                            <label for="contact_email"><?php echo __("Email","gibbs");?> *</label>
+                            <input type="email" id="contact_email" name="package_contact_email" value="<?php echo esc_attr($contact_email);?>" required placeholder="<?php echo __("contact@company.com","gibbs");?>" />
                         </div>
                         <div class="form-group form-group-half">
-                            <label for="contact_phone"><?php echo __("Phone Number","gibbs");?></label>
-                            <input type="text" id="contact_phone" name="package_contact_phone" value="<?php echo esc_attr($contact_phone);?>" placeholder="<?php echo __("+47 000 00 000","gibbs");?>" />
+                            <label for="contact_phone"><?php echo __("Phone Number","gibbs");?> *</label>
+                            <input type="text" id="contact_phone" name="package_contact_phone" value="<?php echo esc_attr($contact_phone);?>" required placeholder="<?php echo __("+47 000 00 000","gibbs");?>" />
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <?php } ?>
             
             <div class="section ">
@@ -368,6 +420,10 @@ if($active_group_id != ""){
     <?php endif; ?>
 </div>
 <script>
+    function updateCountryCode(phone_code){
+        jQuery("#company_country_code").val("+"+phone_code);
+        jQuery("#company_country_code").trigger("change");
+    }
     jQuery("#usergroup_addnew_st").click(function(){
   
         jQuery("#usergroupModal").show();

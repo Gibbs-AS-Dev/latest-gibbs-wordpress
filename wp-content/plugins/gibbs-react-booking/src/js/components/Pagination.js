@@ -15,7 +15,10 @@ function Pagination({
 
   const renderPageNumbers = () => {
     const pages = [];
-    const maxVisiblePages = 10;
+    const isMobile = typeof window !== 'undefined'
+      ? window.matchMedia('(max-width: 600px)').matches
+      : false;
+    const maxVisiblePages = isMobile ? 6 : 10;
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
     let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
@@ -103,9 +106,9 @@ function Pagination({
           <i className="fa fa-chevron-left"></i>
         </button>
 
-        <div className={styles.pageNumbers}>
+        {/* <div className={styles.pageNumbers}> */}
           {renderPageNumbers()}
-        </div>
+        {/* </div> */}
 
         <button
           onClick={() => onPageChange(currentPage + 1)}

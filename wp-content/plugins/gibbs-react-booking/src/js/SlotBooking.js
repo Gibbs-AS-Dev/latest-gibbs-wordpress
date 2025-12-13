@@ -234,6 +234,7 @@ function SlotBooking({ listing_id, apiUrl, homeUrl, setPrevBookingData, prevBook
 
   const [hideQuantity, setHideQuantity] = useState(false);
   const [hidePriceDiv, setHidePriceDiv] = useState(false);
+  const [slotv2HideCalender, setSlotv2HideCalender] = useState(false);
 
   // ============================================================================
   // CALENDAR UTILITIES
@@ -1091,6 +1092,9 @@ const getAvailableDurations = async (slots) => {
           if(response.data.data.hide_price_div && response.data.data.hide_price_div == "on"){
             setHidePriceDiv(true);
           }
+          if(response.data.data.slotv2_hide_calender && response.data.data.slotv2_hide_calender == "on"){
+            setSlotv2HideCalender(true);
+          }
         } else {
           throw new Error(response.data.message || 'Failed to fetch available dates');
         }
@@ -1135,6 +1139,9 @@ const getAvailableDurations = async (slots) => {
       setProcessedBookingsFixed(bookedDates);
       setProcessedBookings(bookedDates);
       setDateChanged(true);
+      if(!slotv2HideCalender){
+        setIsOpen(true);
+      }
     }
   }, [bookingSlots, bookingData, currentViewDates]);
 

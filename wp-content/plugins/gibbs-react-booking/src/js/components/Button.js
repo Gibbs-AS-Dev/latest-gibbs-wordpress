@@ -44,6 +44,8 @@ function Button({
         return styles.outline;
       case 'ghost':
         return styles.ghost;
+      case 'cancel':
+        return styles.cancel;
       case 'link':
         return styles.link;
       default:

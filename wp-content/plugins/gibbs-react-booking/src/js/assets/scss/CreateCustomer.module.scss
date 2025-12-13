@@ -1,0 +1,292 @@
+.createCustomer {
+  // Inner wrapper for content
+  .createCustomerInner {
+    // All content styles are nested here
+  }
+
+  // Form Styles
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .formRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .formRowFullWidth {
+    grid-template-columns: 1fr;
+  }
+  .formRowflexWidth {
+    display: flex;
+    @media (max-width: 600px) {
+      flex-wrap: wrap;
+      width: 100%;
+      .formGroup:nth-child(1) {
+        width: 30%;
+      }
+      .formGroup:nth-child(2) {
+        width: 65%;
+      }
+      .formGroup:nth-child(3) {
+        width: 100%;
+      }
+    }
+  }
+
+  .formRowPhone {
+    grid-template-columns: 2fr 5fr;
+  }
+
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  .sectionTitle {
+    padding-bottom: 0.37rem;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+  }
+
+  .label {
+    font-size: 14px;
+    font-weight: 500;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+  }
+
+  .required {
+    color: #ef4444;
+  }
+
+  .input {
+    padding: 1px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: #ffffff;
+    color: #111827;
+    height: 41px;
+
+    &:focus {
+      outline: none;
+      border-color: #1a9a94;
+      box-shadow: 0 0 0 3px rgba(26, 154, 148, 0.1);
+    }
+
+    &:disabled {
+      background: #f3f4f6;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+
+  .errorMessage {
+    padding: 12px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 6px;
+    color: #dc2626;
+    font-size: 14px;
+    margin-bottom: 1rem;
+  }
+
+  .footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    button {
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      flex-direction: column-reverse;
+      
+      button {
+        width: 100%;
+      }
+    }
+  }
+
+  // Superadmin Search Section
+  .superadminSearchWrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .superadminSearchInput {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .searchIcon {
+    position: absolute;
+    left: 12px;
+    color: #9ca3af;
+    font-size: 14px;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .superadminSearch {
+    width: 100%;
+    padding: 10px 12px 10px 36px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: all 0.2s;
+    background: #ffffff;
+    color: #111827;
+
+    &:focus {
+      outline: none;
+      border-color: #1a9a94;
+      box-shadow: 0 0 0 3px rgba(26, 154, 148, 0.1);
+    }
+
+    &:disabled {
+      background: #f3f4f6;
+      color: #6b7280;
+      cursor: not-allowed;
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+
+  .superadminList {
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    background: #ffffff;
+    margin-top: 0.25rem;
+
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: #f3f4f6;
+      border-radius: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: #d1d5db;
+      border-radius: 4px;
+
+      &:hover {
+        background: #9ca3af;
+      }
+    }
+  }
+
+  .superadminItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #f3f4f6;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: #f9fafb;
+    }
+
+    &.selected {
+      background-color: #eff6ff;
+    }
+
+    .superadminAction {
+      margin-left: auto;
+      font-size: 13px;
+      font-weight: 500;
+      color: #1a9a94;
+      opacity: 0;
+      transition: opacity 0.15s ease-in-out;
+      white-space: nowrap;
+    }
+
+    &:hover .superadminAction,
+    &.selected .superadminAction {
+      opacity: 1;
+    }
+  }
+
+  .userIcon {
+    color: #6b7280;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .superadminInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .superadminName {
+    font-weight: 600;
+    font-size: 14px;
+    color: #111827;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .superadminEmail {
+    font-size: 13px;
+    color: #6b7280;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .searchingIndicator {
+    padding: 12px;
+    text-align: center;
+    color: #6b7280;
+    font-size: 14px;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+

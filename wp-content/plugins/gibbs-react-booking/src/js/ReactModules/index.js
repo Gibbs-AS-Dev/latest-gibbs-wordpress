@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import ReactDOM from 'react-dom/client';
 import SubscriptionDiscount from '../SubscriptionDiscount/SubscriptionDiscount.js';
 import ComponentGallery from './ComponentGallery.js';
-import GibbsCustomer from './GibbsCustomer.js';
+import GibbsCustomer from '../Customer/GibbsCustomer.js';
 
 // React Modules container responsible for rendering requested component
 function ReactModulesContainer({ component, page_id, apiUrl, homeUrl, user_token = null, owner_id = null }) {

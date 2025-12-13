@@ -1,6 +1,6 @@
 <?php
 
-define('GIBBS_VERSION', '4.5.52');
+define('GIBBS_VERSION', '4.5.76');
 require get_stylesheet_directory() . '/vendor/autoload.php';
 require get_stylesheet_directory() . '/scripts.php';
 use Jumbojett\OpenIDConnectClient;
@@ -8031,31 +8031,42 @@ function save_settings(){
 
 
     // Save Company Information
-    if(isset($_POST["package_company_name"])){
-        update_user_meta( $info_user_id, 'package_company_name', sanitize_text_field($_POST["package_company_name"]) );
+    if(isset($_POST["company_company_name"])){
+        update_user_meta( $info_user_id, 'company_company_name', sanitize_text_field($_POST["company_company_name"]) );
     }
-    if(isset($_POST["package_street_address"])){
-        update_user_meta( $info_user_id, 'package_street_address', sanitize_text_field($_POST["package_street_address"]) );
+    if(isset($_POST["company_industry"])){
+        update_user_meta( $info_user_id, 'company_industry', sanitize_text_field($_POST["company_industry"]) );
     }
-    if(isset($_POST["package_zip_code"])){
-        update_user_meta( $info_user_id, 'package_zip_code', sanitize_text_field($_POST["package_zip_code"]) );
+    if(isset($_POST["company_street_address"])){
+        update_user_meta( $info_user_id, 'company_street_address', sanitize_text_field($_POST["company_street_address"]) );
     }
-    if(isset($_POST["package_city"])){
-        update_user_meta( $info_user_id, 'package_city', sanitize_text_field($_POST["package_city"]) );
+    if(isset($_POST["company_zip_code"])){
+        update_user_meta( $info_user_id, 'company_zip_code', sanitize_text_field($_POST["company_zip_code"]) );
     }
-    if(isset($_POST["package_organization_number"])){
-        update_user_meta( $info_user_id, 'package_organization_number', sanitize_text_field($_POST["package_organization_number"]) );
+    if(isset($_POST["company_city"])){
+        update_user_meta( $info_user_id, 'company_city', sanitize_text_field($_POST["company_city"]) );
+    }
+    if(isset($_POST["company_organization_number"])){
+        update_user_meta( $info_user_id, 'company_organization_number', sanitize_text_field($_POST["company_organization_number"]) );
+    }
+    if(isset($_POST["company_country"])){
+        update_user_meta( $info_user_id, 'company_country', sanitize_text_field($_POST["company_country"]) );
     }
     
-    // Save Contact Person Information
-    if(isset($_POST["package_contact_name"])){
-        update_user_meta( $info_user_id, 'package_contact_name', sanitize_text_field($_POST["package_contact_name"]) );
+    if(isset($_POST["company_email"])){
+        update_user_meta( $info_user_id, 'company_email', sanitize_email($_POST["company_email"]) );
     }
-    if(isset($_POST["package_contact_email"])){
-        update_user_meta( $info_user_id, 'package_contact_email', sanitize_email($_POST["package_contact_email"]) );
+    if(isset($_POST["company_country_code"])){
+        update_user_meta( $info_user_id, 'company_country_code', sanitize_text_field($_POST["company_country_code"]) );
     }
-    if(isset($_POST["package_contact_phone"])){
-        update_user_meta( $info_user_id, 'package_contact_phone', sanitize_text_field($_POST["package_contact_phone"]) );
+    if(isset($_POST["company_phone"])){
+        update_user_meta( $info_user_id, 'company_phone', sanitize_text_field($_POST["company_phone"]) );
+    }
+
+    if(class_exists('Class_Gibbs_Subscription') && isset($_POST["company_company_name"]) && $_POST["company_company_name"] != ""){
+        $Class_Gibbs_Subscription = new Class_Gibbs_Subscription();
+        $Class_Gibbs_Subscription->action_init();
+        $Class_Gibbs_Subscription->create_Stripe_Customer($info_user_id);
     }
 
     // if(isset($_POST["dintero_payment_checkbox"]) && $_POST["dintero_payment_checkbox"] == "on"){
@@ -8848,3 +8859,17 @@ add_action('wp_ajax_nopriv_activate_user_profile', 'activate_user_profile');
 
 add_filter('disable_ihaf_header', '__return_true');
 
+function get_countries(){
+    $countries = json_decode(file_get_contents(get_stylesheet_directory() . '/countries.json'), true);
+    return $countries;
+}
+
+function get_industries(){
+    $industries = array(
+        "Private Company" => "Private Company",
+        "Public Sector" => "Public Sector",
+        "Housing Association / Condominium" => "Housing Association / Condominium",
+        "Association / Sports Club" => "Association / Sports Club"
+    );
+    return apply_filters('gibbs_industries', $industries);
+}

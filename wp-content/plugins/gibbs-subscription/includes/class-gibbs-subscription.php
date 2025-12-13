@@ -53,6 +53,7 @@ class Class_Gibbs_Subscription
         add_shortcode('user_stripe_subscription', [$this, 'render_subscription_management']);
 
         add_shortcode('subscription_register', [$this, 'subscription_register']);
+        add_shortcode('checkout_contact_info_modal', [$this, 'render_checkout_contact_info_modal']);
         add_shortcode('user-dashboard', [$this, 'user_dashboard_func']);
 
         add_action('wp_ajax_stripe_dashboard', [$this, 'stripe_dashboard']);
@@ -63,6 +64,8 @@ class Class_Gibbs_Subscription
 
         add_action('admin_menu', [new Class_Gibbs_Subscription_Admin, 'add_stripe_packages_submenu']);
 
+        add_action('wp_footer_custom', [$this, 'render_checkout_contact_info_modal_into_footer']);
+
        // $this->update_group_licence(get_current_user_id(),1);
 
         add_action( 'rest_api_init', function () {
@@ -72,10 +75,121 @@ class Class_Gibbs_Subscription
             ) );
         } );
     }
+    public function render_checkout_contact_info_modal_into_footer(){
+        echo do_shortcode('[checkout_contact_info_modal]');
+    }
+
+    public function render_checkout_contact_info_modal(){
+        ob_start();
+        include GIBBS_STRIPE_PATH . 'templates/checkout-contact-info-modal.php';
+        return ob_get_clean();
+    }
+
+    public function get_user_meta_value($user_id, $meta_key){
+        global $wpdb;
+        return $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT meta_value FROM {$wpdb->usermeta} WHERE user_id = %d AND meta_key = %s",
+                $user_id,
+                $meta_key
+            )
+        );
+    }
+
+    public function create_Stripe_Customer($user_id){
+
+        $company_company_name = $this->get_user_meta_value($user_id, 'company_company_name');
+        $company_email = $this->get_user_meta_value($user_id, 'company_email');
+        $company_industry = $this->get_user_meta_value($user_id, 'company_industry');
+        $company_street_address = $this->get_user_meta_value($user_id, 'company_street_address');
+        $company_zip_code = $this->get_user_meta_value($user_id, 'company_zip_code');
+        $company_city = $this->get_user_meta_value($user_id, 'company_city');
+        $company_organization_number = $this->get_user_meta_value($user_id, 'company_organization_number');
+        $company_country_code = $this->get_user_meta_value($user_id, 'company_country_code'); // E.g. +47 for Norway
+        $company_phone = $this->get_user_meta_value($user_id, 'company_phone');
+        $company_country = $this->get_user_meta_value($user_id, 'company_country'); // E.g. "NO"
+
+        if($company_company_name == "" || $company_email == "" || $company_phone == ""){
+            return false;
+        }
+        $mode = get_option('stripe_mode');
+
+        if($mode == "test"){
+            $stripe_customer_id = $this->get_user_meta_value($user_id, 'stripe_test_customer_id');
+        }else{
+            $stripe_customer_id = $this->get_user_meta_value($user_id, 'stripe_customer_id');
+        }
+
+        // Create country code and country fields to include in Stripe data
+        $stripe_address = [
+            'line1' => $company_street_address,
+            'postal_code' => $company_zip_code,
+            'city' => $company_city,
+        ];
+
+        if (!empty($company_country)) {
+            $stripe_address['country'] = $company_country;
+        }
+
+        $stripe_metadata = [
+            'company_name' => $company_company_name,
+            'email' => $company_email,
+            'phone' => $company_phone,
+            'industry' => $company_industry,
+            'organization_number' => $company_organization_number,
+            'street_address' => $company_street_address,
+            'zip_code' => $company_zip_code,
+            'city' => $company_city,
+            'country' => $company_country,
+            'country_phone_code' => $company_country_code
+        ];
+
+        try {
+            if($stripe_customer_id && $stripe_customer_id != ""){
+                $customer = $this->stripe->customers->update($stripe_customer_id, [
+                    'name' => $company_company_name,
+                    'email' => $company_email,
+                    'business_name' => $company_company_name,
+                    'phone' => $company_phone,
+                    // Stripe's API uses 'address.country' for ISO country and phone should include country code
+                    'address' => $stripe_address,
+                    'metadata' => $stripe_metadata,
+                ]);
+                return $stripe_customer_id;
+            }else{
+                $customer = $this->stripe->customers->create([
+                    'name' => $company_company_name,
+                    'email' => $company_email,
+                    'business_name' => $company_company_name,
+                    'phone' =>  $company_phone,
+                    'address' => $stripe_address,
+                    'metadata' => $stripe_metadata,
+                ]);
+
+                if(isset($customer->id) && $customer->id != ""){
+                    $stripe_customer_id = $customer->id;
+                    if($mode == "test"){
+                        update_user_meta($user_id, 'stripe_test_customer_id', $stripe_customer_id);
+                    }else{
+                        update_user_meta($user_id, 'stripe_customer_id', $stripe_customer_id);
+                    }
+                    return $stripe_customer_id;
+                }else{
+                    return false;
+                }
+            }
+        } catch (Exception $e) {
+
+           // echo "<pre>"; print_r($e->getMessage()); "</pre>"; die;
+            return false;
+        }    
+
+    }
 
     public function add_funds($user_id, $amount, $record_transaction_id, $back_url){
         $user_data = get_userdata($user_id);
-        if($this->stripe_mode == "test"){
+        $mode = get_option('stripe_mode');
+        if($mode == "test"){
             $stripe_customer_id = get_user_meta($user_id, 'stripe_test_customer_id', true);
         }else{
             $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
@@ -89,7 +203,7 @@ class Class_Gibbs_Subscription
                     'name' => $user_data->display_name,
                     'email' => $user_data->user_email,
                 ]);
-                if($this->stripe_mode == "test"){
+                if($mode == "test"){
                     update_user_meta($user_id, 'stripe_test_customer_id', $customer->id);
                 }else{
                     update_user_meta($user_id, 'stripe_customer_id', $customer->id);
@@ -467,7 +581,12 @@ class Class_Gibbs_Subscription
             $license_status = get_user_meta($user_id, 'license_status', true);
 
             if($price_id != "" && $license_status == "active"){
-                    $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+                    $mode = get_option('stripe_mode');
+                    if($mode == "test"){
+                        $stripe_customer_id = get_user_meta($user_id, 'stripe_test_customer_id', true);
+                    }else{
+                        $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+                    }
 
                     $subscriptions = $this->stripe->subscriptions->all(['customer' => $stripe_customer_id]);
                     if (count($subscriptions->data) > 0) {
@@ -517,7 +636,12 @@ class Class_Gibbs_Subscription
     public function stripe_dashboard(){
         $user_id = $this->get_super_admin();
 
-        $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+        $mode = get_option('stripe_mode');
+        if($mode == "test"){
+            $stripe_customer_id = get_user_meta($user_id, 'stripe_test_customer_id', true);
+        }else{
+            $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+        }
 
         $customerId = $stripe_customer_id;
 
@@ -590,7 +714,12 @@ class Class_Gibbs_Subscription
 
     public function remove_active_package($user_id){
 
-        $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+        $mode = get_option('stripe_mode');
+        if($mode == "test"){
+            $stripe_customer_id = get_user_meta($user_id, 'stripe_test_customer_id', true);
+        }else{
+            $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+        }
         $active_subscription_price_id = null;
 
         $has_active = false;
@@ -640,6 +769,65 @@ class Class_Gibbs_Subscription
         ]);
     }
 
+    public function createSubscription($stripe_customer_id, $package_id, $user_id){
+        $start_price_id = get_post_meta($package_id, 'start_price_id', true);
+
+        $price_id = $this->getPriceId($package_id,0,"","");
+
+        if(!$price_id){
+            return false;
+        }
+
+        if($start_price_id === "0"){
+            $collection_method = "send_invoice";
+        }else{
+            $collection_method = "charge_automatically";
+        }
+
+        try {
+            // Check if collection method is send_invoice and add days_until_due as required by Stripe API
+            // When trial_settings[end_behavior][missing_payment_method] is set to 'cancel', 
+            // you cannot set collection_method to 'send_invoice'.
+            // Therefore, we omit the trial if collection_method is 'send_invoice'.
+
+            $lineitems = [
+                'price' => $price_id,
+                'quantity' => 1,
+            ];
+
+            if($this->taxId != ""){
+                $lineitems["tax_rates"] = [$this->taxId];
+            }
+
+            $subscription_data = [
+                'customer' => $stripe_customer_id,
+                'items' => [$lineitems],
+                'collection_method' => $collection_method,
+            ];
+
+            if ($collection_method === "send_invoice") {
+                $subscription_data['days_until_due'] = 14;
+            } else {
+                $subscription_data['trial_settings'] = [
+                    'end_behavior' => ['missing_payment_method' => 'cancel']
+                ];
+                $subscription_data['trial_period_days'] = 7;
+            }
+
+            $subscription = $this->stripe->subscriptions->create($subscription_data);
+
+            if(isset($subscription->id)){
+                update_user_meta($user_id, 'package_id', $package_id);
+                update_user_meta($user_id, 'subscription_id', $subscription->id);
+            }else{
+                return false;
+            }
+            return true;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
     public function create_checkout_session() {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $data = json_decode(file_get_contents('php://input'), true);
@@ -657,7 +845,11 @@ class Class_Gibbs_Subscription
 
             
             $user_data = get_userdata($user_id);
-            $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+            if($mode == "test"){
+                $stripe_customer_id = get_user_meta($user_id, 'stripe_test_customer_id', true);
+            }else{
+                $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+            }
 
             if(!$package_id){
                 echo json_encode(['error' => "package id not found"]);
@@ -684,28 +876,33 @@ class Class_Gibbs_Subscription
             }
 
             // Create Stripe customer if it doesn't exist
-            if (!$stripe_customer_id) {
-                try {
-                    $customer = $this->stripe->customers->create([
-                        'name' => $user_data->display_name,
-                        'email' => $user_data->user_email,
-                        'business_name' => $company_name,
-                        'address' => [
-                            'line1' => $street_address,
-                            'postal_code' => $zip_code,
-                            'city' => $city,
-                        ],
-                        'metadata' => [
-                            'company_name' => $company_name,
-                            'organization_number' => $organization_number,
-                        ],
-                    ]);
-                    update_user_meta($user_id, 'stripe_customer_id', $customer->id);
-                    $stripe_customer_id = $customer->id;
-                } catch (Exception $e) {
-                    echo json_encode(['error' => $e->getMessage()]);
+            if (!$stripe_customer_id || $stripe_customer_id == "") {
+                $stripe_customer_id = $this->create_Stripe_Customer($user_id);
+                if(!$stripe_customer_id){
+                    echo json_encode(['error' => "stripe_customer_id not found"]);
                     wp_die();
                 }
+                // try {
+                //     $customer = $this->stripe->customers->create([
+                //         'name' => $user_data->display_name,
+                //         'email' => $user_data->user_email,
+                //         'business_name' => $company_name,
+                //         'address' => [
+                //             'line1' => $street_address,
+                //             'postal_code' => $zip_code,
+                //             'city' => $city,
+                //         ],
+                //         'metadata' => [
+                //             'company_name' => $company_name,
+                //             'organization_number' => $organization_number,
+                //         ],
+                //     ]);
+                //     update_user_meta($user_id, 'stripe_customer_id', $customer->id);
+                //     $stripe_customer_id = $customer->id;
+                // } catch (Exception $e) {
+                //     echo json_encode(['error' => $e->getMessage()]);
+                //     wp_die();
+                // }
             }
 
             try {
@@ -793,22 +990,38 @@ class Class_Gibbs_Subscription
             }
             
             // Save Company Information
-            if(isset($data['package_company_name'])){
-                update_user_meta($info_user_id, 'package_company_name', sanitize_text_field($data['package_company_name']));
+            if(isset($data['company_company_name'])){
+                update_user_meta($info_user_id, 'company_company_name', sanitize_text_field($data['company_company_name']));
             }
-            if(isset($data['package_street_address'])){
-                update_user_meta($info_user_id, 'package_street_address', sanitize_text_field($data['package_street_address']));
+            if(isset($data['company_email'])){
+                update_user_meta($info_user_id, 'company_email', sanitize_email($data['company_email']));
             }
-            if(isset($data['package_zip_code'])){
-                update_user_meta($info_user_id, 'package_zip_code', sanitize_text_field($data['package_zip_code']));
+            if(isset($data['company_industry'])){
+                update_user_meta($info_user_id, 'company_industry', sanitize_text_field($data['company_industry']));
             }
-            if(isset($data['package_city'])){
-                update_user_meta($info_user_id, 'package_city', sanitize_text_field($data['package_city']));
+            if(isset($data['company_street_address'])){
+                update_user_meta($info_user_id, 'company_street_address', sanitize_text_field($data['company_street_address']));
             }
-            if(isset($data['package_organization_number'])){
-                update_user_meta($info_user_id, 'package_organization_number', sanitize_text_field($data['package_organization_number']));
+            if(isset($data['company_zip_code'])){
+                update_user_meta($info_user_id, 'company_zip_code', sanitize_text_field($data['company_zip_code']));
             }
-            
+            if(isset($data['company_city'])){
+                update_user_meta($info_user_id, 'company_city', sanitize_text_field($data['company_city']));
+            }
+            if(isset($data['company_organization_number'])){
+                update_user_meta($info_user_id, 'company_organization_number', sanitize_text_field($data['company_organization_number']));
+            }
+            if(isset($data['company_country'])){
+                update_user_meta($info_user_id, 'company_country', sanitize_text_field($data['company_country']));
+            }
+            if(isset($data['company_country_code'])){
+                update_user_meta($info_user_id, 'company_country_code', sanitize_text_field($data['company_country_code']));
+            }
+            if(isset($data['company_phone'])){
+                update_user_meta($info_user_id, 'company_phone', sanitize_text_field($data['company_phone']));
+            }
+
+            $this->create_Stripe_Customer($info_user_id);
             echo json_encode(['success' => true]);
             wp_die();
         }
@@ -981,6 +1194,21 @@ class Class_Gibbs_Subscription
                                     update_user_meta($user->ID, 'license_status', "active");
                                     update_user_meta($user->ID, 'stripe_trail', "true");
                                     update_user_meta($user->ID, 'subscription_id', $subscription->id);
+                                    if(isset($subscription->collection_method) && $subscription->collection_method === "send_invoice"){
+                                        update_user_meta($user->ID, 'subscription_type', "invoice");
+                                    }else{
+                                        update_user_meta($user->ID, 'subscription_type', "paid");
+                                    }
+                                    if(isset($subscription->plan) && isset($subscription->plan->interval)){
+
+                                        update_user_meta($user->ID, 'subscription_interval', $subscription->plan->interval);
+
+                                        $amount = $subscription->plan->amount / 100;
+                                        update_user_meta($user->ID, 'subscription_amount', $amount);
+                                        update_user_meta($user->ID, 'subscription_currency', $subscription->plan->currency);
+
+                                    }
+                                    $this->updatePackage($user->ID, $subscription);
                                     $this->update_group_licence($user->ID,1);
 
                                 
@@ -1009,20 +1237,48 @@ class Class_Gibbs_Subscription
                             $customer_id = $session->customer;
     
                             $user = $this->get_user_by_stripe_customer_id($customer_id);
+                            
                             if ($user) {
     
                                 $subscriptions = $this->stripe->subscriptions->all(['customer' => $customer_id]);
+
+                                // $myfile = fopen(ABSPATH."/customer_subscription_updated2.txt", "w");
+
+                                // $text2 = json_encode($subscriptions);
+
+                                // fwrite($myfile, $text2);
+
+                                // fclose($myfile);
+
                                 if (count($subscriptions->data) > 0) {
-    
                                         $subscription = $subscriptions->data[0]; 
                                         update_user_meta($user->ID, 'license_status', "active");
                                         update_user_meta($user->ID, 'stripe_trail', "true");
                                         update_user_meta($user->ID, 'subscription_id', $subscription->id);
-                                        if(isset($subscription->plan) && isset($subscription->plan["amount"]) && $subscription->plan["amount"] < 1){
+                                        if(isset($subscription->collection_method) && $subscription->collection_method === "send_invoice"){
                                             update_user_meta($user->ID, 'subscription_type', "invoice");
                                         }else{
                                             update_user_meta($user->ID, 'subscription_type', "paid");
                                         }
+
+                                        if(isset($subscription->plan) && isset($subscription->plan->interval)){
+
+                                            update_user_meta($user->ID, 'subscription_interval', $subscription->plan->interval);
+
+                                            $amount = $subscription->plan->amount / 100;
+                                            update_user_meta($user->ID, 'subscription_amount', $amount);
+                                            update_user_meta($user->ID, 'subscription_currency', $subscription->plan->currency);
+
+                                        }
+
+                                        // $myfile = fopen(ABSPATH."/customer_subscription_data.txt", "w");
+
+                                        // $text2 = json_encode($subscription);
+
+                                        // fwrite($myfile, $text2);
+
+                                        // fclose($myfile);
+
                                         $this->updatePackage($user->ID, $subscription);
 
                                         $this->update_group_licence($user->ID,1);
@@ -1118,8 +1374,15 @@ class Class_Gibbs_Subscription
 
     // Helper function to get user by Stripe customer ID
     private function get_user_by_stripe_customer_id($stripe_customer_id) {
+        $mode = get_option('stripe_mode');
+        if($mode == "test"){
+            $stripe_customer_id_meta_key = 'stripe_test_customer_id';
+        }else{
+            $stripe_customer_id_meta_key = 'stripe_customer_id';
+        }
+
         $args = [
-            'meta_key' => 'stripe_customer_id',
+            'meta_key' => $stripe_customer_id_meta_key,
             'meta_value' => $stripe_customer_id,
             'number' => 1,
         ];

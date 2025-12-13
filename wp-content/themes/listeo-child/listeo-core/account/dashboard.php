@@ -115,6 +115,7 @@ $ative_steps = false;
 $step2 =false; 
 $step3 =false; 
 $step4 =false; 
+$step5 =false; 
 ?>
 <div class="row">
 
@@ -129,23 +130,50 @@ $step4 =false;
           <div class="content-user-dash active">
               <div class="box-main">
                 <div class="box-inner">
-				<div>
-					<h4>1. <?php echo __("Register on gibbs.no","gibbs");?></h4> 
-                    <p><?php echo __("You have already taken a big step towards automatic bookings","gibbs");?></p>
+				    <div>
+						<h4>1. <?php echo __("Register on gibbs.no","gibbs");?></h4> 
+						<p><?php echo __("You have already taken a big step towards automatic bookings","gibbs");?></p>
 					</div>
 					<span><i class="fa-solid fa-circle-check"></i></span>
                 </div>
+				<?php
+
+				$info_user_id = "";
+
+				if(!$user_id || $user_id == ""){
+					$info_user_id = get_current_user_id();
+				}else{
+					$info_user_id = $user_id;
+				}
+				
+
+				$company_company_name = get_user_meta($info_user_id, 'company_company_name', true);
+				$company_email = get_user_meta($info_user_id, 'company_email', true);
+				?>
+				<div class="box-inner">
+				    <div>
+						<h4>2. <?php echo __("Company Information","gibbs");?></h4> 
+						<p><?php echo __("Fill out your company information","gibbs");?></p>
+					</div>
+					<?php if($company_company_name == "" || $company_email == ""){ ?>
+						<span><button class="button btn btn-primary checkout-popup"><?php echo __("Fill out","gibbs");?></button></span>
+					<?php }else{ 
+						$step2 = true;
+						?>
+						<span><i class="fa-solid fa-circle-check"></i></span>
+					<?php } ?>
+                </div> 
 				<div class="box-inner">
 				<div>
-					<h4>2. <?php echo __("Create department","gibbs");?></h4> 
+					<h4>3. <?php echo __("Create department","gibbs");?></h4> 
                     <p><?php echo __("Set up where booking notifications should be sent, and manage user access","gibbs");?></p>
 					</div>
 					<?php if(empty($all_joined_groups_results)){ 
 						$ative_steps = true;
 						?>
-					  <span class="listing_top_div"><button class="button btn btn-primary"><?php echo __("Create department","gibbs");?></button></span>
+					  <span class="listing_top_div"><button class="button btn btn-primary" <?php if($step2 == false){ echo "disabled";}?>><?php echo __("Create department","gibbs");?></button></span>
 					<?php }else{ 
-						$step2 = true;
+						$step3 = true;
 						?>
 					  <span><i class="fa-solid fa-circle-check"></i></span>
 					<?php } ?>
@@ -155,15 +183,15 @@ $step4 =false;
 				?>
 				<div class="box-inner">
 				<div>
-					<h4>3. <?php echo __("Select package","gibbs");?></h4> 
+					<h4>4. <?php echo __("Select package","gibbs");?></h4> 
                     <p><?php echo __("What do you want to use the system for? Only automatic bookings, or automatic access and heating/light control?","gibbs");?></p>
 					</div>
 					<?php if($active_package != "active"){
 						$ative_steps = true;
 						 ?>
-					  <span><button onclick="location.href='/packages'" class="button btn btn-primary" <?php if($step2 == false){ echo "disabled";}?>><?php echo __("Select","gibbs");?></button></span>
+					  <span><button onclick="location.href='/packages'" class="button btn btn-primary" <?php if($step3 == false){ echo "disabled";}?>><?php echo __("Select","gibbs");?></button></span>
 					<?php }else{ 
-						$step3 = true;
+						$step4 = true;
 						?>
 					    <span><i class="fa-solid fa-circle-check"></i></span>
 					<?php } ?>  
@@ -174,16 +202,16 @@ $step4 =false;
 				?>
 				<div class="box-inner">
 					<div>
-					<h4>4. <?php echo __("Publish your first advertisement/rental object","gibbs");?></h4> 
+					<h4>5. <?php echo __("Publish your first advertisement/rental object","gibbs");?></h4> 
                     <p><?php echo __("As soon as it is published, you are ready to receive bookings","gibbs");?></p>
 					</div>
 					
 					<?php if($get_listing_count < 1){ 
 						$ative_steps = true;
 						?>
-						<span><button onclick="location.href='/my-listings/add-listings/'" class="button btn btn-primary" <?php if($step3 == false){ echo "disabled";}?>><?php echo __("Create","gibbs");?></button></span>
+						<span><button onclick="location.href='/my-listings/add-listings/'" class="button btn btn-primary" <?php if($step4 == false){ echo "disabled";}?>><?php echo __("Create","gibbs");?></button></span>
 					<?php }else{ 
-						$step4 = true;
+						$step5 = true;
 						?>
 					    <span><i class="fa-solid fa-circle-check"></i></span>
 					<?php } ?> 
@@ -204,7 +232,7 @@ $step4 =false;
 				?>
 				<div class="box-inner">
 				<div>
-				<h4><strong>5. <?php echo __("Add payout information","gibbs");?></strong></h4>
+				<h4><strong>6. <?php echo __("Add payout information","gibbs");?></strong></h4>
 
 					<p><?php echo __("Add your account number to receive money from your bookings","gibbs");?></p>
 				</div>
@@ -213,11 +241,11 @@ $step4 =false;
 							$ative_steps = true;
 						?>
 							<span>
-									<button onclick="location.href='/saldo/?popup-saldo=true'" class="button btn btn-primary" <?php if($step4 == false){ echo "disabled";}?>><?php echo __("Add","gibbs");?></button>
+									<button onclick="location.href='/saldo/?popup-saldo=true'" class="button btn btn-primary" <?php if($step5 == false){ echo "disabled";}?>><?php echo __("Add","gibbs");?></button>
 								
 							</span>
 						<?php } else { 
-							$step5 = true;
+							$step6 = true;
 						?>
 							<span><i class="fa-solid fa-circle-check"></i></span>
 						<?php } ?> 
@@ -265,6 +293,7 @@ $step4 =false;
 		});
 	</script>
 <?php } ?>
+
 
 
 <div class="row">
@@ -325,3 +354,11 @@ if(isset($_GET["show_message"]) && $_GET["show_message"] == "true"){
 		jQuery(".dashloader").show();
 	})
 </script>
+
+<?php 
+
+add_action('wp_footer', function(){
+	do_action('wp_footer_custom');
+});
+
+?>

@@ -626,11 +626,13 @@ $show_field_if_booking_enable1 = "";
 		<?php if($section_key == "tidsluke_bookingsystem_avansert"): 
 			if(isset($data->listing_id)){
 				$activate_slotv2 = get_post_meta($data->listing_id,"activate_slotv2",true);
+				$slotv2_hide_calender = get_post_meta($data->listing_id,"slotv2_hide_calender",true);
 			}else{
 				$activate_slotv2 = "";
+				$slotv2_hide_calender = "";
 			}
 			?>
-			<div class="col-md-12">
+			<div class="col-md-6">
 				<div class="form-field-activate_slotv2-container">
 					<label class="label-activate_slotv2" for="activate_slotv2">
 						<?php esc_html_e("Activate slotv2 (this is the new calendar for customers in single listing)","Gibbs"); ?>
@@ -638,6 +640,17 @@ $show_field_if_booking_enable1 = "";
 					</label>
 					<div class="switch_box box_1">
 						<input type="checkbox" class="input-checkbox switch_1" name="activate_slotv2" id="activate_slotv2" placeholder="" value="on" maxlength="" <?php if($activate_slotv2 == "on"){echo "checked";}?>>
+					</div>
+				</div>
+			</div> 
+			<div class="col-md-6">
+				<div class="form-field-slotv2_hide_calender-container">
+					<label class="label-slotv2_hide_calender" for="slotv2_hide_calender">
+						<?php esc_html_e("Slotv2 Hide calender (Default is show. if enabled, calendar will be hidden)","Gibbs"); ?>
+						<i class="tip" data-tip-content="<?php esc_html_e("Slotv2 Hide calender (Default is show. if enabled, calendar will be hidden)","Gibbs"); ?>"><div class="tip-content"><?php esc_html_e("Slotv2 Hide calender (Default is show. if enabled, calendar will be hidden)","Gibbs"); ?></div></i>
+					</label>
+					<div class="switch_box box_1">
+						<input type="checkbox" class="input-checkbox switch_1" name="slotv2_hide_calender" id="slotv2_hide_calender" placeholder="" value="on" maxlength="" <?php if($slotv2_hide_calender == "on"){echo "checked";}?>>
 					</div>
 				</div>
 			</div> 
@@ -786,7 +799,7 @@ $show_field_if_booking_enable1 = "";
 			},100);
 
 
-			jQuery("body").find("input[type=checkbox]").each(function(){
+			jQuery("body").find("#submit-listing-form").find("input[type=checkbox]").each(function(){
 				
 				if(jQuery(this).attr("required") != undefined){
 					var nnn = jQuery(this).attr("name");
@@ -811,7 +824,7 @@ $show_field_if_booking_enable1 = "";
 				}
 				
 			}
-			jQuery("body").find("input[type=text],input[type=number]").each(function(){
+			jQuery("body").find("#submit-listing-form").find("input[type=text],input[type=number]").each(function(){
 				
                 if(jQuery(this).attr("required") != undefined){
 					if(jQuery(this).val() ==  ""){

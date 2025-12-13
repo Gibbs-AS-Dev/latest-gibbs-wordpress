@@ -34,16 +34,110 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         
+        // Validation function
+        function validateCheckoutForm(form) {
+            const fieldErrors = new Map();
+            
+            // Remove previous error messages and styling
+            form.querySelectorAll('.checkout-field-error').forEach(el => el.remove());
+            form.querySelectorAll('.checkout-form-group').forEach(group => {
+                group.classList.remove('checkout-has-error');
+            });
+            
+            // Required fields with their error messages
+            const requiredFields = {
+                'company_company_name': 'Company Name is required',
+                'company_email': 'Company Email is required',
+                'company_phone': 'Company Phone is required',
+                'company_country': 'Company Country is required',
+                'company_country_code': 'Company Country Code is required',
+            };
+            
+            // Validate required fields
+            Object.keys(requiredFields).forEach(fieldName => {
+                const field = form.querySelector(`[name="${fieldName}"]`);
+                if (field) {
+                    const value = field.value.trim();
+                    if (!value) {
+                        fieldErrors.set(field, requiredFields[fieldName]);
+                    }
+                }
+            });
+            
+            // Validate email format
+            const emailField = form.querySelector('[name="company_email"]');
+            if (emailField && emailField.value.trim()) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(emailField.value.trim())) {
+                    fieldErrors.set(emailField, 'Please enter a valid email address');
+                }
+            }
+            
+            // Display errors
+            if (fieldErrors.size > 0) {
+                const firstErrorField = fieldErrors.keys().next().value;
+                
+                fieldErrors.forEach((errorMessage, field) => {
+                    const formGroup = field.closest('.checkout-form-group');
+                    if (formGroup) {
+                        formGroup.classList.add('checkout-has-error');
+                        const errorMsg = document.createElement('span');
+                        errorMsg.className = 'checkout-field-error';
+                        errorMsg.textContent = errorMessage;
+                        formGroup.appendChild(errorMsg);
+                    }
+                });
+                
+                // Scroll to first error
+                if (firstErrorField) {
+                    firstErrorField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    firstErrorField.focus();
+                }
+                
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Add real-time validation - clear errors as user types
+        const form = checkoutModal.querySelector('#checkout-contact-form');
+        if (form) {
+            const fields = form.querySelectorAll('input[required], input[type="email"]');
+            fields.forEach(field => {
+                field.addEventListener('input', function() {
+                    const formGroup = this.closest('.checkout-form-group');
+                    if (formGroup && formGroup.classList.contains('checkout-has-error')) {
+                        const errorMsg = formGroup.querySelector('.checkout-field-error');
+                        if (errorMsg) {
+                            const value = this.value.trim();
+                            // Clear error if field is now valid
+                            if (value && (this.type !== 'email' || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value))) {
+                                formGroup.classList.remove('checkout-has-error');
+                                errorMsg.remove();
+                            }
+                        }
+                    }
+                });
+            });
+        }
+        
         // Save button handler
         const saveBtn = checkoutModal.querySelector('.checkout-btn-save');
         if (saveBtn) {
             saveBtn.addEventListener('click', function() {
                 const form = document.getElementById('checkout-contact-form');
+                
+                // Validate form before submitting
+                if (!validateCheckoutForm(form)) {
+                    return;
+                }
+                
                 const formData = new FormData(form);
                 const data = {};
                 
                 formData.forEach((value, key) => {
-                    data[key] = value;
+                    data[key] = value.trim();
                 });
                 
                 // Show loading

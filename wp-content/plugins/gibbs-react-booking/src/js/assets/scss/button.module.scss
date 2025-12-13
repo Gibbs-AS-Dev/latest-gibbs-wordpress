@@ -210,6 +210,22 @@
   }
 }
 
+.cancel {
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  
+  &:hover:not(:disabled) {
+    background: #f9fafb;
+    border-color: #9ca3af;
+  }
+  
+  &:active:not(:disabled) {
+    background: #f3f4f6;
+    border-color: #6b7280;
+  }
+}
+
 .link {
   background: transparent;
   color: var(--button-primary-bg);

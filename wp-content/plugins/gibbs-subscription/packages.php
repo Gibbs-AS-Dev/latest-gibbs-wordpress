@@ -18,7 +18,13 @@ $packages = $query->posts;
 
 $user_id = $super_admin;
 
-$stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+$mode = get_option('stripe_mode');
+if($mode == "test"){
+    $stripe_customer_id = get_user_meta($user_id, 'stripe_test_customer_id', true);
+}else{
+    $stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
+}
+//$stripe_customer_id = get_user_meta($user_id, 'stripe_customer_id', true);
 
 $active_subscription_price_id = null;
 $active_sub = [];
@@ -176,11 +182,12 @@ if(class_exists('Class_Gibbs_Subscription')){
 
                             <?php
 
-                            $company_name = get_user_meta($info_user_id, 'package_company_name', true);
-
+                            $company_company_name = get_user_meta($info_user_id, 'company_company_name', true);
+                            $company_email = get_user_meta($info_user_id, 'company_email', true);
+                            
                             $existCompanyData = true;
                             
-                            if($company_name == ""){
+                            if($company_company_name == "" || $company_email == ""){
                                 $existCompanyData = false;
                             } ?>
                             <span class="load-div">
@@ -301,56 +308,8 @@ if(class_exists('Class_Gibbs_Subscription')){
 </div>
 
 <!-- Checkout Contact Info Modal -->
-<div id="checkout-contact-modal" class="checkout-modal" style="display: none;">
-    <div class="checkout-modal-content">
-        <div class="checkout-modal-header">
-            <h2><?php echo __("Company Information","gibbs");?></h2>
-            <span class="checkout-modal-close">&times;</span>
-        </div>
-        <div class="checkout-modal-body">
-            <form id="checkout-contact-form">
-                <?php
-                
-                
-                $company_name = get_user_meta($info_user_id, 'package_company_name', true);
-                $street_address = get_user_meta($info_user_id, 'package_street_address', true);
-                $zip_code = get_user_meta($info_user_id, 'package_zip_code', true);
-                $city = get_user_meta($info_user_id, 'package_city', true);
-                $organization_number = get_user_meta($info_user_id, 'package_organization_number', true);
-                
-                ?>
-                
-                <div class="checkout-form-group">
-                    <label for="checkout_company_name"><?php echo __("Company Name","gibbs");?></label>
-                    <input type="text" id="checkout_company_name" name="package_company_name" value="<?php echo esc_attr($company_name);?>" placeholder="<?php echo __("Company Name Inc.","gibbs");?>" />
-                </div>
-                <div class="checkout-form-group">
-                    <label for="checkout_street_address"><?php echo __("Street Address","gibbs");?></label>
-                    <input type="text" id="checkout_street_address" name="package_street_address" value="<?php echo esc_attr($street_address);?>" placeholder="<?php echo __("Street Address","gibbs");?>" />
-                </div>
-                <div class="checkout-form-row">
-                    <div class="checkout-form-group checkout-form-group-half">
-                        <label for="checkout_zip_code"><?php echo __("Zip Code","gibbs");?></label>
-                        <input type="text" id="checkout_zip_code" name="package_zip_code" value="<?php echo esc_attr($zip_code);?>" placeholder="<?php echo __("0000","gibbs");?>" />
-                    </div>
-                    <div class="checkout-form-group checkout-form-group-half">
-                        <label for="checkout_city"><?php echo __("City","gibbs");?></label>
-                        <input type="text" id="checkout_city" name="package_city" value="<?php echo esc_attr($city);?>" placeholder="<?php echo __("City","gibbs");?>" />
-                    </div>
-                </div>
-                <div class="checkout-form-group">
-                    <label for="checkout_organization_number"><?php echo __("Organization Number","gibbs");?></label>
-                    <input type="text" id="checkout_organization_number" name="package_organization_number" value="<?php echo esc_attr($organization_number);?>" placeholder="<?php echo __("999 999 999","gibbs");?>" />
-                </div>
-            </form>
-        </div>
-        <div class="checkout-modal-footer">
-            <button type="button" class="checkout-btn-close"><?php echo __("Close","gibbs");?></button>
-            <button type="button" class="checkout-btn-save"><?php echo __("Save","gibbs");?></button>
-        </div>
-    </div>
-</div>
 
+<?php //echo do_shortcode('[checkout_contact_info_modal]'); ?>
 <script>
     jQuery(".load-div").find("a").click(function(){
         jQuery(this).parent().find(".loading").show();
@@ -360,3 +319,10 @@ if(class_exists('Class_Gibbs_Subscription')){
         },3000)
     })
 </script>
+<?php 
+
+add_action('wp_footer', function(){
+	do_action('wp_footer_custom');
+});
+
+?>

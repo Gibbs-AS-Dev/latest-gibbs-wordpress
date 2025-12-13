@@ -1,16 +1,118 @@
 // Shared table styles
 
 .tableWrapper {
+  position: relative;
   overflow-x: auto;
-  overflow-y: visible;
+  overflow-y: auto;
   max-width: 100%;
   background: #ffffff;
   border-radius: 0;
   // box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   // padding: 20px 16px;
-  // &:hover {
-  //   overflow-x: auto;
-  // }
+  /* Reserve space for the fake top scrollbar so the table
+     does NOT move / resize when the scrollbar becomes visible */
+  padding-top: 16px;
+
+  .tableTopScroll {
+    position: absolute;
+    top: 5px;
+    left: 0;
+    right: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    height: 12px;
+    max-width: 100%;
+    /* Keep height and space constant; hide visually with transparent thumb by default */
+    scrollbar-color: transparent transparent;
+    scrollbar-width: thin;
+
+    &::-webkit-scrollbar {
+      height: 6px;
+    }
+
+    /* Hide any start/end arrow buttons on WebKit browsers */
+    &::-webkit-scrollbar-button,
+    &::-webkit-scrollbar-button:single-button {
+      width: 0;
+      height: 0;
+      display: none;
+      background: transparent;
+      border-style: none;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      border-radius: 999px;
+    }
+  }
+
+  /* Show custom top + bottom scrollbars only when hovering the table wrapper */
+  &:hover {
+    .tableTopScroll {
+      scrollbar-color: #cbd5e1 transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+    }
+
+    .tableBodyScroll {
+      /* visible colors on hover */
+      scrollbar-color: #cbd5e1 transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+      }
+
+      &::-webkit-scrollbar-thumb:hover {
+        background: #94a3b8;
+      }
+    }
+  }
+}
+
+/* Bottom (native) horizontal scrollbar container for the table */
+.tableBodyScroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  max-width: 100%;
+
+  /* Keep constant height so layout doesn't jump; hide by making thumb transparent */
+  scrollbar-color: transparent transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  /* Hide any start/end arrow buttons on WebKit browsers */
+  &::-webkit-scrollbar-button,
+  &::-webkit-scrollbar-button:single-button {
+    width: 0;
+    height: 0;
+    display: none;
+    background: transparent;
+    border-style: none;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: transparent;
+    border-radius: 999px;
+  }
+}
+
+.tableOuter {
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
 }
 
 .table {
