@@ -56,6 +56,8 @@ class CustomerApi {
     private function handleGetRequest($data) {
         $action = isset($data['action']) ? $data['action'] : '';
 
+        $this->authenticateUser();
+
         switch ($action) {
             case 'getGibbsCustomers':
                 $this->requireAuth();
@@ -100,6 +102,8 @@ class CustomerApi {
     private function handlePostRequest($data) {
         $action = isset($data['action']) ? $data['action'] : '';
 
+        $this->authenticateUser();
+
         switch ($action) {
             case 'createGibbsCustomer':
                 $this->requireAuth();
@@ -136,6 +140,8 @@ class CustomerApi {
     private function handlePutRequest($data) {
         $action = isset($data['action']) ? $data['action'] : '';
 
+        $this->authenticateUser();
+
         switch ($action) {
             case 'updateGibbsSuperadmin':
                 $this->requireAuth();
@@ -155,6 +161,8 @@ class CustomerApi {
      */
     private function handleDeleteRequest($data) {
         $action = isset($data['action']) ? $data['action'] : '';
+
+        $this->authenticateUser();
 
         switch ($action) {
             case 'deleteGibbsCustomer':
