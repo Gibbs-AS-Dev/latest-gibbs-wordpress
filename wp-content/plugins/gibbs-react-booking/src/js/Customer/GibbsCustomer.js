@@ -462,7 +462,10 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
   };
 
   const getLicenseBadgeClass = (licenseType) => {
-    switch (licenseType?.toLowerCase()) {
+    if (!licenseType || typeof licenseType !== 'string') {
+      return styles.badgeDefault;
+    }
+    switch (licenseType.toLowerCase()) {
       case 'custom plan':
         return styles.badgeCustomPlan;
       case 'trial':

@@ -76,11 +76,9 @@ class CustomerApi {
                 $this->getCustomerPreferences($data);
                 break;
             case 'getFilterPreferences':
-                $this->requireAuth();
                 $this->getFilterPreferences($data);
                 break;
             case 'getPackages':
-                $this->requireAuth();
                 $this->getPackages($data);
                 break;
             case 'checkEmailExists':

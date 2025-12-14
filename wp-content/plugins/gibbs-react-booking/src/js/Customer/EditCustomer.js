@@ -479,7 +479,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
             >
               <option value="">{Ltext('Select Industry')}</option>
               {industries && Object.entries(industries).map(([key, Industryvalue]) => (
-                <option value={Industryvalue}>{Ltext(Industryvalue)}</option>
+                <option key={key} value={Industryvalue}>{Ltext(Industryvalue)}</option>
               ))}
             </select>
           </div>
@@ -497,7 +497,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
                 required={true}>
                 <option value="">{Ltext('Select Country')}</option>
                 {countries.map((country) => (
-                  <option value={country.code}>{country.name}</option>
+                  <option key={country.code} value={country.code}>{country.name}</option>
                 ))}
                 </select>
             </div>

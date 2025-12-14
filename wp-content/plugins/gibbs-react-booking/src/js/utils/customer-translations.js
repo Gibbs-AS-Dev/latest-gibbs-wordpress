@@ -49,6 +49,11 @@ function getCurrentLanguage() {
  * @returns {string} Translated text
  */
 export function Ltext(text, context = '') {
+  // Handle null, undefined, or non-string values
+  if (!text || typeof text !== 'string') {
+    return text || '';
+  }
+  
   const currentLang = getCurrentLanguage();
   const langTranslations = translations[currentLang] || translations[DEFAULT_LANGUAGE];
   
@@ -89,6 +94,12 @@ export function __dynamicText(text, replacements = {}) {
 
 export function __extraText(text) {
   let translatedText = Ltext(text);
+  
+  // Handle null, undefined, or non-string values
+  if (!translatedText || typeof translatedText !== 'string') {
+    return translatedText || '';
+  }
+  
   const currentLang = getCurrentLanguage();
   const langTranslations = translations[currentLang] || translations[DEFAULT_LANGUAGE]; 
   

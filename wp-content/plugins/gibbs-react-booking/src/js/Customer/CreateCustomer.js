@@ -331,7 +331,7 @@ function CreateCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, onSucce
             >
               <option value="">{Ltext('Select Industry')}</option>
               {industries && Object.entries(industries).map(([key, Industryvalue]) => (
-                <option value={Industryvalue}>{Ltext(Industryvalue)}</option>
+                <option key={key} value={Industryvalue}>{Ltext(Industryvalue)}</option>
               ))}
             </select>
           </div>
@@ -349,7 +349,7 @@ function CreateCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, onSucce
                 required={true}>
                 <option value="">{Ltext('Select Country')}</option>
                 {countries.map((country) => (
-                  <option value={country.code}>{country.name}</option>
+                  <option key={country.code} value={country.code}>{country.name}</option>
                 ))}
                 </select>
             </div>
