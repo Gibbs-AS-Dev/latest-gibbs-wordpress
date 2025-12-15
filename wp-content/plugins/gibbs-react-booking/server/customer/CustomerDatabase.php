@@ -302,7 +302,7 @@ class CustomerDatabase {
         $offset = ($page - 1) * $perPage;
 
         // Validate sort column
-        $allowedSortColumns = ['name', 'created_at', 'superadmin', 'group_admin', 'type_of_form', 'email', 'group_updated_at', 'company_country', 'company_industry'];
+        $allowedSortColumns = ['name', 'created_at', 'superadmin', 'group_admin', 'type_of_form', 'email', 'group_updated_at', 'company_country', 'company_industry', 'next_invoice', 'canceled_at'];
         $sortBy = in_array($sortBy, $allowedSortColumns) ? $sortBy : 'id';
         
 
@@ -408,6 +408,20 @@ class CustomerDatabase {
                       AND um_company.meta_key = 'company_company_name'
                       AND um_company.meta_value LIKE :company_name_search
                 )
+                OR EXISTS (
+                    SELECT 1
+                    FROM {$this->wp_prefix}usermeta um_company_email
+                    WHERE um_company_email.user_id = ug.superadmin
+                      AND um_company_email.meta_key = 'company_email'
+                      AND um_company_email.meta_value LIKE :company_email_search
+                )
+                OR EXISTS (
+                    SELECT 1
+                    FROM {$this->wp_prefix}usermeta um_company_organization_number
+                    WHERE um_company_organization_number.user_id = ug.superadmin
+                      AND um_company_organization_number.meta_key = 'company_organization_number'
+                      AND um_company_organization_number.meta_value LIKE :company_organization_number_search
+                )
             )";
         }
         $outerWhereClause = !empty($outerWhereConditions) ? 'WHERE ' . implode(' AND ', $outerWhereConditions) : '';
@@ -444,6 +458,8 @@ class CustomerDatabase {
                 $countParams[':group_search'] = "%{$search}%";
                 $countParams[':group_admin_email_search'] = "%{$search}%";
                 $countParams[':company_name_search'] = "%{$search}%";
+                $countParams[':company_email_search'] = "%{$search}%";
+                $countParams[':company_organization_number_search'] = "%{$search}%";
                 $countParams[':search'] = "%{$search}%";
                 $countParams[':search2'] = "%{$search}%";
                 $countParams[':search3'] = "%{$search}%";
@@ -465,8 +481,6 @@ class CustomerDatabase {
 
         // Get customers from users_groups table with unique superadmin IDs
         // Using subquery to get one record per unique superadmin (using MIN id to get first record)
-        $needsMetaJoin = ($sortBy === 'company_country' || $sortBy === 'company_industry');
-        
         $sortColumn = $sortBy === 'name' ? 'ug.name' : 
                      ($sortBy === 'created_at' ? 'ug.created_at' : 
                      ($sortBy === 'superadmin' ? 'u.display_name' : 
@@ -476,14 +490,25 @@ class CustomerDatabase {
                      ($sortBy === 'group_updated_at' ? 'ug.updated_at' : 
                      ($sortBy === 'type_of_form' ? 'ug.type_of_form' : 
                      ($sortBy === 'company_country' ? 'um_country.meta_value' : 
-                     ($sortBy === 'company_industry' ? 'um_industry.meta_value' : 'ug.name')))))))));
-        
-        $metaJoinClause = '';
-        if ($needsMetaJoin) {
-            $metaKey = $sortBy === 'company_country' ? 'company_country' : 'company_industry';
-            $alias = $sortBy === 'company_country' ? 'um_country' : 'um_industry';
-            $metaJoinClause = "LEFT JOIN {$this->wp_prefix}usermeta {$alias} ON ug.superadmin = {$alias}.user_id AND {$alias}.meta_key = '{$metaKey}'";
+                     ($sortBy === 'canceled_at' ? 'um_canceled_at.meta_value' : 
+                     ($sortBy === 'next_invoice' ? "COALESCE(NULLIF(um_next_invoice.meta_value, ''), '9999-12-31')" : 
+                     ($sortBy === 'company_industry' ? 'um_industry.meta_value' : 'ug.name')))))))))));
+
+        // Build meta joins when needed (supports multiple meta-based sorts)
+        $metaJoinParts = [];
+        if ($sortBy === 'company_country') {
+            $metaJoinParts[] = "LEFT JOIN {$this->wp_prefix}usermeta um_country ON ug.superadmin = um_country.user_id AND um_country.meta_key = 'company_country'";
         }
+        if ($sortBy === 'company_industry') {
+            $metaJoinParts[] = "LEFT JOIN {$this->wp_prefix}usermeta um_industry ON ug.superadmin = um_industry.user_id AND um_industry.meta_key = 'company_industry'";
+        }
+        if ($sortBy === 'next_invoice') {
+            $metaJoinParts[] = "LEFT JOIN {$this->wp_prefix}usermeta um_next_invoice ON ug.superadmin = um_next_invoice.user_id AND um_next_invoice.meta_key = 'next_invoice'";
+        }
+        if ($sortBy === 'canceled_at') {
+            $metaJoinParts[] = "LEFT JOIN {$this->wp_prefix}usermeta um_canceled_at ON ug.superadmin = um_canceled_at.user_id AND um_canceled_at.meta_key = 'canceled_at'";
+        }   
+        $metaJoinClause = implode(' ', $metaJoinParts);
         
         $sql = "SELECT 
             ug.id,
@@ -535,6 +560,8 @@ class CustomerDatabase {
             $finalQueryParams[':group_search'] = "%{$search}%";
             $finalQueryParams[':group_admin_email_search'] = "%{$search}%";
             $finalQueryParams[':company_name_search'] = "%{$search}%";
+            $finalQueryParams[':company_email_search'] = "%{$search}%";
+            $finalQueryParams[':company_organization_number_search'] = "%{$search}%";
             $finalQueryParams[':search'] = "%{$search}%";
             $finalQueryParams[':search2'] = "%{$search}%";
             $finalQueryParams[':search3'] = "%{$search}%";
@@ -557,7 +584,7 @@ class CustomerDatabase {
                 $customer['usergroups'] = $this->getUsergroupsBySuperadmin($customer['superadmin']);
                 // Map fields for compatibility
 
-                $meta_keys = ['first_name', 'last_name', 'phone', 'company_company_name', 'country_code', 'package_id', 'license_status', 'subscription_type', 'subscription_id', "next_invoice", "company_country", "company_industry", 'mrr', 'arr', 'subscription_interval', 'subscription_amount', 'subscription_currency'];
+                $meta_keys = ['first_name', 'last_name', 'phone', 'company_company_name', 'country_code', 'package_id', 'license_status', 'subscription_type', 'subscription_id', "next_invoice", "company_country", "company_industry", 'mrr', 'arr', 'subscription_interval', 'subscription_amount', 'subscription_currency', 'subscription_status', 'canceled_at'];
 
                 $getPostMetaMultiple = $this->getUserMetaMultiple($customer['superadmin'], $meta_keys);
 
@@ -576,6 +603,7 @@ class CustomerDatabase {
                 $customer['company_industry'] = $getPostMetaMultiple['company_industry'] ?? "";
                 $customer['mrr'] = $getPostMetaMultiple['mrr'] ?? "";
                 $customer['arr'] = $getPostMetaMultiple['arr'] ?? "";
+                $customer['canceled_at'] = $getPostMetaMultiple['canceled_at'] ?? "";
 
                 if($getPostMetaMultiple['subscription_type'] == "invoice"){
                     $customer['payment'] = 'Invoice';
@@ -602,7 +630,13 @@ class CustomerDatabase {
                 
 
                 if($getPostMetaMultiple['license_status'] == "active"){
-                    $customer['stripe_license'] = $user_package['post_title'] ?? 'Custom Plan';
+
+                    if($getPostMetaMultiple['subscription_status'] == "trialing"){
+                        $customer['stripe_license'] = 'Trial';
+                    }else{
+                        $customer['stripe_license'] = $user_package['post_title'] ?? 'Custom Plan';
+                    }
+                   
                 }else{
                     $customer['stripe_license'] = 'No License';
                 }

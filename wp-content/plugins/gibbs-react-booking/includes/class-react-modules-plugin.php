@@ -841,12 +841,18 @@ class ReactModulesPlugin {
 
         $api_url = '';
 
+        $require_login = false;
+        $require_admin = false;
+
         switch ($component) {
             case 'subscription_discount':
                 $api_url = RMP_PLUGIN_URL . 'server/subscriptionDiscount/subscription-discount-endpoint.php';
+                $require_login = true;
                 break;
             case 'gibbs_customer':
                 $api_url = RMP_PLUGIN_URL . 'server/customer/customer-endpoint.php';
+                $require_login = true;
+                $require_admin = true;
                 break;    
             case 'component_gallery':
             case 'components':
@@ -856,6 +862,25 @@ class ReactModulesPlugin {
             default:
                 $api_url = '';
                 break;
+        }
+
+        if($require_login && !is_user_logged_in()){
+            return '<div style="display: flex; justify-content: center; align-items: center; min-height: 200px;">
+                        <div style="text-align: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 12px;" width="48" height="48" fill="none" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#f5f5f5" stroke="#ccc" stroke-width="2"/><path d="M24 19a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5.33 0-8 2.67-8 5.33V29a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2.67C32 23.67 29.33 21 24 21z" fill="#b1b1b1"/></svg>
+                            <p style="font-size: 18px; color: #555; margin-bottom: 4px;">You must be logged in</p>
+                            <p style="font-size: 14px; color: #888;">Please log in to view this component.</p>
+                        </div>
+                    </div>';
+        }
+        if($require_admin && !current_user_can('administrator')){
+            return '<div style="display: flex; justify-content: center; align-items: center; min-height: 200px;">
+                        <div style="text-align: center;">
+                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 12px;" width="48" height="48" fill="none" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#f5f5f5" stroke="#ccc" stroke-width="2"/><path d="M24 19a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5.33 0-8 2.67-8 5.33V29a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2.67C32 23.67 29.33 21 24 21z" fill="#b1b1b1"/></svg>
+                            <p style="font-size: 18px; color: #555; margin-bottom: 4px;">You must be an administrator</p>
+                            <p style="font-size: 14px; color: #888;">Please log in as an administrator to view this component.</p>
+                        </div>
+                    </div>';
         }
 
         // Only require API URL for components that need it

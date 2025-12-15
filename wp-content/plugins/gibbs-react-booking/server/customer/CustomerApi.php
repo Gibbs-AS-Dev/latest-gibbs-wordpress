@@ -63,6 +63,10 @@ class CustomerApi {
                 $this->requireAuth();
                 $this->getCustomers($data);
                 break;
+            case 'getSwitchUserUrl':
+                $this->requireAuth();
+                $this->getSwitchUserUrl($data);
+                break;
             case 'getGibbsCustomer':
                 $this->requireAuth();
                 $this->getCustomer($data);
@@ -851,6 +855,57 @@ class CustomerApi {
         } catch (Exception $e) {
             CoreResponse::serverError('Failed to check email: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Generate a User Switching URL for a superadmin and return it to the client.
+     */
+    private function getSwitchUserUrl($data) {
+        $superadminId = isset($data['superadmin_id']) ? intval($data['superadmin_id']) : 0;
+
+        if (!$superadminId) {
+            CoreResponse::error('Superadmin ID is required', 400);
+            return;
+        }
+
+        // Ensure WordPress core is loaded so we have access to users and helper functions
+        if (!function_exists('get_userdata')) {
+            $wp_load_path = dirname(__FILE__, 6) . '/wp-load.php';
+            if (file_exists($wp_load_path)) {
+                require_once $wp_load_path;
+            } else {
+                CoreResponse::error('WordPress core not found', 500);
+                return;
+            }
+        }
+
+        $user = get_userdata($superadminId);
+        if (!$user) {
+            CoreResponse::error('User not found', 404);
+            return;
+        }
+
+        // Load the User Switching plugin if it is available.
+        if (!class_exists('user_switching')) {
+            $us_plugin_path = dirname(__FILE__, 6) . '/wp-content/plugins/user-switching/user-switching.php';
+            if (file_exists($us_plugin_path)) {
+                require_once $us_plugin_path;
+            }
+        }
+
+        if (!class_exists('user_switching') || !method_exists('user_switching', 'maybe_switch_url')) {
+            CoreResponse::error('User Switching plugin is not available', 500);
+            return;
+        }
+
+        $switchUrl = user_switching::maybe_switch_url($user);
+
+        if (!$switchUrl) {
+            CoreResponse::error('Not allowed to switch to this user', 403);
+            return;
+        }
+
+        CoreResponse::success(['switch_url' => $switchUrl], 'Switch URL generated successfully');
     }
 
     private function getCurrentUserId() {

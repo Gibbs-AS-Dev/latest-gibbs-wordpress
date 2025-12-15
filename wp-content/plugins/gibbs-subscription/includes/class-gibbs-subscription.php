@@ -1199,6 +1199,14 @@ class Class_Gibbs_Subscription
                                     }else{
                                         update_user_meta($user->ID, 'subscription_type', "paid");
                                     }
+                                    
+                                    if(isset($subscription->status) && $subscription->status !== ""){
+                                        update_user_meta($user->ID, 'subscription_status', $subscription->status);
+                                    }else{
+                                        update_user_meta($user->ID, 'subscription_status', "");
+                                    }
+                                    
+                                    
                                     if(isset($subscription->plan) && isset($subscription->plan->interval)){
 
                                         update_user_meta($user->ID, 'subscription_interval', $subscription->plan->interval);
@@ -1261,6 +1269,12 @@ class Class_Gibbs_Subscription
                                             update_user_meta($user->ID, 'subscription_type', "paid");
                                         }
 
+                                        if(isset($subscription->status) && $subscription->status !== ""){
+                                            update_user_meta($user->ID, 'subscription_status', $subscription->status);
+                                        }else{
+                                            update_user_meta($user->ID, 'subscription_status', "");
+                                        }
+
                                         if(isset($subscription->plan) && isset($subscription->plan->interval)){
 
                                             update_user_meta($user->ID, 'subscription_interval', $subscription->plan->interval);
@@ -1269,6 +1283,17 @@ class Class_Gibbs_Subscription
                                             update_user_meta($user->ID, 'subscription_amount', $amount);
                                             update_user_meta($user->ID, 'subscription_currency', $subscription->plan->currency);
 
+                                        }
+
+                                        // Convert Unix timestamp to formatted date string (Y-m-d H:i:s) or empty if not set
+                                        if (isset($subscription->cancel_at) && $subscription->cancel_at != "") {
+                                            $cancel_at_formatted = date('Y-m-d H:i:s', $subscription->cancel_at);
+                                            update_user_meta($user->ID, 'canceled_at', $cancel_at_formatted);
+                                        } else if (isset($subscription->canceled_at) && $subscription->canceled_at != "") {
+                                            $canceled_at_formatted = date('Y-m-d H:i:s', $subscription->canceled_at);
+                                            update_user_meta($user->ID, 'canceled_at', $canceled_at_formatted);
+                                        } else {
+                                            update_user_meta($user->ID, 'canceled_at', "");
                                         }
 
                                         // $myfile = fopen(ABSPATH."/customer_subscription_data.txt", "w");
@@ -1310,6 +1335,20 @@ class Class_Gibbs_Subscription
 
                         $user = $this->get_user_by_stripe_customer_id($customer_id);
                         if ($user) {
+
+                            $subscription_data = $session;
+
+                            if (isset($subscription_data->cancel_at) && $subscription_data->cancel_at != "") {
+                                $cancel_at_formatted = date('Y-m-d H:i:s', $subscription_data->cancel_at);
+                                update_user_meta($user->ID, 'canceled_at', $cancel_at_formatted);
+                            } else if (isset($subscription_data->canceled_at) && $subscription_data->canceled_at != "") {
+                                $canceled_at_formatted = date('Y-m-d H:i:s', $subscription_data->canceled_at);
+                                update_user_meta($user->ID, 'canceled_at', $canceled_at_formatted);
+                            } else {
+                                update_user_meta($user->ID, 'canceled_at', date('Y-m-d H:i:s'));
+                            }
+
+                           
 
                             $subscriptions = $this->stripe->subscriptions->all(['customer' => $customer_id]);
                             if (count($subscriptions->data) > 0) {

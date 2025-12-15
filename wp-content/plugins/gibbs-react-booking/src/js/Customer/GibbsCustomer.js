@@ -58,6 +58,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
   const [savingRevenue, setSavingRevenue] = useState({});
   const revenueSaveTimeouts = useRef({});
   const [revenueEditMode, setRevenueEditMode] = useState({});
+  const [switchingUser, setSwitchingUser] = useState({});
 
   const [callSavePreferences, setCallSavePreferences] = useState(false);
   const [isCreateCustomerOpen, setIsCreateCustomerOpen] = useState(false);
@@ -522,7 +523,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
     return Number(value).toLocaleString('en-US');
   };
 
-  const handleRevenueChange = (row, field, rawValue) => {
+  const handleRevenueInputChange = (row, field, rawValue) => {
     if (!row || !row.superadmin) return;
     const superadminId = row.superadmin;
     const parsedValue = rawValue === '' ? '' : parseFloat(rawValue);
@@ -538,8 +539,9 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
       [field]: rawValue === '' ? '' : parsedValue
     };
 
-    // If ARR was never set, default it to 12x MRR when MRR changes
-    if (field === 'mrr' && (existing.arr === '' || existing.arr === undefined || existing.arr === null)) {
+    // Keep ARR in sync with MRR unless ARR is actively being edited
+    const arrIsBeingEdited = revenueEditMode[superadminId]?.arr;
+    if (field === 'mrr' && !arrIsBeingEdited) {
       updated.arr = rawValue === '' ? '' : parsedValue * 12;
     }
 
@@ -547,19 +549,6 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
       ...prev,
       [superadminId]: updated
     }));
-
-    if (revenueSaveTimeouts.current[superadminId]) {
-      clearTimeout(revenueSaveTimeouts.current[superadminId]);
-    }
-
-    revenueSaveTimeouts.current[superadminId] = setTimeout(() => {
-      saveRevenue(
-        superadminId,
-        updated.mrr === '' || updated.mrr === undefined || updated.mrr === null ? 0 : updated.mrr,
-        updated.arr === '' || updated.arr === undefined || updated.arr === null ? 0 : updated.arr
-      );
-      delete revenueSaveTimeouts.current[superadminId];
-    }, 600);
   };
 
   const startRevenueEdit = (superadminId, row, field) => {
@@ -577,12 +566,90 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
     }));
   };
 
-  const stopRevenueEdit = (superadminId, field) => {
+  const handleRevenueSave = async (superadminId) => {
+    const current = revenueValues[superadminId];
+    if (!current) return;
+    await saveRevenue(
+      superadminId,
+      current.mrr === '' || current.mrr === undefined || current.mrr === null ? 0 : current.mrr,
+      current.arr === '' || current.arr === undefined || current.arr === null ? 0 : current.arr
+    );
+    // Keep UI in sync after save
+    setCustomers((prev) =>
+      prev.map((company) =>
+        company.superadmin === superadminId
+          ? {
+              ...company,
+              mrr: current.mrr === '' || current.mrr === undefined || current.mrr === null ? 0 : current.mrr,
+              arr: current.arr === '' || current.arr === undefined || current.arr === null ? 0 : current.arr
+            }
+          : company
+      )
+    );
     setRevenueEditMode((prev) => ({
       ...prev,
-      [superadminId]: { ...(prev[superadminId] || {}), [field]: false }
+      [superadminId]: { mrr: false, arr: false }
     }));
   };
+
+  const cancelAllRevenueEdits = useCallback(() => {
+    setRevenueEditMode({});
+    setRevenueValues({});
+  }, []);
+
+  const isAnyRevenueEditing = useMemo(
+    () => Object.values(revenueEditMode).some((mode) => (mode?.mrr || mode?.arr)),
+    [revenueEditMode]
+  );
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      const target = event.target;
+      if (target && target.closest && target.closest('[data-revenue-editor]')) return;
+      cancelAllRevenueEdits();
+    };
+    if (isAnyRevenueEditing) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isAnyRevenueEditing, cancelAllRevenueEdits]);
+
+  const decodeHtml = (input) => {
+    if (!input || typeof input !== 'string') return input;
+    const textarea = document.createElement('textarea');
+    textarea.innerHTML = input;
+    return textarea.value;
+  };
+
+  const handleSwitchToUser = useCallback(async (row) => {
+    if (!row || row.isUsergroup || !row.superadmin) return;
+    const superadminId = row.superadmin;
+
+    setSwitchingUser((prev) => ({ ...prev, [superadminId]: true }));
+
+    try {
+      const headers = user_token ? { Authorization: `Bearer ${user_token}` } : {};
+      const response = await axios.get(apiUrl, {
+        params: { action: 'getSwitchUserUrl', superadmin_id: superadminId },
+        headers
+      });
+
+      const switchUrl = decodeHtml(response?.data?.data?.switch_url);
+
+      if (switchUrl) {
+        window.open(switchUrl, '_blank', 'noopener');
+      } else {
+        alert(response?.data?.message || Ltext('Unable to switch to this user'));
+      }
+    } catch (err) {
+      const message = err?.response?.data?.message || err?.message || Ltext('Failed to switch user');
+      alert(message);
+    } finally {
+      setSwitchingUser((prev) => ({ ...prev, [superadminId]: false }));
+    }
+  }, [apiUrl, user_token]);
 
   // Flatten customers and usergroups for table display
   const tableData = useMemo(() => {
@@ -675,6 +742,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
     {
       key: 'phone',
       header: Ltext('PHONE'),
+      sortable: true,
       thStyle: { width: '8%' },
       render: (row) => (row.country_code && row.phone != '' ? row.country_code + ' ' + row.phone : row.phone || '—')
     },
@@ -700,6 +768,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
     },
     {
       key: 'mrr',
+      sortable: true,
       header: Ltext('MRR'),
       thStyle: { width: '10%' },
       render: (row) => {
@@ -729,29 +798,39 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
         }
 
         return (
-          <input
-            type="number"
-            min="0"
-            step="1"
-            autoFocus
-            value={value === '' || value === null || value === undefined ? '' : value}
-            onChange={(e) => handleRevenueChange(row, 'mrr', e.target.value)}
-            onBlur={() => stopRevenueEdit(superadminId, 'mrr')}
-            disabled={savingRevenue[superadminId]}
-            style={{
-              width: 120,
-              padding: '4px 6px',
-              border: '1px solid #d1d5db',
-              borderRadius: 4,
-              fontSize: 13,
-              background: savingRevenue[superadminId] ? '#f9fafb' : '#fff'
-            }}
-          />
+          <div data-revenue-editor style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              autoFocus
+              value={value === '' || value === null || value === undefined ? '' : value}
+              onChange={(e) => handleRevenueInputChange(row, 'mrr', e.target.value)}
+              disabled={savingRevenue[superadminId]}
+              style={{
+                width: 120,
+                padding: '4px 6px',
+                border: '1px solid #d1d5db',
+                borderRadius: 4,
+                fontSize: 13,
+                background: savingRevenue[superadminId] ? '#f9fafb' : '#fff'
+              }}
+            />
+            <Button
+              variant="primary"
+              size="small"
+              disabled={savingRevenue[superadminId]}
+              onClick={() => handleRevenueSave(superadminId)}
+            >
+              {savingRevenue[superadminId] ? Ltext('Saving...') : Ltext('Save')}
+            </Button>
+          </div>
         );
       }
     },
     {
       key: 'arr',
+      sortable: true,
       header: Ltext('ARR'),
       thStyle: { width: '10%' },
       render: (row) => {
@@ -780,24 +859,33 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
         }
 
         return (
-          <input
-            type="number"
-            min="0"
-            step="1"
-            autoFocus
-            value={value === '' || value === null || value === undefined ? '' : value}
-            onChange={(e) => handleRevenueChange(row, 'arr', e.target.value)}
-            onBlur={() => stopRevenueEdit(superadminId, 'arr')}
-            disabled={savingRevenue[superadminId]}
-            style={{
-              width: 120,
-              padding: '4px 6px',
-              border: '1px solid #d1d5db',
-              borderRadius: 4,
-              fontSize: 13,
-              background: savingRevenue[superadminId] ? '#f9fafb' : '#fff'
-            }}
-          />
+          <div data-revenue-editor style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
+            <input
+              type="number"
+              min="0"
+              step="1"
+              autoFocus
+              value={value === '' || value === null || value === undefined ? '' : value}
+              onChange={(e) => handleRevenueInputChange(row, 'arr', e.target.value)}
+              disabled={savingRevenue[superadminId]}
+              style={{
+                width: 120,
+                padding: '4px 6px',
+                border: '1px solid #d1d5db',
+                borderRadius: 4,
+                fontSize: 13,
+                background: savingRevenue[superadminId] ? '#f9fafb' : '#fff'
+              }}
+            />
+            <Button
+              variant="primary"
+              size="small"
+              disabled={savingRevenue[superadminId]}
+              onClick={() => handleRevenueSave(superadminId)}
+            >
+              {savingRevenue[superadminId] ? Ltext('Saving...') : Ltext('Save')}
+            </Button>
+          </div>
         );
       }
     },
@@ -917,6 +1005,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
       key: 'stripe_license',
       header: Ltext('STRIPE LICENSE'),
       thStyle: { width: '12%' },
+      sortable: true,
       render: (row) => {
         if (row.isUsergroup) return '—';
         const stripeLicense = row.stripe_license || row.license_type || row.plan_type || '';
@@ -933,12 +1022,14 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
     {
       key: 'payment',
       header: Ltext('PAYMENT'),
+      sortable: true,
       thStyle: { width: '10%' },
       render: (row) => Ltext(row.payment) || '—'
     },
     {
       key: 'next_invoice',
       header: Ltext('NEXT INVOICE'),
+      sortable: true,
       thStyle: { width: '12%' },
       render: (row) => {
         if (row.payment === 'Invoice') {
@@ -1013,12 +1104,23 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
       }
     },
     {
+      key: 'canceled_at',
+      header: Ltext('CANCEL DATE'),
+      sortable: true,
+      thStyle: { width: '12%' },
+      render: (row) => {
+        if (row.isUsergroup) return '—';
+        return row.canceled_at ? formatDate(row.canceled_at) : '—';
+      }
+    },
+    {
       key: 'edit',
       header: Ltext('EDIT'),
       thStyle: { width: '11%' , textAlign: 'center'},
       render: (row) => {
         return (
           <div className={styles.actionButtons}>
+            
             <Button
               variant="ghost"
               size="small"
@@ -1039,6 +1141,37 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
             >
               <i className="fa fa-edit"></i>
             </Button>
+            {!row.isUsergroup && (
+              <Button
+                variant="ghost"
+                size="small"
+                key={`switch-btn-${row.id}-${row.superadmin}`}
+                onClick={() => handleSwitchToUser(row)}
+                aria-label="Switch user"
+                className={styles.actionButton}
+                disabled={switchingUser[row.superadmin]}
+                title={Ltext('Switch to this user')}
+                loading={switchingUser[row.superadmin]}
+              >
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path d="M17 14l5-5-5-5" />
+                <path d="M12 9h10" />
+                <path d="M7 10l-5 5 5 5" />
+                <path d="M2 15h10" />
+              </svg>
+              </Button>
+            )}
             {/* <Button
               variant="ghost"
               size="small"
@@ -1242,7 +1375,8 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
                             { key: 'created_at', label: Ltext('CREATED') },
                             { key: 'stripe_license', label: Ltext('STRIPE LICENSE') },
                             { key: 'payment', label: Ltext('PAYMENT') },
-                            { key: 'next_invoice', label: Ltext('NEXT INVOICE') }
+                            { key: 'next_invoice', label: Ltext('NEXT INVOICE') },
+                            { key: 'canceled_at', label: Ltext('CANCEL DATE') }
                           ].map(col => {
                             const isChecked = !selectedHideColumns.includes(col.key);
                             return (
