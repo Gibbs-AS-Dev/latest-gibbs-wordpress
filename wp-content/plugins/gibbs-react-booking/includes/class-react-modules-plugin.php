@@ -235,31 +235,9 @@ class ReactModulesPlugin {
         wp_enqueue_script('react-dom2', RMP_PLUGIN_URL . 'react/react-dom.production.min.js', array('react2'), '18.2.0', true);
         
         // Check if minified files exist, otherwise use regular files
-        $js_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/components.min.js') ? 'components.min.js' : 'components.js';
-        $css_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/components.min.css') ? 'components.min.css' : 'components.css';
         
-        // Enqueue our built React components
-        wp_enqueue_script('rmp-components', RMP_PLUGIN_URL . 'assets/js/' . $js_file, array('react2', 'react-dom2'), RMP_PLUGIN_VERSION, true);
-        
-        // Enqueue our built CSS styles
-        wp_enqueue_style('rmp-components', RMP_PLUGIN_URL . 'assets/css/' . $css_file, array(), RMP_PLUGIN_VERSION);
 
-
-        $js_wallet_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/wallet.min.js') ? 'wallet.min.js' : 'wallet.js';
-        $css_wallet_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/wallet.min.css') ? 'wallet.min.css' : 'wallet.css';
-        wp_enqueue_script('rmp-wallet', RMP_PLUGIN_URL . 'assets/js/' . $js_wallet_file, array('react2', 'react-dom2'), time(), true);
-        wp_enqueue_style('rmp-wallet', RMP_PLUGIN_URL . 'assets/css/' . $css_wallet_file, array(), RMP_PLUGIN_VERSION);
-
-        $js_email_template_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/email_template.min.js') ? 'email_template.min.js' : 'email_template.js';
-        $css_email_template_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/email_template.min.css') ? 'email_template.min.css' : 'email_template.css';
-        wp_enqueue_script('rmp-email-template', RMP_PLUGIN_URL . 'assets/js/' . $js_email_template_file, array('react2', 'react-dom2'), time(), true);
-        wp_enqueue_style('rmp-email-template', RMP_PLUGIN_URL . 'assets/css/' . $css_email_template_file, array(), RMP_PLUGIN_VERSION);
-
-
-        $js_react_modules_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/react_modules.min.js') ? 'react_modules.min.js' : 'react_modules.js';
-        $css_react_modules_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/react_modules.min.css') ? 'react_modules.min.css' : 'react_modules.css';
-        wp_enqueue_script('rmp-react-modules', RMP_PLUGIN_URL . 'assets/js/' . $js_react_modules_file, array('react2', 'react-dom2'), time(), true);
-        wp_enqueue_style('rmp-react-modules', RMP_PLUGIN_URL . 'assets/css/' . $css_react_modules_file, array(), RMP_PLUGIN_VERSION);
+      
         
         // Localize script for AJAX
         wp_localize_script('rmp-components', 'rmp_ajax', array(
@@ -547,6 +525,14 @@ class ReactModulesPlugin {
 
     public function render_slot_booking($atts) {
 
+        $js_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/components.min.js') ? 'components.min.js' : 'components.js';
+        $css_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/components.min.css') ? 'components.min.css' : 'components.css';
+        
+        // Enqueue our built React components
+        wp_enqueue_script('rmp-components', RMP_PLUGIN_URL . 'assets/js/' . $js_file, array('react2', 'react-dom2'), RMP_PLUGIN_VERSION, true);
+        // Enqueue our built CSS styles
+        wp_enqueue_style('rmp-components', RMP_PLUGIN_URL . 'assets/css/' . $css_file, array(), RMP_PLUGIN_VERSION);
+
         if(isset($atts['listing_id'])){
             $page_id = $atts['listing_id'];
         }else{
@@ -600,6 +586,14 @@ class ReactModulesPlugin {
     }
     public function render_wallet($atts) {
 
+        $js_wallet_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/wallet.min.js') ? 'wallet.min.js' : 'wallet.js';
+        $css_wallet_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/wallet.min.css') ? 'wallet.min.css' : 'wallet.css';
+        wp_enqueue_script('rmp-wallet', RMP_PLUGIN_URL . 'assets/js/' . $js_wallet_file, array('react2', 'react-dom2'), time(), true);
+        wp_enqueue_style('rmp-wallet', RMP_PLUGIN_URL . 'assets/css/' . $css_wallet_file, array(), RMP_PLUGIN_VERSION);
+
+       
+
+
         $page_id = get_the_ID();
         $atts = shortcode_atts(array(
             'id' => 'rmp-wallet-' . uniqid()
@@ -649,6 +643,13 @@ class ReactModulesPlugin {
     }
     
     public function render_sms_log($atts) {
+
+        $js_wallet_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/wallet.min.js') ? 'wallet.min.js' : 'wallet.js';
+        $css_wallet_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/wallet.min.css') ? 'wallet.min.css' : 'wallet.css';
+        wp_enqueue_script('rmp-wallet', RMP_PLUGIN_URL . 'assets/js/' . $js_wallet_file, array('react2', 'react-dom2'), time(), true);
+        wp_enqueue_style('rmp-wallet', RMP_PLUGIN_URL . 'assets/css/' . $css_wallet_file, array(), RMP_PLUGIN_VERSION);
+
+       
 
         $page_id = get_the_ID();
         $atts = shortcode_atts(array(
@@ -706,6 +707,11 @@ class ReactModulesPlugin {
         return $html;
     }
     public function render_email_log($atts) {
+
+        $js_email_template_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/email_template.min.js') ? 'email_template.min.js' : 'email_template.js';
+        $css_email_template_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/email_template.min.css') ? 'email_template.min.css' : 'email_template.css';
+        wp_enqueue_script('rmp-email-template', RMP_PLUGIN_URL . 'assets/js/' . $js_email_template_file, array('react2', 'react-dom2'), time(), true);
+        wp_enqueue_style('rmp-email-template', RMP_PLUGIN_URL . 'assets/css/' . $css_email_template_file, array(), RMP_PLUGIN_VERSION);
 
         $page_id = get_the_ID();
         $atts = shortcode_atts(array(
@@ -765,6 +771,11 @@ class ReactModulesPlugin {
     
     public function render_email_template($atts) {
 
+        $js_email_template_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/email_template.min.js') ? 'email_template.min.js' : 'email_template.js';
+        $css_email_template_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/email_template.min.css') ? 'email_template.min.css' : 'email_template.css';
+        wp_enqueue_script('rmp-email-template', RMP_PLUGIN_URL . 'assets/js/' . $js_email_template_file, array('react2', 'react-dom2'), time(), true);
+        wp_enqueue_style('rmp-email-template', RMP_PLUGIN_URL . 'assets/css/' . $css_email_template_file, array(), RMP_PLUGIN_VERSION);
+
         $page_id = get_the_ID();
         $atts = shortcode_atts(array(
             'id' => 'rmp-email-template-' . uniqid()
@@ -822,6 +833,11 @@ class ReactModulesPlugin {
     }
     
     public function render_react_modules($atts) {
+
+        $js_react_modules_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/react_modules.min.js') ? 'react_modules.min.js' : 'react_modules.js';
+        $css_react_modules_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/react_modules.min.css') ? 'react_modules.min.css' : 'react_modules.css';
+        wp_enqueue_script('rmp-react-modules', RMP_PLUGIN_URL . 'assets/js/' . $js_react_modules_file, array('react2', 'react-dom2'), time(), true);
+        wp_enqueue_style('rmp-react-modules', RMP_PLUGIN_URL . 'assets/css/' . $css_react_modules_file, array(), RMP_PLUGIN_VERSION);
        
 
         $page_id = get_the_ID();
