@@ -613,9 +613,9 @@ class CustomerDatabase {
                     if(isset($getPostMetaMultiple['subscription_interval']) && isset($getPostMetaMultiple['subscription_amount'])){
                         if($getPostMetaMultiple['subscription_interval'] == "month"){
                             $customer['mrr'] = $getPostMetaMultiple['subscription_amount'];
-                            $customer['arr'] = "";
+                            $customer['arr'] = $getPostMetaMultiple['subscription_amount'] * 12;
                         }else{
-                            $customer['mrr'] = "";
+                            $customer['mrr'] = $getPostMetaMultiple['subscription_amount'] ? $getPostMetaMultiple['subscription_amount'] / 12 : "";
                             $customer['arr'] = $getPostMetaMultiple['subscription_amount'];
                         }
                     }

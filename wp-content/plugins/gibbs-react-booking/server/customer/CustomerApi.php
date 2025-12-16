@@ -206,20 +206,25 @@ class CustomerApi {
     }
 
     private function getFilterPreferences($data) {
-        if ( ! function_exists( 'get_current_user_id' ) ) {
-            // Try to include WordPress core if not already loaded
-            $wp_load_path = dirname( __FILE__, 6 ) . '/wp-load.php';
-            if ( file_exists( $wp_load_path ) ) {
-                require_once( $wp_load_path );
-            }else{
-                CoreResponse::error('WordPress core not found', 400);
+
+        $coutries_file = dirname( __FILE__, 6 ) . '/wp-content/themes/listeo-child/countries.json';
+        if ( file_exists( $coutries_file ) ) {
+            $industries_file = dirname( __FILE__, 6 ) . '/wp-content/themes/listeo-child/industries.json';
+            $countries = json_decode(file_get_contents($coutries_file), true);
+            $industries = json_decode(file_get_contents($industries_file), true);
+        }else{
+            if ( ! function_exists( 'get_current_user_id' ) ) {
+                // Try to include WordPress core if not already loaded
+                $wp_load_path = dirname( __FILE__, 6 ) . '/wp-load.php';
+                if ( file_exists( $wp_load_path ) ) {
+                    require_once( $wp_load_path );
+                }else{
+                    CoreResponse::error('WordPress core not found', 400);
+                }
             }
+            $countries = get_countries();
+            $industries = get_industries();
         }
-
-        
-
-        $countries = get_countries();
-        $industries = get_industries();
 
         $result = array(
             'countries' => $countries,

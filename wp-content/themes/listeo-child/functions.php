@@ -1,6 +1,6 @@
 <?php
 
-define('GIBBS_VERSION', '4.5.85');
+define('GIBBS_VERSION', '4.5.87');
 require get_stylesheet_directory() . '/vendor/autoload.php';
 require get_stylesheet_directory() . '/scripts.php';
 use Jumbojett\OpenIDConnectClient;
@@ -8865,11 +8865,7 @@ function get_countries(){
 }
 
 function get_industries(){
-    $industries = array(
-        "Private Company" => "Private Company",
-        "Public Sector" => "Public Sector",
-        "Housing Association / Condominium" => "Housing Association / Condominium",
-        "Association / Sports Club" => "Association / Sports Club"
-    );
+    $industries_file = get_stylesheet_directory() . '/industries.json';
+    $industries = json_decode(file_get_contents($industries_file), true);
     return apply_filters('gibbs_industries', $industries);
 }

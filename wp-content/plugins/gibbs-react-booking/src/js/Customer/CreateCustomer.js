@@ -285,7 +285,7 @@ function CreateCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, onSucce
         <div className={`${styles.formRow}`}>
           <div className={styles.formGroup}>
             <label htmlFor="company_company_name" className={styles.label}>
-              {Ltext('Company Name')}
+              {Ltext('Company Name')} <span className={styles.required}>*</span>
             </label>
             <input
               type="text"
@@ -300,7 +300,7 @@ function CreateCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, onSucce
           </div>
           <div className={styles.formGroup}>
                 <label htmlFor="company_email" className={styles.label}>
-                {Ltext('Company Email')}
+                {Ltext('Company Email')} <span className={styles.required}>*</span>
                 </label>
                 <input
                 type="email"
@@ -318,7 +318,7 @@ function CreateCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, onSucce
         <div className={`${styles.formRow}`}>
           <div className={styles.formGroup}>
             <label htmlFor="company_industry" className={styles.label}>
-              {Ltext('Organization type')}
+              {Ltext('Organization type')} <span className={styles.required}>*</span>
             </label>
             <select
               id="company_industry"
@@ -337,7 +337,7 @@ function CreateCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, onSucce
           </div>
           <div className={styles.formGroup}>
                 <label htmlFor="company_country" className={styles.label}>
-                {Ltext('Country')}
+                {Ltext('Country')} <span className={styles.required}>*</span>
                 </label>
                 <select
                 id="company_country"
@@ -358,7 +358,7 @@ function CreateCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, onSucce
         <div className={`${styles.formRow} ${styles.formRowflexWidth} react_phone_input_container`}>
           <div className={styles.formGroup}>
             <label htmlFor="country_code" className={styles.label}>
-              {Ltext('Country Code')}
+              {Ltext('Country Code')} <span className={styles.required}>*</span>
             </label>
             <PhoneInput
               country={'no'}
@@ -366,7 +366,8 @@ function CreateCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, onSucce
               onChange={handleCompanyCountryCodeChange}
               inputProps={{
                 readOnly: true,
-                disabled: loading
+                disabled: loading,
+                required: true
               }}
               readonly={true}
               enableSearch={false}
@@ -392,7 +393,7 @@ function CreateCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, onSucce
           </div>
           <div className={styles.formGroup}>
               <label htmlFor="company_phone" className={styles.label}>
-                {Ltext('Phone Number')}
+                {Ltext('Phone Number')} <span className={styles.required}>*</span>
               </label>
               <input
                 type="tel"

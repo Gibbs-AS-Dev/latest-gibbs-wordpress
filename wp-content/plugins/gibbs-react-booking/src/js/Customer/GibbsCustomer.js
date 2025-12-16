@@ -777,6 +777,8 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
         const revenue = revenueValues[superadminId] ?? { mrr: row.mrr ?? '', arr: row.arr ?? '' };
         const value = revenue.mrr ?? '';
         const isEditing = revenueEditMode[superadminId]?.mrr;
+        const company_country = row.company_country;
+        const company_country_data = countries.find((country) => country.code === company_country);
 
         if (!isEditing || row.payment !== 'Invoice') {
           return (
@@ -786,7 +788,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
             >
               {row.payment === 'Invoice' || (value !== '' && value !== null && value !== undefined && value !== 0) ? (
                 <>
-                  <span style={{ fontSize: 12, color: '#6b7280' }}>NOK</span> 
+                  <span style={{ fontSize: 12, color: '#6b7280' }}>{company_country_data?.currency || 'NOK'}</span> 
                   <span>{formatCurrency(value)}</span>
                 </>
               ): (
@@ -839,6 +841,8 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
         const revenue = revenueValues[superadminId] ?? { mrr: row.mrr ?? '', arr: row.arr ?? '' };
         const value = revenue.arr ?? '';
         const isEditing = revenueEditMode[superadminId]?.arr;
+        const company_country = row.company_country;
+        const company_country_data = countries.find((country) => country.code === company_country);
 
         if (!isEditing || row.payment !== 'Invoice') {
           return (
@@ -848,7 +852,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
             >
               {row.payment === 'Invoice' || (value !== '' && value !== null && value !== undefined && value !== 0) ? (
                 <>
-                  <span style={{ fontSize: 12, color: '#6b7280' }}>NOK</span> 
+                  <span style={{ fontSize: 12, color: '#6b7280' }}>{company_country_data?.currency || 'NOK'}</span> 
                   <span>{formatCurrency(value)}</span>
                 </>
               ): (

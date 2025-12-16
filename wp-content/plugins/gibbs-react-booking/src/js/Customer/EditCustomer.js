@@ -433,7 +433,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
         <div className={`${styles.formRow}`}>
           <div className={styles.formGroup}>
             <label htmlFor="company_company_name" className={styles.label}>
-              {Ltext('Company Name')}
+              {Ltext('Company Name')} <span className={styles.required}>*</span>
             </label>
             <input
               type="text"
@@ -448,7 +448,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
           </div>
           <div className={styles.formGroup}>
                 <label htmlFor="company_email" className={styles.label}>
-                {Ltext('Company Email')}
+                {Ltext('Company Email')} <span className={styles.required}>*</span>
                 </label>
                 <input
                 type="email"
@@ -466,7 +466,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
         <div className={`${styles.formRow}`}>
           <div className={styles.formGroup}>
             <label htmlFor="company_industry" className={styles.label}>
-              {Ltext('Organization type')}
+              {Ltext('Organization type')} <span className={styles.required}>*</span>
             </label>
             <select
               id="company_industry"
@@ -485,7 +485,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
           </div>
           <div className={styles.formGroup}>
                 <label htmlFor="company_country" className={styles.label}>
-                {Ltext('Country')}
+                {Ltext('Country')} <span className={styles.required}>*</span>
                 </label>
                 <select
                 id="company_country"
@@ -506,7 +506,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
         <div className={`${styles.formRow} ${styles.formRowflexWidth} react_phone_input_container`}>
           <div className={styles.formGroup}>
             <label htmlFor="country_code" className={styles.label}>
-              {Ltext('Country Code')}
+              {Ltext('Country Code')} <span className={styles.required}>*</span>
             </label>
             <PhoneInput
               country={'no'}
@@ -514,7 +514,8 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
               onChange={handleCompanyCountryCodeChange}
               inputProps={{
                 readOnly: true,
-                disabled: loading
+                disabled: loading,
+                required: true
               }}
               readonly={true}
               enableSearch={false}
@@ -540,7 +541,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
           </div>
           <div className={styles.formGroup}>
               <label htmlFor="company_phone" className={styles.label}>
-                {Ltext('Phone Number')}
+                {Ltext('Phone Number')} <span className={styles.required}>*</span>
               </label>
               <input
                 type="tel"
@@ -624,7 +625,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
         <div className={styles.formRow}>
           <div className={styles.formGroup}>
             <label htmlFor="first_name" className={styles.label}>
-              {Ltext('First Name')}
+              {Ltext('First Name')} <span className={styles.required}>*</span>
             </label>
             <input
               type="text"
@@ -656,7 +657,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
         <div className={`${styles.formRow} ${styles.formRowFullWidth}`}>
           <div className={styles.formGroup}>
             <label htmlFor="email" className={styles.label}>
-              {Ltext('Email')}
+              {Ltext('Email')} <span className={styles.required}>*</span>
             </label>
             <input
               type="email"
@@ -675,7 +676,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
         <div className={`${styles.formRow} ${styles.formRowPhone} react_phone_input_container`}>
           <div className={styles.formGroup}>
             <label htmlFor="country_code" className={styles.label}>
-              {Ltext('Country Code')}
+              {Ltext('Country Code')} <span className={styles.required}>*</span>
             </label>
             <PhoneInput
               country={'no'}
@@ -683,7 +684,8 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
               onChange={handleCountryCodeChange}
               inputProps={{
                 readOnly: true,
-                disabled: loading
+                disabled: loading,
+                required: true
               }}
               readonly={true}
               enableSearch={false}
@@ -709,7 +711,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
           </div>
           <div className={styles.formGroup}>
             <label htmlFor="phone" className={styles.label}>
-              {Ltext('Phone')}
+              {Ltext('Phone')} <span className={styles.required}>*</span>
             </label>
             <input
               type="tel"
