@@ -1026,10 +1026,17 @@ class Gibbs_Admin_Calendar_API
         }
         if(isset($_POST["mobiscroll_view"]) && $_POST["mobiscroll_view"] != "schedule_year" && $_POST["mobiscroll_view"] != "agenda" ){
             if(isset($_POST["cal_date"]) && $_POST["cal_date"] != ""){
-                $yearr= date("Y-m-d",strtotime($_POST["cal_date"]));
-               // $last_date= date("Y-m-d",strtotime($_POST["last_date"]));
-                $start_month = date('Y-m-d H:i:s', strtotime("-30 days", strtotime($yearr)));
-                $end_month = date('Y-m-d H:i:s', strtotime("+80 days", strtotime($yearr)));
+                if($tv && isset($_POST["last_date"]) && $_POST["last_date"] != ""){
+                    $start_date= date("Y-m-d",strtotime($_POST["cal_date"]));
+                    $last_date= date("Y-m-d",strtotime($_POST["last_date"]));
+                    $start_month = date('Y-m-d H:i:s', strtotime("-1 days", strtotime($start_date)));
+                    $end_month = date('Y-m-d H:i:s', strtotime("+1 days", strtotime($last_date)));
+                }else{
+                    $yearr= date("Y-m-d",strtotime($_POST["cal_date"]));
+                // $last_date= date("Y-m-d",strtotime($_POST["last_date"]));
+                    $start_month = date('Y-m-d H:i:s', strtotime("-30 days", strtotime($yearr)));
+                    $end_month = date('Y-m-d H:i:s', strtotime("+80 days", strtotime($yearr)));
+                }
 
                 // if($_POST["mobiscroll_view"] == "timeline_month" || $_POST["mobiscroll_view"] == "schedule_month"){
                 //     $end_month = date('Y-m-d H:i:s', strtotime("+2 days", strtotime($last_date)));
@@ -1056,7 +1063,7 @@ class Gibbs_Admin_Calendar_API
         }
 
 
-        //echo $booking_where; die;
+      // echo $booking_where; die;
 
         
             

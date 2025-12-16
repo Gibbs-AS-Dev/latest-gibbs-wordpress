@@ -82,6 +82,7 @@ window.calendar = '';
     var calendarAdditionalInfo = WPMCalendarV2Obj.additional_info !== '' ? WPMCalendarV2Obj.additional_info : "";
     var calendarShowFieldInfo = WPMCalendarV2Obj.show_fields_info !== '' ? WPMCalendarV2Obj.show_fields_info : "";
 
+
     if(!Array.isArray(calendarAdditionalInfo)){
         calendarAdditionalInfo = ["empty"];
     }
@@ -1114,6 +1115,19 @@ window.calendar = '';
         if (shouldShowLoader) {
             showLoader();
         }
+        var mobiscroll_view = jQuery(".cal_view_select").val();
+        var cal_date = '';
+        var last_date = '';
+
+        if (WPMCalendarV2Obj.header != 1) {
+            if(calendar._firstDay){
+                cal_date = moment(calendar._firstDay).format('YYYY-MM-DD HH:mm:ss');
+            }
+            if(calendar._lastDay){
+                last_date = moment(calendar._lastDay).format('YYYY-MM-DD HH:mm:ss');
+            }
+        } 
+
 
         $.ajax({
             type: "POST",
@@ -1126,6 +1140,9 @@ window.calendar = '';
                 listing: WPMCalendarV2Obj.listings,
                 additional_info: calendarAdditionalInfo,
                 show_fields_info: calendarShowFieldInfo,
+                cal_date: cal_date,
+                last_date: last_date,
+                mobiscroll_view: calendar_view_val,
             },
             success: function (response) {
                 console.log(response)
