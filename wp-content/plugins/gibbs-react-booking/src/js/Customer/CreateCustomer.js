@@ -243,7 +243,7 @@ function CreateCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, onSucce
               readonly={true}
               enableSearch={false}
               inputStyle={{
-                width: '0%',
+                width: '100%',
                 border: '1px solid #d1d5db',
                 borderLeft: 'none',
                 borderRadius: '0 6px 6px 0',
@@ -372,7 +372,7 @@ function CreateCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, onSucce
               readonly={true}
               enableSearch={false}
               inputStyle={{
-                width: '0%',
+                width: '100%',
                 border: '1px solid #d1d5db',
                 borderLeft: 'none',
                 borderRadius: '0 6px 6px 0',

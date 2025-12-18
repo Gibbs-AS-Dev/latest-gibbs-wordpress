@@ -638,7 +638,11 @@ class CustomerDatabase {
                     }
                    
                 }else{
-                    $customer['stripe_license'] = 'No License';
+                    if($getPostMetaMultiple['subscription_status'] != ""){
+                        $customer['stripe_license'] = $getPostMetaMultiple['subscription_status'];
+                    }else{
+                        $customer['stripe_license'] = 'No License';
+                    }
                 }
 
             }

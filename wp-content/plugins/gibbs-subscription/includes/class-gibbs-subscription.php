@@ -1167,72 +1167,72 @@ class Class_Gibbs_Subscription
                         }
                     }
                     break;
+                // case 'customer.subscription.created':
 
-                case 'customer.subscription.created':
+                //     $session = $event->data->object; 
 
-                    $session = $event->data->object; 
+                //     $myfile = fopen(ABSPATH."/customer_subscription_created.txt", "w");
 
-                    $myfile = fopen(ABSPATH."/customer_subscription_created.txt", "w");
+                //     $text2 = json_encode($session);
 
-                    $text2 = json_encode($session);
+                //     fwrite($myfile, $text2);
 
-                    fwrite($myfile, $text2);
-
-                    fclose($myfile);
+                //     fclose($myfile);
 
 
-                    if (isset($session->customer)) {
-                        $customer_id = $session->customer;
+                //     if (isset($session->customer)) {
+                //         $customer_id = $session->customer;
 
-                        $user = $this->get_user_by_stripe_customer_id($customer_id);
-                        if ($user) {
+                //         $user = $this->get_user_by_stripe_customer_id($customer_id);
+                //         if ($user) {
 
-                            $subscriptions = $this->stripe->subscriptions->all(['customer' => $customer_id]);
-                            if (count($subscriptions->data) > 0) {
+                //             $subscriptions = $this->stripe->subscriptions->all(['customer' => $customer_id]);
+                //             if (count($subscriptions->data) > 0) {
 
-                                    $subscription = $subscriptions->data[0]; 
-                                    update_user_meta($user->ID, 'license_status', "active");
-                                    update_user_meta($user->ID, 'stripe_trail', "true");
-                                    update_user_meta($user->ID, 'subscription_id', $subscription->id);
-                                    if(isset($subscription->collection_method) && $subscription->collection_method === "send_invoice"){
-                                        update_user_meta($user->ID, 'subscription_type', "invoice");
-                                    }else{
-                                        update_user_meta($user->ID, 'subscription_type', "paid");
-                                    }
+                //                     $subscription = $subscriptions->data[0]; 
+                //                     update_user_meta($user->ID, 'license_status', "active");
+                //                     update_user_meta($user->ID, 'stripe_trail', "true");
+                //                     update_user_meta($user->ID, 'subscription_id', $subscription->id);
+                //                     if(isset($subscription->collection_method) && $subscription->collection_method === "send_invoice"){
+                //                         update_user_meta($user->ID, 'subscription_type', "invoice");
+                //                     }else{
+                //                         update_user_meta($user->ID, 'subscription_type', "paid");
+                //                     }
                                     
-                                    if(isset($subscription->status) && $subscription->status !== ""){
-                                        update_user_meta($user->ID, 'subscription_status', $subscription->status);
-                                    }else{
-                                        update_user_meta($user->ID, 'subscription_status', "");
-                                    }
+                //                     if(isset($subscription->status) && $subscription->status !== ""){
+                //                         update_user_meta($user->ID, 'subscription_status', $subscription->status);
+                //                     }else{
+                //                         update_user_meta($user->ID, 'subscription_status', "");
+                //                     }
                                     
                                     
-                                    if(isset($subscription->plan) && isset($subscription->plan->interval)){
+                //                     if(isset($subscription->plan) && isset($subscription->plan->interval)){
 
-                                        update_user_meta($user->ID, 'subscription_interval', $subscription->plan->interval);
+                //                         update_user_meta($user->ID, 'subscription_interval', $subscription->plan->interval);
 
-                                        $amount = $subscription->plan->amount / 100;
-                                        update_user_meta($user->ID, 'subscription_amount', $amount);
-                                        update_user_meta($user->ID, 'subscription_currency', $subscription->plan->currency);
+                //                         $amount = $subscription->plan->amount / 100;
+                //                         update_user_meta($user->ID, 'subscription_amount', $amount);
+                //                         update_user_meta($user->ID, 'subscription_currency', $subscription->plan->currency);
 
-                                    }
-                                    $this->updatePackage($user->ID, $subscription);
-                                    $this->update_group_licence($user->ID,1);
+                //                     }
+                //                     $this->updatePackage($user->ID, $subscription);
+                //                     $this->update_group_licence($user->ID,1);
 
                                 
-                            }else{
-                                update_user_meta($user->ID, 'license_status', "inactive");
-                                update_user_meta($user->ID, 'subscription_id', "");
-                                $this->update_group_licence($user->ID,0);
-                            }
-                        }
+                //             }else{
+                //                 update_user_meta($user->ID, 'license_status', "inactive");
+                //                 update_user_meta($user->ID, 'subscription_id', "");
+                //                 $this->update_group_licence($user->ID,0);
+                //             }
+                //         }
                         
-                    }
-                    break;
+                //     }
+                //     break;
+                case 'customer.subscription.created':
                 case 'customer.subscription.updated':
                         $session = $event->data->object; 
 
-                        $myfile = fopen(ABSPATH."/customer_subscription_updated.txt", "w");
+                        $myfile = fopen(ABSPATH."/customer_subscription_".$event->type.".txt", "w");
 
                         $text2 = json_encode($session);
 
@@ -1260,7 +1260,15 @@ class Class_Gibbs_Subscription
 
                                 if (count($subscriptions->data) > 0) {
                                         $subscription = $subscriptions->data[0]; 
-                                        update_user_meta($user->ID, 'license_status', "active");
+                                        if($subscription->status == "active" 
+                                        || $subscription->status == "trialing"
+                                        ){
+                                            update_user_meta($user->ID, 'license_status', "active");
+                                        }else{
+                                            update_user_meta($user->ID, 'license_status', "inactive");
+                                        }
+                                        update_user_meta($user->ID, 'subscription_status', $subscription->status);
+                                        
                                         update_user_meta($user->ID, 'stripe_trail', "true");
                                         update_user_meta($user->ID, 'subscription_id', $subscription->id);
                                         if(isset($subscription->collection_method) && $subscription->collection_method === "send_invoice"){
@@ -1269,11 +1277,11 @@ class Class_Gibbs_Subscription
                                             update_user_meta($user->ID, 'subscription_type', "paid");
                                         }
 
-                                        if(isset($subscription->status) && $subscription->status !== ""){
-                                            update_user_meta($user->ID, 'subscription_status', $subscription->status);
-                                        }else{
-                                            update_user_meta($user->ID, 'subscription_status', "");
-                                        }
+                                        // if(isset($subscription->status) && $subscription->status !== ""){
+                                        //     update_user_meta($user->ID, 'subscription_status', $subscription->status);
+                                        // }else{
+                                        //     update_user_meta($user->ID, 'subscription_status', "");
+                                        // }
 
                                         if(isset($subscription->plan) && isset($subscription->plan->interval)){
 
@@ -1316,7 +1324,24 @@ class Class_Gibbs_Subscription
                             
                         }
                         break;    
+                case 'customer.subscription.paused':
+                    $session = $event->data->object; // Contains the session details
 
+                    $myfile = fopen(ABSPATH."/customer_subscription_paused.txt", "w");
+
+                    $text2 = json_encode($session);
+
+                    fwrite($myfile, $text2);
+                    break;
+                case 'customer.subscription.resumed':
+                    $session = $event->data->object; // Contains the session details
+
+                    $myfile = fopen(ABSPATH."/customer_subscription_resumed.txt", "w");
+
+                    $text2 = json_encode($session);
+
+                    fwrite($myfile, $text2);
+                    break;
                 case 'customer.subscription.deleted':
                     $session = $event->data->object; // Contains the session details
 
@@ -1347,8 +1372,11 @@ class Class_Gibbs_Subscription
                             } else {
                                 update_user_meta($user->ID, 'canceled_at', date('Y-m-d H:i:s'));
                             }
-
-                           
+                            if(isset($subscription_data->status) && $subscription_data->status != ""){
+                                update_user_meta($user->ID, 'subscription_status', $subscription_data->status);
+                            }else{
+                                update_user_meta($user->ID, 'subscription_status', "");
+                            }   
 
                             $subscriptions = $this->stripe->subscriptions->all(['customer' => $customer_id]);
                             if (count($subscriptions->data) > 0) {
