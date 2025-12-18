@@ -1,7 +1,7 @@
 // Sidebar Styles
 $sidebar-bg: #1e3a5f;
 $sidebar-bg-dark: #162f4f;
-$sidebar-width: 280px;
+$sidebar-width: 250px;
 $sidebar-width-collapsed: 64px;
 $text-white: #ffffff;
 $text-light: rgba(255, 255, 255, 0.8);
@@ -179,7 +179,7 @@ $hover-bg: rgba(255, 255, 255, 0.1);
           &.active {
             background-color: $active-bg;
             color: $text-white;
-            border-left: 3px solid $primary-color;
+            border-left: 0px solid $primary-color;
 
             .menuIcon {
               color: $primary-color;
@@ -270,7 +270,7 @@ $hover-bg: rgba(255, 255, 255, 0.1);
 
               &.active {
                 background-color: $active-bg;
-                border-left: 3px solid $primary-color;
+                border-left: 0px solid $primary-color;
               }
             }
           }

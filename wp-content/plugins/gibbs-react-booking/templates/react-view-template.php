@@ -10,8 +10,11 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+
+
 $react_modules_plugin = new ReactModulesPlugin();
 $react_modules_plugin->enqueue_scripts();
+$content = apply_filters('the_content', get_the_content());
 echo $react_modules_plugin->react_header();
 ?>
     <div id="app" class="site">
@@ -22,7 +25,7 @@ echo $react_modules_plugin->react_header();
                 <article id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
                     <div class="entry-content">
                         <?php
-                        the_content();
+                        echo $content;
                         ?>
                     </div>
                 </article>

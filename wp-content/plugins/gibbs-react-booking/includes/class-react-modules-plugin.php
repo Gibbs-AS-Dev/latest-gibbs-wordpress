@@ -16,6 +16,8 @@ require_once plugin_dir_path(__FILE__) . '../includes/class-custom-jwt.php';
 class ReactModulesPlugin {
 
     private $custom_jwt;
+
+    private $version;
     
     public function __construct() {
        
@@ -26,10 +28,14 @@ class ReactModulesPlugin {
         add_action('admin_init', array($this, 'register_oauth_settings'));
 
         $this->custom_jwt = new Custom_JWT();
+
+        
         
     }
 
     public function action_init() {
+
+        $this->version = defined('GIBBS_VERSION') ? GIBBS_VERSION : time();
 
         add_action('wp_enqueue_scripts', array($this, 'enqueue_scripts'));
         add_action('wp_ajax_rmp_get_data', array($this, 'ajax_get_data'));
@@ -529,9 +535,9 @@ class ReactModulesPlugin {
         $css_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/components.min.css') ? 'components.min.css' : 'components.css';
         
         // Enqueue our built React components
-        wp_enqueue_script('rmp-components', RMP_PLUGIN_URL . 'assets/js/' . $js_file, array('react2', 'react-dom2'), RMP_PLUGIN_VERSION, true);
+        wp_enqueue_script('rmp-components', RMP_PLUGIN_URL . 'assets/js/' . $js_file, array('react2', 'react-dom2'), $this->version, true);
         // Enqueue our built CSS styles
-        wp_enqueue_style('rmp-components', RMP_PLUGIN_URL . 'assets/css/' . $css_file, array(), RMP_PLUGIN_VERSION);
+        wp_enqueue_style('rmp-components', RMP_PLUGIN_URL . 'assets/css/' . $css_file, array(), $this->version);
 
         if(isset($atts['listing_id'])){
             $page_id = $atts['listing_id'];
@@ -588,8 +594,8 @@ class ReactModulesPlugin {
 
         $js_wallet_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/wallet.min.js') ? 'wallet.min.js' : 'wallet.js';
         $css_wallet_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/wallet.min.css') ? 'wallet.min.css' : 'wallet.css';
-        wp_enqueue_script('rmp-wallet', RMP_PLUGIN_URL . 'assets/js/' . $js_wallet_file, array('react2', 'react-dom2'), time(), true);
-        wp_enqueue_style('rmp-wallet', RMP_PLUGIN_URL . 'assets/css/' . $css_wallet_file, array(), RMP_PLUGIN_VERSION);
+        wp_enqueue_script('rmp-wallet', RMP_PLUGIN_URL . 'assets/js/' . $js_wallet_file, array('react2', 'react-dom2'), $this->version, true);
+        wp_enqueue_style('rmp-wallet', RMP_PLUGIN_URL . 'assets/css/' . $css_wallet_file, array(), $this->version);
 
        
 
@@ -646,8 +652,8 @@ class ReactModulesPlugin {
 
         $js_wallet_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/wallet.min.js') ? 'wallet.min.js' : 'wallet.js';
         $css_wallet_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/wallet.min.css') ? 'wallet.min.css' : 'wallet.css';
-        wp_enqueue_script('rmp-wallet', RMP_PLUGIN_URL . 'assets/js/' . $js_wallet_file, array('react2', 'react-dom2'), time(), true);
-        wp_enqueue_style('rmp-wallet', RMP_PLUGIN_URL . 'assets/css/' . $css_wallet_file, array(), RMP_PLUGIN_VERSION);
+        wp_enqueue_script('rmp-wallet', RMP_PLUGIN_URL . 'assets/js/' . $js_wallet_file, array('react2', 'react-dom2'), $this->version, true);
+        wp_enqueue_style('rmp-wallet', RMP_PLUGIN_URL . 'assets/css/' . $css_wallet_file, array(), $this->version);
 
        
 
@@ -680,8 +686,6 @@ class ReactModulesPlugin {
             $owner_id = get_current_user_id();
         }
 
-
-
         // Get current page/post ID
         
         
@@ -710,8 +714,10 @@ class ReactModulesPlugin {
 
         $js_email_template_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/email_template.min.js') ? 'email_template.min.js' : 'email_template.js';
         $css_email_template_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/email_template.min.css') ? 'email_template.min.css' : 'email_template.css';
-        wp_enqueue_script('rmp-email-template', RMP_PLUGIN_URL . 'assets/js/' . $js_email_template_file, array('react2', 'react-dom2'), time(), true);
-        wp_enqueue_style('rmp-email-template', RMP_PLUGIN_URL . 'assets/css/' . $css_email_template_file, array(), RMP_PLUGIN_VERSION);
+        wp_enqueue_script('rmp-email-template', RMP_PLUGIN_URL . 'assets/js/' . $js_email_template_file, array('react2', 'react-dom2'), $this->version, true);
+        wp_enqueue_style('rmp-email-template', RMP_PLUGIN_URL . 'assets/css/' . $css_email_template_file, array(), $this->version);
+
+       
 
         $page_id = get_the_ID();
         $atts = shortcode_atts(array(
@@ -773,8 +779,8 @@ class ReactModulesPlugin {
 
         $js_email_template_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/email_template.min.js') ? 'email_template.min.js' : 'email_template.js';
         $css_email_template_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/email_template.min.css') ? 'email_template.min.css' : 'email_template.css';
-        wp_enqueue_script('rmp-email-template', RMP_PLUGIN_URL . 'assets/js/' . $js_email_template_file, array('react2', 'react-dom2'), time(), true);
-        wp_enqueue_style('rmp-email-template', RMP_PLUGIN_URL . 'assets/css/' . $css_email_template_file, array(), RMP_PLUGIN_VERSION);
+        wp_enqueue_script('rmp-email-template', RMP_PLUGIN_URL . 'assets/js/' . $js_email_template_file, array('react2', 'react-dom2'), $this->version, true);
+        wp_enqueue_style('rmp-email-template', RMP_PLUGIN_URL . 'assets/css/' . $css_email_template_file, array(), $this->version);
 
         $page_id = get_the_ID();
         $atts = shortcode_atts(array(
@@ -836,8 +842,8 @@ class ReactModulesPlugin {
 
         $js_react_modules_file = file_exists(RMP_PLUGIN_PATH . 'assets/js/react_modules.min.js') ? 'react_modules.min.js' : 'react_modules.js';
         $css_react_modules_file = file_exists(RMP_PLUGIN_PATH . 'assets/css/react_modules.min.css') ? 'react_modules.min.css' : 'react_modules.css';
-        wp_enqueue_script('rmp-react-modules', RMP_PLUGIN_URL . 'assets/js/' . $js_react_modules_file, array('react2', 'react-dom2'), time(), true);
-        wp_enqueue_style('rmp-react-modules', RMP_PLUGIN_URL . 'assets/css/' . $css_react_modules_file, array(), RMP_PLUGIN_VERSION);
+        wp_enqueue_script('rmp-react-modules', RMP_PLUGIN_URL . 'assets/js/' . $js_react_modules_file, array('react2', 'react-dom2'), $this->version, true);
+        wp_enqueue_style('rmp-react-modules', RMP_PLUGIN_URL . 'assets/css/' . $css_react_modules_file, array(), $this->version);
        
 
         $page_id = get_the_ID();

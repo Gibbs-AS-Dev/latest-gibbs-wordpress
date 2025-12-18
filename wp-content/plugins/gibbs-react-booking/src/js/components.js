@@ -6,6 +6,7 @@ import DinteroPayment from './DinteroPayment';
 import DibsCheckout from './DibsCheckout';
 import IframePage from './IframePage';
 import { Ltext } from './utils/translations';
+import { Layout } from './layouts';
 
 // Full Screen Timer Banner Component
 const FullScreenTimerBanner = ({ startTime, onClose }) => {
@@ -376,14 +377,16 @@ window.rmpSlotBookingInit = function (containerId, listing_id, apiUrl, homeUrl, 
     if (container) {
         const root = ReactDOM.createRoot(container);
         root.render(
-            <BookingContainer 
-                listing_id={listing_id} 
-                apiUrl={apiUrl} 
-                homeUrl={homeUrl}
-                pluginUrl={pluginUrl}
-                current_user_id={cr_user_id}
-                hideBorder={hideBorder}
-            />
+            <Layout>
+              <BookingContainer 
+                  listing_id={listing_id} 
+                  apiUrl={apiUrl} 
+                  homeUrl={homeUrl}
+                  pluginUrl={pluginUrl}
+                  current_user_id={cr_user_id}
+                  hideBorder={hideBorder}
+              />
+            </Layout>
         );
     }
 };

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import SubscriptionDiscount from '../SubscriptionDiscount/SubscriptionDiscount.js';
 import ComponentGallery from './ComponentGallery.js';
 import GibbsCustomer from '../Customer/GibbsCustomer.js';
+import { Layout } from '../layouts';
 
 // React Modules container responsible for rendering requested component
 function ReactModulesContainer({ component, page_id, apiUrl, homeUrl, user_token = null, owner_id = null }) {
@@ -55,14 +56,16 @@ window.rmpReactModulesInit = function (component, containerId, page_id, apiUrl, 
     if (container) {
         const root = ReactDOM.createRoot(container);
         root.render(
-            <ReactModulesContainer 
-                component={component}
-                page_id={page_id} 
-                apiUrl={apiUrl} 
-                homeUrl={homeUrl}
-                user_token={user_token} 
-                owner_id={owner_id}
-            />
+            <Layout>
+                <ReactModulesContainer 
+                    component={component}
+                    page_id={page_id} 
+                    apiUrl={apiUrl} 
+                    homeUrl={homeUrl}
+                    user_token={user_token} 
+                    owner_id={owner_id}
+                />
+            </Layout>
         );
     }
 };

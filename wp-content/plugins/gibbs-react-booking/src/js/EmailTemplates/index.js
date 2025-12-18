@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 import EmailTemplate from './EmailTemplate';
 import EmailLog from './EmailLog';
+import { Layout } from '../layouts';
+
 
 
 
@@ -43,13 +45,15 @@ window.rmpEmailTemplateInit = function (containerId, page_id, apiUrl, homeUrl, u
     if (container) {
         const root = ReactDOM.createRoot(container);
         root.render(
-            <EmailTemplateContainer 
-                page_id={page_id} 
-                apiUrl={apiUrl} 
-                homeUrl={homeUrl}
-                user_token={user_token} 
-                owner_id={owner_id}
-            />
+            <Layout>
+                <EmailTemplateContainer 
+                    page_id={page_id} 
+                    apiUrl={apiUrl} 
+                    homeUrl={homeUrl}
+                    user_token={user_token} 
+                    owner_id={owner_id}
+                />
+            </Layout>
         );
     }
 };
@@ -58,13 +62,15 @@ window.rmpEmailLogInit = function (containerId, page_id, apiUrl, homeUrl, user_t
     if (container) {
         const root = ReactDOM.createRoot(container);
         root.render(
-            <EmailLog 
-                page_id={page_id} 
-                apiUrl={apiUrl} 
-                homeUrl={homeUrl}
-                user_token={user_token} 
-                owner_id={owner_id}
-            />
+            <Layout>
+                <EmailLog 
+                    page_id={page_id} 
+                    apiUrl={apiUrl} 
+                    homeUrl={homeUrl}
+                    user_token={user_token} 
+                    owner_id={owner_id}
+                />
+            </Layout>
         );
     }
 };

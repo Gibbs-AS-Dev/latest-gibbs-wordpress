@@ -60,23 +60,18 @@ class CustomerApi {
 
         switch ($action) {
             case 'getGibbsCustomers':
-                $this->requireAuth();
                 $this->getCustomers($data);
                 break;
             case 'getSwitchUserUrl':
-                $this->requireAuth();
                 $this->getSwitchUserUrl($data);
                 break;
             case 'getGibbsCustomer':
-                $this->requireAuth();
                 $this->getCustomer($data);
                 break;
             case 'getUsers':
-                $this->requireAuth();
                 $this->getUsers($data);
                 break;
             case 'getCustomerPreferences':
-                $this->requireAuth();
                 $this->getCustomerPreferences($data);
                 break;
             case 'getFilterPreferences':
@@ -86,11 +81,9 @@ class CustomerApi {
                 $this->getPackages($data);
                 break;
             case 'checkEmailExists':
-                $this->requireAuth();
                 $this->checkEmailExists($data);
                 break;
             case 'getGibbsUsergroup':
-                $this->requireAuth();
                 $this->getUsergroup($data);
                 break;
             default:
@@ -108,27 +101,21 @@ class CustomerApi {
 
         switch ($action) {
             case 'createGibbsCustomer':
-                $this->requireAuth();
                 $this->createCustomer($data);
                 break;
             case 'saveCustomerPreferences':
-                $this->requireAuth();
                 $this->saveCustomerPreferences($data);
                 break;
             case 'changeSuperAdmin':
-                $this->requireAuth();
                 $this->changeSuperAdmin($data);
                 break;
             case 'updateGroupLicenses':
-                $this->requireAuth();
                 $this->updateGroupLicenses($data);
                 break;
             case 'updateNextInvoice':
-                $this->requireAuth();
                 $this->updateNextInvoice($data);
                 break;
             case 'updateMrrArr':
-                $this->requireAuth();
                 $this->updateMrrArr($data);
                 break;
             default:
@@ -146,11 +133,9 @@ class CustomerApi {
 
         switch ($action) {
             case 'updateGibbsSuperadmin':
-                $this->requireAuth();
                 $this->updateSuperadminData($data);
                 break;
             case 'updateGibbsUsergroup':
-                $this->requireAuth();
                 $this->updateUsergroupData($data);
                 break;
             default:
@@ -168,7 +153,6 @@ class CustomerApi {
 
         switch ($action) {
             case 'deleteGibbsCustomer':
-                $this->requireAuth();
                 $this->deleteCustomer($data);
                 break;
             default:
@@ -182,6 +166,10 @@ class CustomerApi {
     }
 
     private function changeSuperAdmin($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $oldSuperadminId = isset($data['old_superadmin_id']) ? intval($data['old_superadmin_id']) : 0;
         $newSuperadminId = isset($data['new_superadmin_id']) ? intval($data['new_superadmin_id']) : 0;
         
@@ -238,6 +226,10 @@ class CustomerApi {
      * Update group licenses for a usergroup
      */
     private function updateGroupLicenses($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $groupId = isset($data['group_id']) ? intval($data['group_id']) : 0;
         $superadmin_id = isset($data['superadmin_id']) ? intval($data['superadmin_id']) : 0;
         $licenseIds = isset($data['license_ids']) && is_array($data['license_ids']) ? $data['license_ids'] : [];
@@ -260,6 +252,10 @@ class CustomerApi {
      * Update next invoice date for a customer
      */
     private function updateNextInvoice($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $superadminId = isset($data['superadmin_id']) ? intval($data['superadmin_id']) : 0;
         $nextInvoice = isset($data['next_invoice']) ? trim($data['next_invoice']) : '';
 
@@ -281,6 +277,10 @@ class CustomerApi {
      * Update MRR and ARR for a customer
      */
     private function updateMrrArr($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $superadminId = isset($data['superadmin_id']) ? intval($data['superadmin_id']) : 0;
         $mrr = isset($data['mrr']) && $data['mrr'] !== '' ? floatval($data['mrr']) : 0;
         $arrProvided = array_key_exists('arr', $data);
@@ -309,7 +309,10 @@ class CustomerApi {
     }
 
     private function updateSuperadminData($data) {
-
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         if ( ! function_exists( 'get_current_user_id' ) ) {
             // Try to include WordPress core if not already loaded
             $wp_load_path = dirname( __FILE__, 6 ) . '/wp-load.php';
@@ -389,6 +392,11 @@ class CustomerApi {
      * Get customers list
      */
     private function getCustomers($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
+
         $params = [
             'page' => isset($data['page']) ? intval($data['page']) : 1,
             'per_page' => isset($data['per_page']) ? intval($data['per_page']) : 20,
@@ -408,6 +416,10 @@ class CustomerApi {
     }
 
     private function getUsers($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $params = [
             'page' => isset($data['page']) ? intval($data['page']) : 1,
             'per_page' => isset($data['per_page']) ? intval($data['per_page']) : 20,
@@ -424,6 +436,10 @@ class CustomerApi {
      * Supports fetching by customer_id or superadmin_id
      */
     private function getCustomer($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $customerId = isset($data['customer_id']) ? intval($data['customer_id']) : 0;
         $superadminId = isset($data['superadmin_id']) ? intval($data['superadmin_id']) : 0;
 
@@ -486,6 +502,11 @@ class CustomerApi {
      * Create customer
      */
     private function createCustomer($data) {
+
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
 
         if ( ! function_exists( 'get_current_user_id' ) ) {
             // Try to include WordPress core if not already loaded
@@ -698,6 +719,10 @@ class CustomerApi {
      * Delete customer
      */
     private function deleteCustomer($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         // Implementation for deleting customer
         CoreResponse::success('Customer deleted successfully', []);
     }
@@ -794,6 +819,10 @@ class CustomerApi {
      * Save customer table preferences
      */
     private function saveCustomerPreferences($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $owner_id = $this->getCurrentUserId();
         
         if (!$owner_id) {
@@ -816,6 +845,10 @@ class CustomerApi {
      * Get customer table preferences
      */
     private function getCustomerPreferences($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $owner_id = $this->getCurrentUserId();
         
         if (!$owner_id) {
@@ -836,6 +869,10 @@ class CustomerApi {
      * Check if email already exists
      */
     private function checkEmailExists($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $email = isset($data['email']) ? trim($data['email']) : '';
         $excludeUserId = isset($data['exclude_user_id']) ? intval($data['exclude_user_id']) : 0;
 
@@ -866,6 +903,10 @@ class CustomerApi {
      * Generate a User Switching URL for a superadmin and return it to the client.
      */
     private function getSwitchUserUrl($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $superadminId = isset($data['superadmin_id']) ? intval($data['superadmin_id']) : 0;
 
         if (!$superadminId) {
@@ -928,6 +969,10 @@ class CustomerApi {
      * Get usergroup by ID
      */
     private function getUsergroup($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $usergroupId = isset($data['usergroup_id']) ? intval($data['usergroup_id']) : 0;
         
         if (!$usergroupId) {
@@ -948,6 +993,10 @@ class CustomerApi {
      * Update usergroup data
      */
     private function updateUsergroupData($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
         $usergroupId = isset($data['usergroup_id']) ? intval($data['usergroup_id']) : 0;
         
         if (!$usergroupId) {
@@ -986,8 +1035,11 @@ class CustomerApi {
     /**
      * Check if user is authenticated
      */
-    private function isAuthenticated() {
-        return $this->current_user_id !== null;
+    public function isAuthenticated() {
+        if($this->current_user_id && $this->current_user_id > 0){
+            return true;
+        }
+        return false;
     }
 
     /**

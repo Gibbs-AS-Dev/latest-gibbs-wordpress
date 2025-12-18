@@ -6,23 +6,28 @@ $version = time();
 if(defined('GIBBS_VERSION')){
     $version = GIBBS_VERSION;
 }
+
 ?>
 <!DOCTYPE html>
 <html <?php language_attributes(); ?>>
 <head>
     <meta charset="<?php bloginfo('charset'); ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php wp_title('|', true, 'right'); ?></title>
+    <title><?php wp_title('|', true, 'right'); ?> <?php echo bloginfo('name'); ?></title>
     <link href="<?php echo get_stylesheet_directory_uri();?>/assets/fontawesome-pro/css/fontawesome.min.css" rel="stylesheet">
     <link href="<?php echo get_stylesheet_directory_uri();?>/assets/fontawesome-pro/css/solid.min.css" rel="stylesheet">
     <link href="<?php echo get_stylesheet_directory_uri();?>/assets/fontawesome-pro/css/svg-with-js.css" rel="stylesheet"> 
-    <script defer src="<?php echo get_stylesheet_directory_uri();?>/assets/fontawesome-pro/js/solid.min.js"></script>
-    <script defer src="<?php echo get_stylesheet_directory_uri();?>/assets/fontawesome-pro/js/fontawesome.min.js"></script>
+    <link href="<?php echo RMP_PLUGIN_URL;?>/src/css/gibbs-view.css?v=<?php echo $version; ?>" rel="stylesheet"> 
     <?php
     if (!empty($wp_styles->queue)) {
         foreach ($wp_styles->queue as $handle) {
+
+            if($handle == 'application_form_common-style'){
+                continue;
+            }
             $style = $wp_styles->registered[$handle];
-            echo '<link rel="stylesheet" href="' . esc_url($style->src) . '" type="text/css" media="' . esc_attr($style->args) . '" />' . "\n";
+            $version = $style->ver??$version;
+            echo '<link rel="stylesheet" href="' . esc_url($style->src) . '?v=' . $version . '" type="text/css" media="' . esc_attr($style->args) . '" />' . "\n";
         }
     }
     
@@ -52,6 +57,9 @@ if(defined('GIBBS_VERSION')){
         $menu = wp_get_nav_menu_object($locations[$theme_location]);
         if ($menu) {
             $raw_menu_items = wp_get_nav_menu_items($menu->term_id);
+            if (function_exists('_wp_menu_item_classes_by_context')) {
+                _wp_menu_item_classes_by_context($raw_menu_items);
+            }
 
             // Apply wp_nav_menu_objects filter to the menu items
             if (has_filter('wp_nav_menu_objects')) {
@@ -71,6 +79,11 @@ if(defined('GIBBS_VERSION')){
             } else {
                 $filtered_menu_items = $raw_menu_items;
             }
+
+            // echo "<pre>";
+            // print_r($filtered_menu_items);
+            // echo "</pre>";
+            // exit;
             
 
             // Format the menu items array for use in React/JS
@@ -107,6 +120,7 @@ if(defined('GIBBS_VERSION')){
         'logo_retina' => $logo_retina,
         'userInfo' => is_user_logged_in() ? wp_get_current_user()->data : null,
         'menuItems' => $menu_items,
+        'title' => get_the_title(),
         // Add more as needed
     ];
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import ReactDOM from 'react-dom/client';
 import Wallet from './Wallet';
 import SmsLogContainer from './SmsLog';
+import { Layout } from '../layouts';
 
 
 
@@ -42,12 +43,14 @@ window.rmpWalletInit = function (containerId, page_id, apiUrl, homeUrl, user_tok
     if (container) {
         const root = ReactDOM.createRoot(container);
         root.render(
-            <WalletContainer 
-                page_id={page_id} 
-                apiUrl={apiUrl} 
-                homeUrl={homeUrl}
-                user_token={user_token}
-            />
+            <Layout>
+                <WalletContainer 
+                    page_id={page_id} 
+                    apiUrl={apiUrl} 
+                    homeUrl={homeUrl}
+                    user_token={user_token}
+                />
+            </Layout>
         );
     }
 };
@@ -58,13 +61,15 @@ window.rmpSmsLogInit = function (containerId, page_id, apiUrl, homeUrl, user_tok
     if (container) {
         const root = ReactDOM.createRoot(container);
         root.render(
-            <SmsLogContainer 
-                page_id={page_id} 
-                apiUrl={apiUrl} 
-                homeUrl={homeUrl}
-                user_token={user_token} 
-                owner_id={owner_id}
-            />
+            <Layout>
+                <SmsLogContainer 
+                    page_id={page_id} 
+                    apiUrl={apiUrl} 
+                    homeUrl={homeUrl}
+                    user_token={user_token} 
+                    owner_id={owner_id}
+                />
+            </Layout>
         );
     }
 };
