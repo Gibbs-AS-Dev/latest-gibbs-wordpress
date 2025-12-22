@@ -11,7 +11,7 @@ import { Ltext } from '../utils/customer-translations';
  * Edit existing customer (company + superadmin) in a modal.
  * Layout is similar to the "Add New Customer" modal, but fields are pre‑filled.
  */
-function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer, onSuccess, industries, countries }) {
+function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer, onSuccess, industries, countries, customerActions }) {
   const [formData, setFormData] = useState({
     company_company_name: '',
     company_email: '',
@@ -183,6 +183,9 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
   }, [availableSuperadmins]);
 
   const handleSuperadminSelect = (superadmin) => {
+    if (!customerActions.includes('change_superadmin')) {
+      return;
+    }
     setConfirmError(null);
     // Show confirmation dialog
     setPendingSuperadmin(superadmin);
@@ -191,6 +194,9 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
 
   const handleConfirmSuperadminSelect = async () => {
     if (!pendingSuperadmin) return;
+    if (!customerActions.includes('change_superadmin')) {
+      return;
+    }
 
     setCheckingEmail(true);
     setConfirmError(null);
@@ -351,7 +357,7 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
         )}
 
         {/* Confirmation Dialog */}
-        {showConfirmDialog && (
+        {showConfirmDialog && customerActions.includes('change_superadmin') && (
           <div style={{
             position: 'fixed',
             top: 0,
@@ -727,41 +733,45 @@ function EditCustomer({ isOpen, onClose, apiUrl, user_token, owner_id, customer,
         </div>
 
         {/* Change Superadmin */}
-        <div className={styles.sectionTitle}>{Ltext('Change Superadmin')}</div>
-        <div className={styles.superadminSearchWrapper} ref={superadminSectionRef}>
-          <div className={styles.superadminSearchInput}>
-            <i className={`fa fa-search ${styles.searchIcon}`}></i>
-            <input
-              type="text"
-              placeholder={Ltext('Search for superadmin...')}
-              value={superadminSearch}
-              onChange={(e) => setSuperadminSearch(e.target.value)}
-              className={styles.superadminSearch}
-              disabled={loading || fetchingCustomer}
-            />
-          </div>
-          {availableSuperadmins.length > 0 && (
-            <div className={styles.superadminList}>
-              {availableSuperadmins.map((superadmin) => (
-                <div
-                  key={superadmin.id}
-                  className={`${styles.superadminItem} ${selectedSuperadminId === superadmin.id ? styles.selected : ''}`}
-                  onClick={() => handleSuperadminSelect(superadmin)}
-                >
-                  <i className={`fa fa-user ${styles.userIcon}`}></i>
-                  <div className={styles.superadminInfo}>
-                    <div className={styles.superadminName}>{superadmin.name}</div>
-                    <div className={styles.superadminEmail}>{superadmin.email}</div>
-                  </div>
-                  <span className={styles.superadminAction}>{Ltext('Select')}</span>
+        {customerActions.includes('change_superadmin') && (
+          <>
+            <div className={styles.sectionTitle}>{Ltext('Change Superadmin')}</div>
+            <div className={styles.superadminSearchWrapper} ref={superadminSectionRef}>
+              <div className={styles.superadminSearchInput}>
+                <i className={`fa fa-search ${styles.searchIcon}`}></i>
+                <input
+                  type="text"
+                  placeholder={Ltext('Search for superadmin...')}
+                  value={superadminSearch}
+                  onChange={(e) => setSuperadminSearch(e.target.value)}
+                  className={styles.superadminSearch}
+                  disabled={loading || fetchingCustomer}
+                />
+              </div>
+              {availableSuperadmins.length > 0 && (
+                <div className={styles.superadminList}>
+                  {availableSuperadmins.map((superadmin) => (
+                    <div
+                      key={superadmin.id}
+                      className={`${styles.superadminItem} ${selectedSuperadminId === superadmin.id ? styles.selected : ''}`}
+                      onClick={() => handleSuperadminSelect(superadmin)}
+                    >
+                      <i className={`fa fa-user ${styles.userIcon}`}></i>
+                      <div className={styles.superadminInfo}>
+                        <div className={styles.superadminName}>{superadmin.name}</div>
+                        <div className={styles.superadminEmail}>{superadmin.email}</div>
+                      </div>
+                      <span className={styles.superadminAction}>{Ltext('Select')}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+              {searchingSuperadmins && (
+                <div className={styles.searchingIndicator}>{Ltext('Loading...')}</div>
+              )}
             </div>
-          )}
-          {searchingSuperadmins && (
-            <div className={styles.searchingIndicator}>{Ltext('Loading...')}</div>
-          )}
-        </div>
+          </>
+        )}
       </form>
     </Modal>
   );

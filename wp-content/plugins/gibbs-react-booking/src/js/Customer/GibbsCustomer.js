@@ -71,6 +71,12 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
 
   const [packages, setPackages] = useState([]);
 
+  const [customerColumns, setCustomerColumns] = useState(window.customerListData.columns);
+  const [customerActions, setCustomerActions] = useState(window.customerListData.actions);
+  const [salesRepRole, setSalesRepRole] = useState(window.customerListData.sales_rep_role);
+  const [selectedCountries, setSelectedCountries] = useState(window.customerListData.selected_countries);
+
+
   const tabs = [
     { id: 'active', label: Ltext('Active'), count: paginationMeta.total },
     { id: 'invoice', label: Ltext('Invoice'), count: paginationMeta.total },
@@ -124,6 +130,11 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
         industry: industryFilter
       };
 
+      if(salesRepRole){
+        params.selected_countries = selectedCountries || [];
+        params.sales_rep = true;
+      }
+
       const headers = user_token ? { Authorization: `Bearer ${user_token}` } : {};
       const response = await axios.get(apiUrl, { params, headers });
       
@@ -152,7 +163,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
     } finally {
       setLoading(false);
     }
-  }, [apiUrl, owner_id, page, rowsPerPage, activeTab, searchQuery, sortConfig, statusFilter, countryFilter, industryFilter, user_token]);
+  }, [apiUrl, owner_id, page, rowsPerPage, activeTab, searchQuery, sortConfig, statusFilter, countryFilter, industryFilter, user_token, salesRepRole, selectedCountries]);
 
   // Load user preferences on mount
   useEffect(() => {
@@ -684,6 +695,16 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
     return count;
   }, [countryFilter, industryFilter]);
 
+  // Filter countries based on salesRepRole and selectedCountries
+  const availableCountries = useMemo(() => {
+    if (salesRepRole && selectedCountries && selectedCountries.length > 0) {
+      return countries.filter(country => selectedCountries.includes(country.code));
+    }else if(salesRepRole){
+      return [];
+    }
+    return countries;
+  }, [countries, salesRepRole, selectedCountries]);
+
   const allColumns = [
     {
       key: 'company_name',
@@ -780,7 +801,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
         const company_country = row.company_country;
         const company_country_data = countries.find((country) => country.code === company_country);
 
-        if (!isEditing || row.payment !== 'Invoice') {
+        if (!isEditing || row.payment !== 'Invoice' || !customerActions.includes('update_mrr_arr')) {
           return (
             <div
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
@@ -844,7 +865,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
         const company_country = row.company_country;
         const company_country_data = countries.find((country) => country.code === company_country);
 
-        if (!isEditing || row.payment !== 'Invoice') {
+        if (!isEditing || row.payment !== 'Invoice' || !customerActions.includes('update_mrr_arr')) {
           return (
             <div
               style={{ display: 'inline-flex', alignItems: 'center', gap: 6, cursor: 'pointer' }}
@@ -919,6 +940,9 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
                 options={options}
                 value={selectedOptions}
                 onChange={(selected) => {
+                  if (!customerActions.includes('update_group_licenses')) {
+                    return;
+                  }
                   const ids = (selected || []).map((opt) => opt.value);
                   setGroupLicenseSelections((prev) => ({
                     ...prev,
@@ -1063,6 +1087,9 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
                 readOnly
                 value={currentDateString || ''}
                 onClick={(e) => {
+                  if (!customerActions.includes('update_next_invoice')) {
+                    return;
+                  }
                   const rect = e.target.getBoundingClientRect();
                   setDatePickerPosition({
                     top: rect.bottom + window.scrollY + 4,
@@ -1124,28 +1151,36 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
       render: (row) => {
         return (
           <div className={styles.actionButtons}>
-            
-            <Button
-              variant="ghost"
-              size="small"
-              key={`edit-btn-${row.id}-${row.superadmin}`}
-              onClick={() => {
-                if (row.isUsergroup) {
-
-                  console.log(row);
+            {(customerActions.includes('edit_usergroup') && row.isUsergroup) ? (
+              <Button
+                variant="ghost"
+                size="small"
+                key={`edit-btn-${row.id}-${row.superadmin}`}
+                onClick={() => {
                   setEditingUsergroup({id: row.id, name: row.name, email: row.email, email_cc: row.email_cc});
                   setIsEditUsergroupOpen(true);
-                }else{
+                }}
+                aria-label="Edit"
+                className={styles.actionButton}
+              >
+                <i className="fa fa-edit"></i>
+              </Button>
+            ) : (customerActions.includes('edit_customer') && !row.isUsergroup) ? (
+              <Button
+                variant="ghost"
+                size="small"
+                key={`edit-btn-${row.id}-${row.superadmin}`}
+                onClick={() => {
                   setEditingCustomer({id: row.id, superadmin: row.superadmin});
                   setIsEditCustomerOpen(true);
-                }
-              }}
-              aria-label="Edit"
-              className={styles.actionButton}
-            >
-              <i className="fa fa-edit"></i>
-            </Button>
-            {!row.isUsergroup && (
+                }}
+                aria-label="Edit"
+                className={styles.actionButton}
+              >
+                <i className="fa fa-edit"></i>
+              </Button>
+            ) : null}
+            {!row.isUsergroup && customerActions.includes('switch_customer') && (
               <Button
                 variant="ghost"
                 size="small"
@@ -1190,8 +1225,40 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
     }
   ];
 
-  // Filter columns based on selectedHideColumns
-  const columns = allColumns.filter(col => !selectedHideColumns.includes(col.key));
+  // Filter columns based on user permissions and selectedHideColumns
+  // First, get allowed column keys from customerColumns (permissions from backend)
+  const allowedColumnKeys = useMemo(() => {
+    if (!customerColumns || !Array.isArray(customerColumns)) {
+      return [];
+    }
+    return customerColumns.map(col => col.key || col);
+  }, [customerColumns]);
+
+  // Filter allColumns to only include columns user has permission to see
+  // Note: 'edit' column is always shown regardless of permissions
+  const permittedColumns = useMemo(() => {
+    return allColumns.filter(col => {
+      // Always include edit column
+      if (col.key === 'edit' && (customerActions.includes('edit_customer') || customerActions.includes('switch_customer') || customerActions.includes('edit_usergroup'))) {
+        return true;
+      }
+      // Check permission for other columns
+      return allowedColumnKeys.includes(col.key);
+    });
+  }, [allColumns, allowedColumnKeys]);
+
+  // Then filter based on selectedHideColumns (user preferences)
+  // Note: 'edit' column is always shown and cannot be hidden
+  const columns = useMemo(() => {
+    return permittedColumns.filter(col => {
+      // Always show edit column
+      // if (col.key === 'edit') {
+      //   return true;
+      // }
+      // Apply hide/show preference for other columns
+      return !selectedHideColumns.includes(col.key);
+    });
+  }, [permittedColumns, selectedHideColumns]);
 
   return (
     <div className={styles.wrapper}>
@@ -1254,8 +1321,8 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
                             }}
                           >
                             <option value="all">{Ltext('All Countries')}</option>
-                            {countries.map((country) => (
-                              <option value={country.code}>{country.name}</option>
+                            {availableCountries.map((country) => (
+                              <option key={country.code} value={country.code}>{country.name}</option>
                             ))}
                           </select>
                         </div>
@@ -1310,14 +1377,17 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
                   </div>
                 )}
             </div>
-            <Button
-              variant="primary"
-              onClick={() => setIsCreateCustomerOpen(true)}
-              leftIcon={<span>+</span>}
-              className={styles.newCustomerButton}
-            >
-              {Ltext('New Customer')}
-            </Button>
+
+            {customerActions.includes('create_customer') && (
+              <Button
+                variant="primary"
+                onClick={() => setIsCreateCustomerOpen(true)}
+                leftIcon={<span>+</span>}
+                className={styles.newCustomerButton}
+              >
+                {Ltext('New Customer')}
+              </Button>
+            )}
             <div className={styles.searchBox}>
               <i className={`fa fa-search ${styles.searchIcon}`}></i>
               <input
@@ -1328,128 +1398,139 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
                 onChange={handleSearchChange}
               />
             </div>
-            
-            <div className={styles.settingsWrapper}>
-              <Button
-                variant="ghost"
-                size="small"
-                className={`${styles.iconButton} ${isSettingsOpen ? styles.active : ''}`}
-                aria-label="Settings"
-                onClick={() => {
-                  setIsSettingsOpen(!isSettingsOpen);
-                  setIsFilterOpen(false);
-                }}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-5 h-5" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg>
-              </Button>
-              {isSettingsOpen && (
-                <div className={`${styles.settingsDropdownMenu} ${styles.settingsDropdownMenuSettings}`}>
-                  <div className={styles.settingsDropdownHeader}>
-                    <h3>{Ltext('Settings')}</h3>
-                  </div>
-                  <div className={styles.settingsDropdownBody}>
-                    <div className={`${styles.settingsSection} ${styles.columnsSection}`}>
-                      <div 
-                        className={styles.settingsSectionHeader}
-                        onClick={() => 
-                          {
-                            setIsColumnsOpen(!isColumnsOpen);
-                            setIsShowRowsOpen(false);
-                          }
-                        }
-                      >
-                        <div className={styles.showRowsHeaderLeft}>
-                          <i className={`fa fa-columns ${styles.icon}`}></i>
-                          <span>{Ltext('Select columns')}</span>
-                        </div>
-                        <i className={`fa ${isColumnsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
-                      </div>
-                      {isColumnsOpen && (
-                        <div className={styles.settingsCheckboxes}>
-                          {[
-                            { key: 'company_name', label: Ltext('COMPANY NAME') },
-                            { key: 'superadmin', label: Ltext('SUPERADMIN') },
-                            { key: 'email', label: Ltext('EMAIL') },
-                            { key: 'phone', label: Ltext('PHONE') },
-                            { key: 'company_country', label: Ltext('COUNTRY') },
-                            { key: 'company_industry', label: Ltext('INDUSTRY') },
-                              { key: 'mrr', label: Ltext('MRR') },
-                              { key: 'arr', label: Ltext('ARR') },
-                            { key: 'gibbs_licenses', label: Ltext('GIBBS LICENSES') },
-                            { key: 'created_at', label: Ltext('CREATED') },
-                            { key: 'stripe_license', label: Ltext('STRIPE LICENSE') },
-                            { key: 'payment', label: Ltext('PAYMENT') },
-                            { key: 'next_invoice', label: Ltext('NEXT INVOICE') },
-                            { key: 'canceled_at', label: Ltext('CANCEL DATE') }
-                          ].map(col => {
-                            const isChecked = !selectedHideColumns.includes(col.key);
-                            return (
-                              <label key={col.key} className={styles.settingsCheckbox+` ${!isChecked ? styles.hideColumnChecked : ''}`}>
-                                <input
-                                  type="checkbox"
-                                  checked={isChecked}
-                                  onChange={(e) => {
-                                    setCallSavePreferences(true);
-                                    // Checkbox checked = column is visible
-                                    if (e.target.checked) {
-                                      // Remove from hidden columns
-                                      setSelectedHideColumns((prev) =>
-                                        prev.filter((c) => c !== col.key)
-                                      );
-                                    } else {
-                                      // Add to hidden columns
-                                      setSelectedHideColumns((prev) =>
-                                        prev.includes(col.key) ? prev : [...prev, col.key]
-                                      );
-                                    }
-                                  }}
-                                  style={{ display: 'none' }}
-                                />
-                                <span>{col.label}</span>
-                                <i className={`fa fa-check ${styles.checkboxCheckIcon}`} style={{ color: '#10b981' }}></i>
-                              </label>
-                            );
-                          })}
-                        </div>
-                      )}
+
+            {customerActions.includes('manage_preferences') && (
+              <div className={styles.settingsWrapper}>
+                <Button
+                  variant="ghost"
+                  size="small"
+                  className={`${styles.iconButton} ${isSettingsOpen ? styles.active : ''}`}
+                  aria-label="Settings"
+                  onClick={() => {
+                    setIsSettingsOpen(!isSettingsOpen);
+                    setIsFilterOpen(false);
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-settings w-5 h-5" aria-hidden="true"><path d="M9.671 4.136a2.34 2.34 0 0 1 4.659 0 2.34 2.34 0 0 0 3.319 1.915 2.34 2.34 0 0 1 2.33 4.033 2.34 2.34 0 0 0 0 3.831 2.34 2.34 0 0 1-2.33 4.033 2.34 2.34 0 0 0-3.319 1.915 2.34 2.34 0 0 1-4.659 0 2.34 2.34 0 0 0-3.32-1.915 2.34 2.34 0 0 1-2.33-4.033 2.34 2.34 0 0 0 0-3.831A2.34 2.34 0 0 1 6.35 6.051a2.34 2.34 0 0 0 3.319-1.915"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                </Button>
+                {isSettingsOpen && (
+                  <div className={`${styles.settingsDropdownMenu} ${styles.settingsDropdownMenuSettings}`}>
+                    <div className={styles.settingsDropdownHeader}>
+                      <h3>{Ltext('Settings')}</h3>
                     </div>
-                    <div className={`${styles.settingsSection} ${styles.showRowsSection}`}>
-                      <div 
-                        className={styles.settingsSectionHeader}
-                        onClick={() => 
+                    <div className={styles.settingsDropdownBody}>
+                      <div className={`${styles.settingsSection} ${styles.columnsSection}`}>
+                        <div 
+                          className={styles.settingsSectionHeader}
+                          onClick={() => 
                             {
-                              setIsShowRowsOpen(!isShowRowsOpen);
-                              setIsColumnsOpen(false);
+                              setIsColumnsOpen(!isColumnsOpen);
+                              setIsShowRowsOpen(false);
                             }
                           }
-                      >
-                        <div className={styles.showRowsHeaderLeft}>
-                          <i className={`fa fa-list ${styles.icon}`}></i>
-                          <span>{Ltext('Show rows')}</span>
+                        >
+                          <div className={styles.showRowsHeaderLeft}>
+                            <i className={`fa fa-columns ${styles.icon}`}></i>
+                            <span>{Ltext('Select columns')}</span>
+                          </div>
+                          <i className={`fa ${isColumnsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
                         </div>
-                        <i className={`fa ${isShowRowsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
+                        {isColumnsOpen && (
+                          <div className={styles.settingsCheckboxes}>
+                            
+                            {/* {[
+                              { key: 'company_name', label: Ltext('COMPANY NAME') },
+                              { key: 'superadmin', label: Ltext('SUPERADMIN') },
+                              { key: 'email', label: Ltext('EMAIL') },
+                              { key: 'phone', label: Ltext('PHONE') },
+                              { key: 'company_country', label: Ltext('COUNTRY') },
+                              { key: 'company_industry', label: Ltext('INDUSTRY') },
+                                { key: 'mrr', label: Ltext('MRR') },
+                                { key: 'arr', label: Ltext('ARR') },
+                              { key: 'gibbs_licenses', label: Ltext('GIBBS LICENSES') },
+                              { key: 'created_at', label: Ltext('CREATED') },
+                              { key: 'stripe_license', label: Ltext('STRIPE LICENSE') },
+                              { key: 'payment', label: Ltext('PAYMENT') },
+                              { key: 'next_invoice', label: Ltext('NEXT INVOICE') },
+                              { key: 'canceled_at', label: Ltext('CANCEL DATE') }
+                            ] */}
+                            {permittedColumns.map(col => {
+                              // Skip edit column in selection UI - it's always visible
+                              if (col.key === 'edit') {
+                                return null;
+                              }
+                              
+                              const isChecked = !selectedHideColumns.includes(col.key);
+                              // Get label from customerColumns if available, otherwise use column header
+                              const columnLabel = customerColumns?.find(c => (c.key || c) === col.key)?.label || col.header || col.key;
+                              return (
+                                <label key={col.key} className={styles.settingsCheckbox+` ${!isChecked ? styles.hideColumnChecked : ''}`}>
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={(e) => {
+                                      setCallSavePreferences(true);
+                                      // Checkbox checked = column is visible
+                                      if (e.target.checked) {
+                                        // Remove from hidden columns
+                                        setSelectedHideColumns((prev) =>
+                                          prev.filter((c) => c !== col.key)
+                                        );
+                                      } else {
+                                        // Add to hidden columns
+                                        setSelectedHideColumns((prev) =>
+                                          prev.includes(col.key) ? prev : [...prev, col.key]
+                                        );
+                                      }
+                                    }}
+                                    style={{ display: 'none' }}
+                                  />
+                                  <span>{typeof columnLabel === 'string' ? Ltext(columnLabel) : columnLabel}</span>
+                                  <i className={`fa fa-check ${styles.checkboxCheckIcon}`} style={{ color: '#10b981' }}></i>
+                                </label>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
-                      {isShowRowsOpen && (
-                        <div className={styles.showRowsOptions}>
-                          {[10, 25, 50, 100].map((rows) => (
-                            <div
-                              key={rows}
-                              className={`${styles.showRowsOption} ${rowsPerPage === rows ? styles.selected : ''}`}
-                              onClick={() => handleRowsPerPageChange(rows)}
-                            >
-                              <span>{rows} {Ltext('rows')}</span>
-                              {rowsPerPage === rows && (
-                                <i className="fa fa-check" style={{ color: '#10b981' }}></i>
-                              )}
-                            </div>
-                          ))}
+                      <div className={`${styles.settingsSection} ${styles.showRowsSection}`}>
+                        <div 
+                          className={styles.settingsSectionHeader}
+                          onClick={() => 
+                              {
+                                setIsShowRowsOpen(!isShowRowsOpen);
+                                setIsColumnsOpen(false);
+                              }
+                            }
+                        >
+                          <div className={styles.showRowsHeaderLeft}>
+                            <i className={`fa fa-list ${styles.icon}`}></i>
+                            <span>{Ltext('Show rows')}</span>
+                          </div>
+                          <i className={`fa ${isShowRowsOpen ? 'fa-chevron-up' : 'fa-chevron-down'}`}></i>
                         </div>
-                      )}
+                        {isShowRowsOpen && (
+                          <div className={styles.showRowsOptions}>
+                            {[10, 25, 50, 100].map((rows) => (
+                              <div
+                                key={rows}
+                                className={`${styles.showRowsOption} ${rowsPerPage === rows ? styles.selected : ''}`}
+                                onClick={() => handleRowsPerPageChange(rows)}
+                              >
+                                <span>{rows} {Ltext('rows')}</span>
+                                {rowsPerPage === rows && (
+                                  <i className="fa fa-check" style={{ color: '#10b981' }}></i>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
             {/* <Button
               variant="ghost"
               size="small"
@@ -1537,56 +1618,64 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
           </div>
         )}
       </div>
+      
+      {customerActions.includes('create_customer') && (
+        <CreateCustomer
+          isOpen={isCreateCustomerOpen}
+          onClose={() => setIsCreateCustomerOpen(false)}
+          apiUrl={apiUrl}
+          user_token={user_token}
+          owner_id={owner_id}
+          onSuccess={() => {
+            // After successful creation, reset sorting to company name (ascending) and go to first page.
+            // The effect watching sortConfig/page will then refetch customers.
+            setSortConfig({ key: 'company_name', direction: 'desc' });
+            setPage(1);
+          }}
+          industries={industries}
+          countries={availableCountries}
+          packages={packages}
+        />
+      )}
 
-      <CreateCustomer
-        isOpen={isCreateCustomerOpen}
-        onClose={() => setIsCreateCustomerOpen(false)}
-        apiUrl={apiUrl}
-        user_token={user_token}
-        owner_id={owner_id}
-        onSuccess={() => {
-          // After successful creation, reset sorting to company name (ascending) and go to first page.
-          // The effect watching sortConfig/page will then refetch customers.
-          setSortConfig({ key: 'company_name', direction: 'desc' });
-          setPage(1);
-        }}
-        industries={industries}
-        countries={countries}
-        packages={packages}
-      />
-      <EditCustomer
-        isOpen={isEditCustomerOpen}
-        onClose={() => {
-          setIsEditCustomerOpen(false);
-          setEditingCustomer(null);
-        }}
-        apiUrl={apiUrl}
-        user_token={user_token}
-        owner_id={owner_id}
-        customer={editingCustomer}
-        onSuccess={() => {
-          // Refresh current page after successful edit
-          setSortConfig({ key: 'group_updated_at', direction: 'desc' });
-          setPage(1);
-        }}
-        industries={industries}
-        countries={countries}
-      />
-      <EditUsergroup
-        isOpen={isEditUsergroupOpen}
-        onClose={() => {
-          setIsEditUsergroupOpen(false);
-          setEditingUsergroup(null);
-        }}
-        apiUrl={apiUrl}
-        user_token={user_token}
-        owner_id={owner_id}
-        usergroup={editingUsergroup}
-        onSuccess={() => {
-          // Refresh current page after successful edit
-          fetchCustomers(page);
-        }}
-      />
+      {customerActions.includes('edit_customer') && (
+          <EditCustomer
+            isOpen={isEditCustomerOpen}
+            onClose={() => {
+              setIsEditCustomerOpen(false);
+              setEditingCustomer(null);
+            }}
+            apiUrl={apiUrl}
+            user_token={user_token}
+            owner_id={owner_id}
+            customer={editingCustomer}
+            onSuccess={() => {
+              // Refresh current page after successful edit
+              setSortConfig({ key: 'group_updated_at', direction: 'desc' });
+              setPage(1);
+            }}
+            industries={industries}
+            countries={availableCountries}
+            customerActions={customerActions}
+          />
+      )}
+      {customerActions.includes('edit_usergroup') && (
+        <EditUsergroup
+          isOpen={isEditUsergroupOpen}
+          onClose={() => {
+            setIsEditUsergroupOpen(false);
+            setEditingUsergroup(null);
+          }}
+          apiUrl={apiUrl}
+          user_token={user_token}
+          owner_id={owner_id}
+          usergroup={editingUsergroup}
+          onSuccess={() => {
+            // Refresh current page after successful edit
+            fetchCustomers(page);
+          }}
+        />
+      )}
 
       {/* DatePicker Portal - Renders outside the table */}
       {openDatePicker && datePickerPosition && datePickerData && typeof document !== 'undefined' && createPortal(
