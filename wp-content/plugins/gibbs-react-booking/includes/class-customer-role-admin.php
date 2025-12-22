@@ -280,14 +280,14 @@ class Customer_Role_Admin {
 
         wp_enqueue_style(
             'gibbs-customer-role-admin',
-            RMP_PLUGIN_URL . 'assets/admin/admin-customer-roles.css',
+            RMP_PLUGIN_URL . 'common/css/admin-customer-roles.css',
             array(),
             RMP_PLUGIN_VERSION
         );
 
         wp_enqueue_script(
             'gibbs-customer-role-admin',
-            RMP_PLUGIN_URL . 'assets/admin/admin-customer-roles.js',
+            RMP_PLUGIN_URL . 'common/js/admin-customer-roles.js',
             array('jquery'),
             RMP_PLUGIN_VERSION,
             true
