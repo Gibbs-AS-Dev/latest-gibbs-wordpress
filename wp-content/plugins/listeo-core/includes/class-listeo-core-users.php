@@ -1390,11 +1390,11 @@ class Listeo_Core_Users {
 					$field_value = esc_attr( get_the_author_meta( $field['id'], $user->ID ) );
 
 
-					if($key == "phone"){
-						if (strpos($field_value, "+") != true) {
-							 $field_value = get_the_author_meta( "country_code", $user->ID,true ).$field_value;
-						}
-					}	
+					// if($key == "phone"){
+					// 	if (strpos($field_value, "+") != true) {
+					// 		 $field_value = get_the_author_meta( "country_code", $user->ID,true ).$field_value;
+					// 	}
+					// }	
 						?>
 						<input type="text" name="<?php echo $field['id']; ?>" id="<?php echo $field['id']; ?>" value="<?php echo $field_value; ?>" class="regular-text" />
 				

@@ -86,6 +86,12 @@ class CustomerApi {
             case 'getGibbsUsergroup':
                 $this->getUsergroup($data);
                 break;
+            case 'getCustomerColumns':
+                $this->getCustomerColumns($data);
+                break;
+            case 'getCustomerActions':
+                $this->getCustomerActions($data);
+                break;
             default:
                 CoreResponse::error('Invalid action for GET request', 400);
         }
@@ -168,6 +174,19 @@ class CustomerApi {
     private function changeSuperAdmin($data) {
         if(!$this->isAuthenticated()){
             CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
+        if ( ! function_exists( 'get_current_user_id' ) ) {
+            // Try to include WordPress core if not already loaded
+            $wp_load_path = dirname( __FILE__, 6 ) . '/wp-load.php';
+            if ( file_exists( $wp_load_path ) ) {
+                require_once( $wp_load_path );
+            }else{
+                CoreResponse::error('WordPress core not found', 400);
+            }
+        }
+        if(!is_user_logged_in()){
+            CoreResponse::error('User is not authenticated', 401);
             return;
         }
         $oldSuperadminId = isset($data['old_superadmin_id']) ? intval($data['old_superadmin_id']) : 0;
@@ -322,6 +341,10 @@ class CustomerApi {
                 CoreResponse::error('WordPress core not found', 400);
             }
         }
+        if(!is_user_logged_in()){
+            CoreResponse::error('User is not authenticated', 401);
+            return;
+        }
 
         $superadminId = isset($data['superadmin_id']) ? intval($data['superadmin_id']) : 0;
         
@@ -407,8 +430,12 @@ class CustomerApi {
             'status' => isset($data['status']) ? $data['status'] : 'all',
             'country' => isset($data['country']) ? $data['country'] : 'all',
             'industry' => isset($data['industry']) ? $data['industry'] : 'all',
-            'owner_id' => isset($data['owner_id']) ? intval($data['owner_id']) : $this->current_user_id
+            'owner_id' => isset($data['owner_id']) ? intval($data['owner_id']) : $this->current_user_id,
         ];
+        if(isset($data['sales_rep']) && $data['sales_rep'] != ''){
+            $params['sales_rep'] = $data['sales_rep'];
+            $params['selected_countries'] = isset($data['selected_countries']) ? $data['selected_countries'] : [];
+        }
 
         $result = $this->db->getCustomers($params);
 
@@ -516,6 +543,11 @@ class CustomerApi {
             }else{
                 CoreResponse::error('WordPress core not found', 400);
             }
+        }
+
+        if(!is_user_logged_in()){
+            CoreResponse::error('User is not authenticated', 401);
+            return;
         }
 
        
@@ -997,6 +1029,19 @@ class CustomerApi {
             CoreResponse::error('You are not authorized to access this page', 403);
             return;
         }
+        if ( ! function_exists( 'get_current_user_id' ) ) {
+            // Try to include WordPress core if not already loaded
+            $wp_load_path = dirname( __FILE__, 6 ) . '/wp-load.php';
+            if ( file_exists( $wp_load_path ) ) {
+                require_once( $wp_load_path );
+            }else{
+                CoreResponse::error('WordPress core not found', 400);
+            }
+        }
+        if(!is_user_logged_in()){
+            CoreResponse::error('User is not authenticated', 401);
+            return;
+        }
         $usergroupId = isset($data['usergroup_id']) ? intval($data['usergroup_id']) : 0;
         
         if (!$usergroupId) {
@@ -1051,6 +1096,32 @@ class CustomerApi {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Get customer columns definition
+     */
+    private function getCustomerColumns($data) {
+        if (!class_exists('Customer_Columns')) {
+            CoreResponse::error('Customer columns class not found', 500);
+            return;
+        }
+
+        $columns = Customer_Columns::get_columns_array();
+        CoreResponse::success(['columns' => $columns], 'Customer columns retrieved successfully');
+    }
+
+    /**
+     * Get customer actions definition
+     */
+    private function getCustomerActions($data) {
+        if (!class_exists('Customer_Actions')) {
+            CoreResponse::error('Customer actions class not found', 500);
+            return;
+        }
+
+        $actions = Customer_Actions::get_actions_array();
+        CoreResponse::success(['actions' => $actions], 'Customer actions retrieved successfully');
     }
 }
 

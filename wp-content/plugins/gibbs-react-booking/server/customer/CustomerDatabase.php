@@ -299,6 +299,18 @@ class CustomerDatabase {
         $industry = isset($params['industry']) ? trim($params['industry']) : 'all';
         $superadminId = isset($params['superadmin_id']) ? intval($params['superadmin_id']) : null;
 
+        $salesRepRole = false;
+        $selectedCountries = [];
+        if(isset($params['sales_rep']) && $params['sales_rep'] != ''){
+            $salesRepRole = true;
+            $selectedCountries = $params['selected_countries'];
+        }
+
+        // echo '<pre>';
+        // print_r($selectedCountries);
+        // echo '</pre>';
+        // die();
+
         $offset = ($page - 1) * $perPage;
 
         // Validate sort column
@@ -308,6 +320,8 @@ class CustomerDatabase {
 
         // Build where conditions for subquery
         $baseWhereConditions = ["superadmin IS NOT NULL AND superadmin != 0"];
+
+        
         // If "invoice" tab is active, only include superadmins with active license_status in usermeta
         if ($tab === 'stripe') {
             $baseWhereConditions[] = "EXISTS (
@@ -354,6 +368,30 @@ class CustomerDatabase {
         if ($superadminId) {
             $baseWhereConditions[] = "superadmin = :sub_superadmin_id";
             $subQueryParams[':sub_superadmin_id'] = $superadminId;
+        }
+        if($salesRepRole){
+
+            if(empty($selectedCountries)){
+                $selectedCountries = ["empty_country"];
+            }
+            // Create individual placeholders for each country to properly use IN clause
+            $countryPlaceholders = [];
+            foreach ($selectedCountries as $index => $countryCode) {
+                $placeholder = ':selected_country_' . $index;
+                $countryPlaceholders[] = $placeholder;
+                $subQueryParams[$placeholder] = $countryCode;
+            }
+            
+            if (!empty($countryPlaceholders)) {
+                $placeholdersStr = implode(',', $countryPlaceholders);
+                $baseWhereConditions[] = "EXISTS (
+                    SELECT 1
+                    FROM {$this->wp_prefix}usermeta um_sales_rep
+                    WHERE um_sales_rep.user_id = superadmin
+                      AND um_sales_rep.meta_key = 'company_country'
+                      AND um_sales_rep.meta_value IN ({$placeholdersStr})
+                )";
+            }
         }
         if (!empty($country) && strtolower($country) !== 'all') {
             $baseWhereConditions[] = "EXISTS (
@@ -450,6 +488,12 @@ class CustomerDatabase {
             }
             if (isset($subQueryParams[':country_filter'])) {
                 $countParams[':country_filter'] = $subQueryParams[':country_filter'];
+            }
+            // Copy all selected_country_X parameters
+            foreach ($subQueryParams as $key => $value) {
+                if (strpos($key, ':selected_country_') === 0) {
+                    $countParams[$key] = $value;
+                }
             }
             if (isset($subQueryParams[':industry_filter'])) {
                 $countParams[':industry_filter'] = $subQueryParams[':industry_filter'];
@@ -552,6 +596,12 @@ class CustomerDatabase {
         }
         if (isset($subQueryParams[':country_filter'])) {
             $finalQueryParams[':country_filter'] = $subQueryParams[':country_filter'];
+        }
+        // Copy all selected_country_X parameters
+        foreach ($subQueryParams as $key => $value) {
+            if (strpos($key, ':selected_country_') === 0) {
+                $finalQueryParams[$key] = $value;
+            }
         }
         if (isset($subQueryParams[':industry_filter'])) {
             $finalQueryParams[':industry_filter'] = $subQueryParams[':industry_filter'];

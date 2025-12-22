@@ -352,6 +352,20 @@ class ReactModulesPlugin {
                 ),
             ),
         ));
+
+        // Register get customer columns endpoint
+        register_rest_route('react-modules/v1', '/customer-columns', array(
+            'methods' => 'GET',
+            'callback' => array($this, 'get_customer_columns'),
+            'permission_callback' => '__return_true',
+        ));
+
+        // Register get customer actions endpoint
+        register_rest_route('react-modules/v1', '/customer-actions', array(
+            'methods' => 'GET',
+            'callback' => array($this, 'get_customer_actions'),
+            'permission_callback' => '__return_true',
+        ));
     }
 
     /**
@@ -470,6 +484,34 @@ class ReactModulesPlugin {
                 'slot_price_label' => 'Drop in',
                 'all_slot_price_label' => 'Privat'
             )
+        );
+
+        return new WP_REST_Response($response_data, 200);
+    }
+
+    /**
+     * Get customer columns REST API endpoint
+     */
+    public function get_customer_columns($request) {
+        $columns = Customer_Columns::get_columns_array();
+        
+        $response_data = array(
+            'success' => true,
+            'data' => $columns
+        );
+
+        return new WP_REST_Response($response_data, 200);
+    }
+
+    /**
+     * Get customer actions REST API endpoint
+     */
+    public function get_customer_actions($request) {
+        $actions = Customer_Actions::get_actions_array();
+        
+        $response_data = array(
+            'success' => true,
+            'data' => $actions
         );
 
         return new WP_REST_Response($response_data, 200);
@@ -895,15 +937,57 @@ class ReactModulesPlugin {
                         </div>
                     </div>';
         }
-        if($require_admin && !current_user_can('administrator')){
-            return '<div style="display: flex; justify-content: center; align-items: center; min-height: 200px;">
-                        <div style="text-align: center;">
-                            <svg xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 12px;" width="48" height="48" fill="none" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#f5f5f5" stroke="#ccc" stroke-width="2"/><path d="M24 19a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5.33 0-8 2.67-8 5.33V29a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2.67C32 23.67 29.33 21 24 21z" fill="#b1b1b1"/></svg>
-                            <p style="font-size: 18px; color: #555; margin-bottom: 4px;">You must be an administrator</p>
-                            <p style="font-size: 14px; color: #888;">Please log in as an administrator to view this component.</p>
-                        </div>
-                    </div>';
+        $scripts = '';
+
+        if ($component == 'gibbs_customer') {
+            // Check if user has permission to view customer list
+            if (!$this->user_can_view_customer_list() ) {
+                return '<div style="display: flex; justify-content: center; align-items: center; min-height: 200px;">
+                    <div style="text-align: center;">
+                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 12px;" width="48" height="48" fill="none" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#f5f5f5" stroke="#ccc" stroke-width="2"/><path d="M24 19a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5.33 0-8 2.67-8 5.33V29a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2.67C32 23.67 29.33 21 24 21z" fill="#b1b1b1"/></svg>
+                        <p style="font-size: 18px; color: #555; margin-bottom: 4px;">Access denied</p>
+                        <p style="font-size: 14px; color: #888;">You do not have permission to view the customer list.</p>
+                    </div>
+                </div>';
+            }
+
+            $cr_role = false;
+            $selected_countries = array();
+
+            $current_user_roles = wp_get_current_user()->roles;
+
+            if(in_array('sales_rep', $current_user_roles)){
+                $cr_role = true;
+                $current_user = wp_get_current_user();
+                $selected_countries = Customer_Role_Admin::get_user_country_permissions($current_user->ID);
+            }
+
+            $customer_list_data = array(
+                'user_can_view_customer_list' => $this->user_can_view_customer_list(),
+                'columns' => $this::get_available_columns(),
+                'actions' => $this::get_available_actions(),
+                'sales_rep_role' => $cr_role,
+                'selected_countries' => $selected_countries,
+            );
+            // print_r($customer_list_data);
+            // echo "</pre>";
+            // die();
+
+            $scripts = '<script>
+                window.customerListData = ' . json_encode($customer_list_data) . ';
+            </script>';
+
         }
+
+        // if($require_admin && !current_user_can('administrator')){
+        //     return '<div style="display: flex; justify-content: center; align-items: center; min-height: 200px;">
+        //                 <div style="text-align: center;">
+        //                     <svg xmlns="http://www.w3.org/2000/svg" style="margin-bottom: 12px;" width="48" height="48" fill="none" viewBox="0 0 48 48"><circle cx="24" cy="24" r="22" fill="#f5f5f5" stroke="#ccc" stroke-width="2"/><path d="M24 19a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5.33 0-8 2.67-8 5.33V29a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-2.67C32 23.67 29.33 21 24 21z" fill="#b1b1b1"/></svg>
+        //                     <p style="font-size: 18px; color: #555; margin-bottom: 4px;">You must be an administrator</p>
+        //                     <p style="font-size: 14px; color: #888;">Please log in as an administrator to view this component.</p>
+        //                 </div>
+        //             </div>';
+        // }
 
         // Only require API URL for components that need it
         $components_requiring_api = array('subscription_discount', 'gibbs_customer');
@@ -938,6 +1022,7 @@ class ReactModulesPlugin {
         
         
         $html = '<div id="' . esc_attr($atts['id']) . '" data-page-id="' . esc_attr($page_id) . '"></div>';
+        $html .= $scripts;
         $html .= '<script>
             (function() {
                 function initReactModules() {
@@ -1178,6 +1263,141 @@ class ReactModulesPlugin {
             'supports' => array('title'),
             'rewrite' => false,
         ));
+    }
+
+    /**
+     * Check if current user can view customer list
+     * 
+     * @return bool True if user has permission to view customer list
+     */
+    private function user_can_view_customer_list() {
+        // Administrators always have access
+        if (current_user_can('manage_options')) {
+            return true;
+        }
+
+        // Check if user is logged in
+        if (!is_user_logged_in()) {
+            return false;
+        }
+
+        // Get current user's roles
+        $user = wp_get_current_user();
+        if (empty($user->roles)) {
+            return false;
+        }
+
+        // Check if any of the user's roles have view_customer permission
+        foreach ($user->roles as $role_name) {
+            // Check if role has view_customer action permission
+            if (Customer_Role_Admin::can_perform_action($role_name, 'view_customer_list')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Get available columns that current user has permission to access
+     * 
+     * @return array Array of columns with 'key' and 'label' that user can access
+     */
+    public function get_available_columns() {
+        // Administrators get all columns
+        if (current_user_can('manage_options')) {
+            return Customer_Columns::get_columns_array();
+        }
+
+        // Check if user is logged in
+        if (!is_user_logged_in()) {
+            return array();
+        }
+
+        // Get current user's roles
+        $user = wp_get_current_user();
+        if (empty($user->roles)) {
+            return array();
+        }
+
+        // Collect all allowed columns from all user roles
+        $allowed_column_keys = array();
+        
+        foreach ($user->roles as $role_name) {
+            $role_column_permissions = Customer_Role_Admin::get_role_column_permissions($role_name);
+            $allowed_column_keys = array_merge($allowed_column_keys, $role_column_permissions);
+        }
+
+        // Remove duplicates
+        $allowed_column_keys = array_unique($allowed_column_keys);
+
+        // If no columns are allowed, return empty array
+        if (empty($allowed_column_keys)) {
+            return array();
+        }
+
+        // Filter columns to only return allowed ones
+        $all_columns = Customer_Columns::get_columns_array();
+        $filtered_columns = array();
+
+        foreach ($all_columns as $column) {
+            if (in_array($column['key'], $allowed_column_keys)) {
+                $filtered_columns[] = $column;
+            }
+        }
+
+        return $filtered_columns;
+    }
+
+    /**
+     * Get available actions that current user has permission to perform
+     * 
+     * @return array Array of actions with 'key' and 'label' that user can perform
+     */
+    public function get_available_actions() {
+        // Administrators get all actions
+        if (current_user_can('manage_options')) {
+            return Customer_Actions::get_action_keys();
+        }
+
+        // Check if user is logged in
+        if (!is_user_logged_in()) {
+            return array();
+        }
+
+        // Get current user's roles
+        $user = wp_get_current_user();
+        if (empty($user->roles)) {
+            return array();
+        }
+
+        // Collect all allowed actions from all user roles
+        $allowed_action_keys = array();
+        
+        foreach ($user->roles as $role_name) {
+            $role_action_permissions = Customer_Role_Admin::get_role_action_permissions($role_name);
+            $allowed_action_keys = array_merge($allowed_action_keys, $role_action_permissions);
+        }
+
+        // Remove duplicates
+        $allowed_action_keys = array_unique($allowed_action_keys);
+
+        // If no actions are allowed, return empty array
+        if (empty($allowed_action_keys)) {
+            return array();
+        }
+
+        // Filter actions to only return allowed ones
+        $all_actions = Customer_Actions::get_actions_array();
+        $filtered_actions = array();
+
+        foreach ($all_actions as $action) {
+            if (in_array($action['key'], $allowed_action_keys)) {
+                $filtered_actions[] = $action['key'];
+            }
+        }
+
+        return $filtered_actions;
     }
 
 } 
