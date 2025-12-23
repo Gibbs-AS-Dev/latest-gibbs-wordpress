@@ -279,11 +279,81 @@ class CustomerDatabase {
         }
     }
 
+    public function searchUsers($params = []) {
+        if (!$this->connection) {
+            return ['users' => []];
+        }
+        $page = isset($params['page']) ? max(1, intval($params['page'])) : 1;
+        $perPage = isset($params['per_page']) ? max(1, intval($params['per_page'])) : 20;
+        $search = isset($params['search']) ? trim($params['search']) : '';
+        $sortBy = isset($params['sort_by']) ? $params['sort_by'] : 'display_name';
+        $sortDirection = (isset($params['sort_direction']) && strtoupper($params['sort_direction']) === 'DESC') ? 'DESC' : 'ASC';
+
+        $offset = ($page - 1) * $perPage;
+
+        $whereParts = [];
+        $queryParams = [];
+        if (!empty($search)) {
+            $whereParts[] = "(
+                u.display_name LIKE :search 
+                OR u.user_email LIKE :search2
+                OR u.user_login LIKE :search3
+                OR u.ID IN (
+                    SELECT DISTINCT user_id FROM {$this->wp_prefix}usermeta 
+                    WHERE meta_key IN ('first_name', 'last_name') 
+                    AND meta_value LIKE :search4
+                )
+            )";
+            $queryParams[':search'] = '%' . $search . '%';
+            $queryParams[':search2'] = '%' . $search . '%';
+            $queryParams[':search3'] = '%' . $search . '%';
+            $queryParams[':search4'] = '%' . $search . '%';
+        }
+        $whereParts[] = "ug2.user_id IS NULL";
+        $whereParts[] = 'u.display_name != "" AND u.display_name IS NOT NULL';
+        $where = !empty($whereParts) ? 'WHERE ' . implode(' AND ', $whereParts) : '';
+        $orderBy = "ORDER BY u.{$sortBy} {$sortDirection}";
+        $sql = "SELECT u.ID as id, u.display_name, u.user_email, u.user_login, u.user_registered, 
+                       MAX(CASE WHEN um.meta_key = 'first_name' THEN um.meta_value END) as first_name, 
+                       MAX(CASE WHEN um.meta_key = 'last_name' THEN um.meta_value END) as last_name, 
+                       MAX(CASE WHEN um.meta_key = 'phone' THEN um.meta_value END) as phone, 
+                       MAX(CASE WHEN um.meta_key = 'country_code' THEN um.meta_value END) as country_code 
+                FROM {$this->wp_prefix}users u 
+                LEFT JOIN {$this->wp_prefix}usermeta um 
+                    ON u.ID = um.user_id 
+                    AND um.meta_key IN ('first_name', 'last_name', 'phone', 'country_code') 
+                LEFT JOIN (
+                    SELECT DISTINCT group_admin as user_id FROM {$this->wp_prefix}users_groups WHERE group_admin IS NOT NULL
+                ) ug2 ON ug2.user_id = u.ID    
+                $where 
+                GROUP BY u.ID, u.display_name, u.user_email, u.user_login, u.user_registered 
+                $orderBy 
+                LIMIT :limit OFFSET :offset";
+        try {
+            $stmt = $this->connection->prepare($sql);
+            foreach ($queryParams as $key => $value) {
+                $stmt->bindValue($key, $value, PDO::PARAM_STR);
+            }
+            $stmt->bindValue(':limit', $perPage, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $users = $stmt->fetchAll();
+            return [
+                'users' => $users
+            ];
+        } catch (\PDOException $e) {
+            if (function_exists('error_log')) {
+                error_log('[CustomerDatabase] searchUsers query error: ' . $e->getMessage());
+            }
+            return ['users' => []];
+        }
+    }
+
     /**
      * Get customers (companies) with pagination and filters
      * Gets data from users_groups table with unique superadmin IDs
      */
-    public function getCustomers($params = []) {
+    public function getCustomers($params = [],$current_user_id = null) {
         if (!$this->connection) {
             return ['customers' => [], 'pagination' => ['total' => 0, 'total_pages' => 1, 'page' => 1]];
         }
@@ -304,6 +374,11 @@ class CustomerDatabase {
         if(isset($params['sales_rep']) && $params['sales_rep'] != ''){
             $salesRepRole = true;
             $selectedCountries = $params['selected_countries'];
+
+            if(!$current_user_id){
+                return ['customers' => [], 'pagination' => ['total' => 0, 'total_pages' => 1, 'page' => 1]];
+            }
+
         }
 
         // echo '<pre>';
@@ -462,13 +537,17 @@ class CustomerDatabase {
                 )
             )";
         }
+
+        if($salesRepRole){
+            $outerWhereConditions[] = "ug.created_by = :current_user_id";
+        }
         $outerWhereClause = !empty($outerWhereConditions) ? 'WHERE ' . implode(' AND ', $outerWhereConditions) : '';
         
         // Get unique superadmin IDs count first
         // Build count query with same logic as main query
         $countSql = "SELECT COUNT(*) as total 
             FROM (
-                SELECT ug1.superadmin, ug1.name
+                SELECT ug1.superadmin, ug1.name, ug1.created_by
                 FROM {$this->wp_prefix}users_groups ug1
                 INNER JOIN (
                     SELECT superadmin, MIN(id) as min_id
@@ -509,6 +588,9 @@ class CustomerDatabase {
                 $countParams[':search3'] = "%{$search}%";
                 $countParams[':search4'] = "%{$search}%";
                 $countParams[':search5'] = "%{$search}%";
+            }
+            if($salesRepRole){
+                $countParams[':current_user_id'] = $current_user_id;
             }
             foreach ($countParams as $key => $value) {
                 $countStmt->bindValue($key, $value, is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR);
@@ -618,6 +700,9 @@ class CustomerDatabase {
             $finalQueryParams[':search4'] = "%{$search}%";
             $finalQueryParams[':search5'] = "%{$search}%";
         }
+        if($salesRepRole){
+            $finalQueryParams[':current_user_id'] = $current_user_id;
+        }
         $finalQueryParams[':limit'] = $perPage;
         $finalQueryParams[':offset'] = $offset;
 
@@ -654,6 +739,10 @@ class CustomerDatabase {
                 $customer['mrr'] = $getPostMetaMultiple['mrr'] ?? "";
                 $customer['arr'] = $getPostMetaMultiple['arr'] ?? "";
                 $customer['canceled_at'] = $getPostMetaMultiple['canceled_at'] ?? "";
+
+                if(isset($customer['created_by']) && $customer['created_by'] > 0){
+                    $customer['created_by'] = $this->getUserById($customer['created_by']);
+                }
 
                 if($getPostMetaMultiple['subscription_type'] == "invoice"){
                     $customer['payment'] = 'Invoice';
@@ -716,6 +805,19 @@ class CustomerDatabase {
                 error_log('[CustomerDatabase] Query error: ' . $e->getMessage());
             }
             return ['customers' => [], 'pagination' => ['total' => 0, 'total_pages' => 1, 'page' => 1]];
+        }
+    }
+    public function getUserById($userId) {
+        if (!$this->connection || !$userId) {
+            return null;
+        }
+        try{
+            $sql = "SELECT * FROM {$this->wp_prefix}users WHERE ID = :userId";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->execute([':userId' => $userId]);
+            return $stmt->fetch();
+        } catch (PDOException $e) {
+            return null;
         }
     }
 
@@ -1157,8 +1259,8 @@ class CustomerDatabase {
         }
     }
 
-    public function createGroup($group_name, $user_id) {
-        if (!$this->connection || !$group_name || !$user_id) {
+    public function createGroup($group_name, $user_id, $created_by) {
+        if (!$this->connection || !$group_name || !$user_id || !$created_by) {
             return false;
         }
         try{
@@ -1167,7 +1269,7 @@ class CustomerDatabase {
             $published_at = date('Y-m-d H:i:s');
             $stmt->bindParam(':group_name', $group_name, PDO::PARAM_STR);
             $stmt->bindParam(':superadmin', $user_id, PDO::PARAM_INT);
-            $stmt->bindParam(':created_by', $user_id, PDO::PARAM_INT);
+            $stmt->bindParam(':created_by', $created_by, PDO::PARAM_INT);
             $stmt->bindParam(':published_at', $published_at, PDO::PARAM_STR);
             $stmt->bindParam(':updated_by', $user_id, PDO::PARAM_INT);
             $stmt->execute();
@@ -1543,6 +1645,360 @@ class CustomerDatabase {
                 error_log('[CustomerDatabase] Update MRR/ARR error: ' . $e->getMessage());
             }
             return false;
+        }
+    }
+
+    /**
+     * Update created_by field for a customer (superadmin)
+     */
+    public function updateCreatedBy($superadminId, $createdByUserId) {
+        if (!$this->connection || !$superadminId) {
+            return false;
+        }
+
+        try {
+            // Update created_by in users_groups table for all groups with this superadmin
+            $sql = "UPDATE {$this->wp_prefix}users_groups SET created_by = :created_by WHERE superadmin = :superadmin_id";
+            $stmt = $this->connection->prepare($sql);
+            $stmt->bindValue(':created_by', $createdByUserId ? intval($createdByUserId) : null, $createdByUserId ? PDO::PARAM_INT : PDO::PARAM_NULL);
+            $stmt->bindValue(':superadmin_id', $superadminId, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->rowCount() > 0;
+        } catch (PDOException $e) {
+            if (function_exists('error_log')) {
+                error_log('[CustomerDatabase] Update created_by error: ' . $e->getMessage());
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Get revenue totals (MRR and ARR) for customers matching the same filters as getCustomers
+     */
+    public function getRevenueTotalsOld($params = [], $current_user_id = null) {
+        if (!$this->connection) {
+            return ['totalMRR' => 0, 'totalARR' => 0];
+        }
+
+        $tab = isset($params['tab']) ? $params['tab'] : 'all';
+        $search = isset($params['search']) ? trim($params['search']) : '';
+        $status = isset($params['status']) ? strtolower(trim($params['status'])) : 'all';
+        $country = isset($params['country']) ? trim($params['country']) : 'all';
+        $industry = isset($params['industry']) ? trim($params['industry']) : 'all';
+
+        $salesRepRole = false;
+        $selectedCountries = [];
+        if(isset($params['sales_rep']) && $params['sales_rep'] != ''){
+            $salesRepRole = true;
+            $selectedCountries = isset($params['selected_countries']) ? $params['selected_countries'] : [];
+
+            if(!$current_user_id){
+                return ['totalMRR' => 0, 'totalARR' => 0];
+            }
+        }
+
+        // Build where conditions for subquery (same as getCustomers)
+        $baseWhereConditions = ["superadmin IS NOT NULL AND superadmin != 0"];
+
+        // Tab filters (same as getCustomers)
+        if ($tab === 'stripe') {
+            $baseWhereConditions[] = "EXISTS (
+                SELECT 1 
+                FROM {$this->wp_prefix}usermeta um_sid
+                WHERE um_sid.user_id = superadmin 
+                  AND um_sid.meta_key = 'subscription_id' 
+                  AND um_sid.meta_value != ''
+            ) 
+            AND NOT EXISTS (
+                SELECT 1 
+                FROM {$this->wp_prefix}usermeta um_sid
+                WHERE um_sid.user_id = superadmin 
+                  AND um_sid.meta_key = 'subscription_type' 
+                  AND um_sid.meta_value = 'invoice'
+            )";
+        }else if ($tab === 'invoice') {
+            $baseWhereConditions[] = "EXISTS (
+                SELECT 1 
+                FROM {$this->wp_prefix}usermeta um 
+                WHERE um.user_id = superadmin 
+                  AND um.meta_key = 'subscription_type' 
+                  AND um.meta_value = 'invoice'
+            )";
+        }elseif ($tab === 'active') {
+            $baseWhereConditions[] = "EXISTS (
+                SELECT 1
+                FROM {$this->wp_prefix}usermeta um_status
+                WHERE um_status.user_id = superadmin
+                  AND um_status.meta_key = 'license_status'
+                  AND um_status.meta_value = 'active'
+            )";
+        } elseif ($tab === 'inactive') {
+            $baseWhereConditions[] = "NOT EXISTS (
+                SELECT 1
+                FROM {$this->wp_prefix}usermeta um_status
+                WHERE um_status.user_id = superadmin
+                  AND um_status.meta_key = 'license_status'
+                  AND um_status.meta_value = 'active'
+            )";
+        }
+
+        $subQueryParams = [];
+        if($salesRepRole){
+            if(empty($selectedCountries)){
+                return ['totalMRR' => 0, 'totalARR' => 0];
+            }
+            $placeholders = str_repeat('?,', count($selectedCountries) - 1) . '?';
+            $baseWhereConditions[] = "EXISTS (
+                SELECT 1 
+                FROM {$this->wp_prefix}usermeta um_country
+                WHERE um_country.user_id = superadmin 
+                  AND um_country.meta_key = 'company_country' 
+                  AND um_country.meta_value IN ($placeholders)
+            )";
+            foreach($selectedCountries as $countryCode){
+                $subQueryParams[] = $countryCode;
+            }
+        }
+
+        // Build main query to get MRR and ARR for each superadmin
+        $queryParams = [];
+        $whereParts = $baseWhereConditions;
+
+        // Search filter
+        if (!empty($search)) {
+            $whereParts[] = "(
+                EXISTS (
+                    SELECT 1 FROM {$this->wp_prefix}usermeta um_name
+                    WHERE um_name.user_id = ug.superadmin 
+                    AND (um_name.meta_key = 'company_company_name' OR um_name.meta_key = 'first_name' OR um_name.meta_key = 'last_name')
+                    AND um_name.meta_value LIKE :search
+                )
+                OR EXISTS (
+                    SELECT 1 FROM {$this->wp_prefix}users u
+                    WHERE u.ID = ug.superadmin
+                    AND (u.user_email LIKE :search2 OR u.display_name LIKE :search3)
+                )
+            )";
+            $queryParams[':search'] = "%{$search}%";
+            $queryParams[':search2'] = "%{$search}%";
+            $queryParams[':search3'] = "%{$search}%";
+        }
+
+        // Country filter
+        if ($country !== 'all' && !empty($country)) {
+            $whereParts[] = "EXISTS (
+                SELECT 1 FROM {$this->wp_prefix}usermeta um_country
+                WHERE um_country.user_id = ug.superadmin 
+                AND um_country.meta_key = 'company_country'
+                AND um_country.meta_value = :country
+            )";
+            $queryParams[':country'] = $country;
+        }
+
+        // Industry filter
+        if ($industry !== 'all' && !empty($industry)) {
+            $whereParts[] = "EXISTS (
+                SELECT 1 FROM {$this->wp_prefix}usermeta um_industry
+                WHERE um_industry.user_id = ug.superadmin 
+                AND um_industry.meta_key = 'company_industry'
+                AND um_industry.meta_value = :industry
+            )";
+            $queryParams[':industry'] = $industry;
+        }
+
+        $where = !empty($whereParts) ? 'WHERE ' . implode(' AND ', $whereParts) : '';
+
+        // Query to get all superadmins with their MRR/ARR
+        $sql = "SELECT DISTINCT
+                    ug.superadmin,
+                    MAX(CASE WHEN um_mrr.meta_key = 'mrr' THEN um_mrr.meta_value END) as mrr,
+                    MAX(CASE WHEN um_arr.meta_key = 'arr' THEN um_arr.meta_value END) as arr,
+                    MAX(CASE WHEN um_sub_type.meta_key = 'subscription_type' THEN um_sub_type.meta_value END) as subscription_type,
+                    MAX(CASE WHEN um_sub_id.meta_key = 'subscription_id' THEN um_sub_id.meta_value END) as subscription_id,
+                    MAX(CASE WHEN um_sub_interval.meta_key = 'subscription_interval' THEN um_sub_interval.meta_value END) as subscription_interval,
+                    MAX(CASE WHEN um_sub_amount.meta_key = 'subscription_amount' THEN um_sub_amount.meta_value END) as subscription_amount
+                FROM {$this->wp_prefix}users_groups ug
+                LEFT JOIN {$this->wp_prefix}usermeta um_mrr ON um_mrr.user_id = ug.superadmin AND um_mrr.meta_key = 'mrr'
+                LEFT JOIN {$this->wp_prefix}usermeta um_arr ON um_arr.user_id = ug.superadmin AND um_arr.meta_key = 'arr'
+                LEFT JOIN {$this->wp_prefix}usermeta um_sub_type ON um_sub_type.user_id = ug.superadmin AND um_sub_type.meta_key = 'subscription_type'
+                LEFT JOIN {$this->wp_prefix}usermeta um_sub_id ON um_sub_id.user_id = ug.superadmin AND um_sub_id.meta_key = 'subscription_id'
+                LEFT JOIN {$this->wp_prefix}usermeta um_sub_interval ON um_sub_interval.user_id = ug.superadmin AND um_sub_interval.meta_key = 'subscription_interval'
+                LEFT JOIN {$this->wp_prefix}usermeta um_sub_amount ON um_sub_amount.user_id = ug.superadmin AND um_sub_amount.meta_key = 'subscription_amount'
+                $where
+                GROUP BY ug.superadmin";
+
+        try {
+            $stmt = $this->connection->prepare($sql);
+            
+            // Bind subquery params (for sales rep countries)
+            $paramIndex = 1;
+            foreach($subQueryParams as $param){
+                $stmt->bindValue($paramIndex, $param, PDO::PARAM_STR);
+                $paramIndex++;
+            }
+            
+            // Bind main query params
+            foreach ($queryParams as $key => $value) {
+                $stmt->bindValue($key, $value, PDO::PARAM_STR);
+            }
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+            $totalMRR = 0;
+            $totalARR = 0;
+
+            foreach ($results as $row) {
+                $mrr = 0;
+                $arr = 0;
+
+                // Use same logic as getCustomers to calculate MRR/ARR
+                if ($row['subscription_type'] == 'invoice') {
+                    // For invoice, use stored mrr/arr
+                    $mrr = !empty($row['mrr']) ? floatval($row['mrr']) : 0;
+                    $arr = !empty($row['arr']) ? floatval($row['arr']) : 0;
+                } elseif (!empty($row['subscription_id']) && !empty($row['subscription_amount'])) {
+                    // For card payments, calculate from subscription
+                    if ($row['subscription_interval'] == 'month') {
+                        $mrr = floatval($row['subscription_amount']);
+                        $arr = $mrr * 12;
+                    } else {
+                        $mrr = floatval($row['subscription_amount']) / 12;
+                        $arr = floatval($row['subscription_amount']);
+                    }
+                } else {
+                    // Use stored mrr/arr if available
+                    $mrr = !empty($row['mrr']) ? floatval($row['mrr']) : 0;
+                    $arr = !empty($row['arr']) ? floatval($row['arr']) : 0;
+                }
+
+                $totalMRR += $mrr;
+                $totalARR += $arr;
+            }
+
+            return [
+                'totalMRR' => round($totalMRR, 2),
+                'totalARR' => round($totalARR, 2)
+            ];
+        } catch (PDOException $e) {
+            if (function_exists('error_log')) {
+                error_log('[CustomerDatabase] getRevenueTotals query error: ' . $e->getMessage());
+            }
+            return ['totalMRR' => 0, 'totalARR' => 0];
+        }
+    }
+    public function getRevenueTotals($params = [], $current_user_id = null) {
+        if (!$this->connection) {
+            return ['totalMRR' => 0, 'totalARR' => 0];
+        }
+
+        $tab = 'active';
+        $search = isset($params['search']) ? trim($params['search']) : '';
+        $status = isset($params['status']) ? strtolower(trim($params['status'])) : 'all';
+        $country = isset($params['country']) ? trim($params['country']) : 'all';
+        $industry = isset($params['industry']) ? trim($params['industry']) : 'all';
+
+        
+
+        // Build where conditions for subquery (same as getCustomers)
+        $baseWhereConditions = ["superadmin IS NOT NULL AND superadmin != 0"];
+
+        // Tab filters (same as getCustomers)
+        $baseWhereConditions[] = "EXISTS (
+            SELECT 1
+            FROM {$this->wp_prefix}usermeta um_status
+            WHERE um_status.user_id = superadmin
+              AND um_status.meta_key = 'license_status'
+              AND um_status.meta_value = 'active'
+        )";
+
+    
+
+        // Build main query to get MRR and ARR for each superadmin
+        $queryParams = [];
+        $whereParts = $baseWhereConditions;
+
+
+        $where = !empty($whereParts) ? 'WHERE ' . implode(' AND ', $whereParts) : '';
+
+        // Query to get all superadmins with their MRR/ARR
+        $sql = "SELECT DISTINCT
+                    ug.superadmin,
+                    MAX(CASE WHEN um_mrr.meta_key = 'mrr' THEN um_mrr.meta_value END) as mrr,
+                    MAX(CASE WHEN um_arr.meta_key = 'arr' THEN um_arr.meta_value END) as arr,
+                    MAX(CASE WHEN um_sub_type.meta_key = 'subscription_type' THEN um_sub_type.meta_value END) as subscription_type,
+                    MAX(CASE WHEN um_sub_id.meta_key = 'subscription_id' THEN um_sub_id.meta_value END) as subscription_id,
+                    MAX(CASE WHEN um_sub_interval.meta_key = 'subscription_interval' THEN um_sub_interval.meta_value END) as subscription_interval,
+                    MAX(CASE WHEN um_sub_amount.meta_key = 'subscription_amount' THEN um_sub_amount.meta_value END) as subscription_amount
+                FROM {$this->wp_prefix}users_groups ug
+                LEFT JOIN {$this->wp_prefix}usermeta um_mrr ON um_mrr.user_id = ug.superadmin AND um_mrr.meta_key = 'mrr'
+                LEFT JOIN {$this->wp_prefix}usermeta um_arr ON um_arr.user_id = ug.superadmin AND um_arr.meta_key = 'arr'
+                LEFT JOIN {$this->wp_prefix}usermeta um_sub_type ON um_sub_type.user_id = ug.superadmin AND um_sub_type.meta_key = 'subscription_type'
+                LEFT JOIN {$this->wp_prefix}usermeta um_sub_id ON um_sub_id.user_id = ug.superadmin AND um_sub_id.meta_key = 'subscription_id'
+                LEFT JOIN {$this->wp_prefix}usermeta um_sub_interval ON um_sub_interval.user_id = ug.superadmin AND um_sub_interval.meta_key = 'subscription_interval'
+                LEFT JOIN {$this->wp_prefix}usermeta um_sub_amount ON um_sub_amount.user_id = ug.superadmin AND um_sub_amount.meta_key = 'subscription_amount'
+                $where
+                GROUP BY ug.superadmin";
+
+        try {
+            $stmt = $this->connection->prepare($sql);
+            
+            // Bind subquery params (for sales rep countries)
+            $paramIndex = 1;
+            // foreach($subQueryParams as $param){
+            //     $stmt->bindValue($paramIndex, $param, PDO::PARAM_STR);
+            //     $paramIndex++;
+            // }
+            
+            // Bind main query params
+            foreach ($queryParams as $key => $value) {
+                $stmt->bindValue($key, $value, PDO::PARAM_STR);
+            }
+            
+            $stmt->execute();
+            $results = $stmt->fetchAll();
+
+
+            $totalMRR = 0;
+            $totalARR = 0;
+
+            foreach ($results as $row) {
+                $mrr = 0;
+                $arr = 0;
+
+                // Use same logic as getCustomers to calculate MRR/ARR
+                if ($row['subscription_type'] == 'invoice') {
+                    // For invoice, use stored mrr/arr
+                    $mrr = !empty($row['mrr']) ? floatval($row['mrr']) : 0;
+                    $arr = !empty($row['arr']) ? floatval($row['arr']) : 0;
+                } elseif (!empty($row['subscription_id']) && !empty($row['subscription_amount'])) {
+                    // For card payments, calculate from subscription
+                    if ($row['subscription_interval'] == 'month') {
+                        $mrr = floatval($row['subscription_amount']);
+                        $arr = $mrr * 12;
+                    } else {
+                        $mrr = floatval($row['subscription_amount']) / 12;
+                        $arr = floatval($row['subscription_amount']);
+                    }
+                } else {
+                    // Use stored mrr/arr if available
+                    $mrr = !empty($row['mrr']) ? floatval($row['mrr']) : 0;
+                    $arr = !empty($row['arr']) ? floatval($row['arr']) : 0;
+                }
+
+                $totalMRR += $mrr;
+                $totalARR += $arr;
+            }
+
+            return [
+                'totalMRR' => round($totalMRR, 2),
+                'totalARR' => round($totalARR, 2)
+            ];
+        } catch (PDOException $e) {
+            if (function_exists('error_log')) {
+                error_log('[CustomerDatabase] getRevenueTotals query error: ' . $e->getMessage());
+            }
+            return ['totalMRR' => 0, 'totalARR' => 0];
         }
     }
 }

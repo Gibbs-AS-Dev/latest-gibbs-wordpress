@@ -8,6 +8,7 @@ import Pagination from '../components/Pagination';
 import CreateCustomer from './CreateCustomer';
 import EditCustomer from './EditCustomer';
 import EditUsergroup from './EditUsergroup';
+import UserSearchModal from './UserSearchModal';
 import styles from '../assets/scss/GibbsCustomer.module.scss';
 import '../assets/scss/GibbsCustomer.scss';
 import Select from 'react-select';
@@ -59,6 +60,11 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
   const revenueSaveTimeouts = useRef({});
   const [revenueEditMode, setRevenueEditMode] = useState({});
   const [switchingUser, setSwitchingUser] = useState({});
+  const [isUserSearchModalOpen, setIsUserSearchModalOpen] = useState(false);
+  const [selectedRowForCreatedBy, setSelectedRowForCreatedBy] = useState(null);
+  const [savingCreatedBy, setSavingCreatedBy] = useState({});
+  const [revenueTotals, setRevenueTotals] = useState({ totalMRR: 0, totalARR: 0 });
+  const [loadingRevenue, setLoadingRevenue] = useState(false);
 
   const [callSavePreferences, setCallSavePreferences] = useState(false);
   const [isCreateCustomerOpen, setIsCreateCustomerOpen] = useState(false);
@@ -75,6 +81,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
   const [customerActions, setCustomerActions] = useState(window.customerListData.actions);
   const [salesRepRole, setSalesRepRole] = useState(window.customerListData.sales_rep_role);
   const [selectedCountries, setSelectedCountries] = useState(window.customerListData.selected_countries);
+  const [isAdmin, setIsAdmin] = useState(window.customerListData.is_admin === 'true' ? true : false);
 
 
   const tabs = [
@@ -601,6 +608,8 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
       ...prev,
       [superadminId]: { mrr: false, arr: false }
     }));
+    // Refresh revenue totals after save
+    fetchRevenueTotals();
   };
 
   const cancelAllRevenueEdits = useCallback(() => {
@@ -662,6 +671,56 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
     }
   }, [apiUrl, user_token]);
 
+  const handleOpenUserSearchModal = useCallback((row) => {
+    if (row.isUsergroup || !row.superadmin) return;
+    setSelectedRowForCreatedBy(row);
+    setIsUserSearchModalOpen(true);
+  }, []);
+
+  const handleUserSelect = useCallback(async (selectedUser) => {
+    if (!selectedRowForCreatedBy || !selectedRowForCreatedBy.superadmin) return;
+
+    const superadminId = selectedRowForCreatedBy.superadmin;
+    const createdByUserId = selectedUser ? selectedUser.id : null;
+
+    setSavingCreatedBy((prev) => ({ ...prev, [superadminId]: true }));
+
+    try {
+      const headers = user_token ? { Authorization: `Bearer ${user_token}` } : {};
+      const response = await axios.post(apiUrl, {
+        action: 'updateCreatedBy',
+        superadmin_id: superadminId,
+        created_by_user_id: createdByUserId
+      }, { headers });
+
+      if (response?.data?.success) {
+        // Update local state
+        setCustomers((prev) =>
+          prev.map((company) =>
+            company.superadmin === superadminId
+              ? {
+                  ...company,
+                  created_by: selectedUser ? {
+                    id: selectedUser.id,
+                    display_name: selectedUser.display_name,
+                    username: selectedUser.user_login
+                  } : null
+                }
+              : company
+          )
+        );
+      } else {
+        throw new Error(response?.data?.message || 'Failed to update created by');
+      }
+    } catch (err) {
+      const message = err?.response?.data?.message || err?.message || Ltext('Failed to update created by');
+      alert(message);
+    } finally {
+      setSavingCreatedBy((prev) => ({ ...prev, [superadminId]: false }));
+      setSelectedRowForCreatedBy(null);
+    }
+  }, [selectedRowForCreatedBy, apiUrl, user_token]);
+
   // Flatten customers and usergroups for table display
   const tableData = useMemo(() => {
     const rows = [];
@@ -704,6 +763,52 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
     }
     return countries;
   }, [countries, salesRepRole, selectedCountries]);
+
+  // Fetch revenue totals from API
+  const fetchRevenueTotals = useCallback(async () => {
+    if (!apiUrl) return;
+    if(!isAdmin) return;
+
+    setLoadingRevenue(true);
+    try {
+      const params = {
+        action: 'getRevenueTotals',
+        owner_id,
+        tab: activeTab,
+        search: searchQuery,
+        status: statusFilter,
+        country: countryFilter,
+        industry: industryFilter
+      };
+
+      if(salesRepRole){
+        params.selected_countries = selectedCountries || [];
+        params.sales_rep = true;
+      }
+
+      const headers = user_token ? { Authorization: `Bearer ${user_token}` } : {};
+      const response = await axios.get(apiUrl, { params, headers });
+      
+      if (response?.data?.success) {
+        const totals = response.data.data || { totalMRR: 0, totalARR: 0 };
+        setRevenueTotals(totals);
+      } else {
+        setRevenueTotals({ totalMRR: 0, totalARR: 0 });
+      }
+    } catch (err) {
+      console.error('Failed to fetch revenue totals:', err);
+      setRevenueTotals({ totalMRR: 0, totalARR: 0 });
+    } finally {
+      setLoadingRevenue(false);
+    }
+  }, [apiUrl, owner_id, activeTab, searchQuery, statusFilter, countryFilter, industryFilter, user_token, salesRepRole, selectedCountries]);
+
+  // Fetch revenue totals when filters change
+  useEffect(() => {
+    if (!loading && !error) {
+      fetchRevenueTotals();
+    }
+  }, [fetchRevenueTotals, loading, error]);
 
   const allColumns = [
     {
@@ -1135,6 +1240,48 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
       }
     },
     {
+      key: 'created_by',
+      header: Ltext('CREATED BY'),
+      sortable: true,
+      thStyle: { width: '12%' },
+      render: (row) => {
+        if (row.isUsergroup) return '—';
+        const displayValue = row.created_by?.display_name || row.created_by?.username || '—';
+        const superadminId = row.superadmin;
+        const isSaving = savingCreatedBy[superadminId];
+        
+        return (
+          <div
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              cursor: isSaving ? 'not-allowed' : 'pointer',
+              color: isSaving ? '#9ca3af' : 'inherit'
+            }}
+            onClick={() => {
+              if (!isSaving) {
+                handleOpenUserSearchModal(row);
+              }
+            }}
+            onMouseEnter={(e) => {
+              if (!isSaving) {
+                e.currentTarget.style.textDecoration = 'underline';
+                e.currentTarget.style.color = '#3b82f6';
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isSaving) {
+                e.currentTarget.style.textDecoration = 'none';
+                e.currentTarget.style.color = 'inherit';
+              }
+            }}
+          >
+            {isSaving ? Ltext('Saving...') : displayValue}
+          </div>
+        );
+      }
+    },
+    {
       key: 'canceled_at',
       header: Ltext('CANCEL DATE'),
       sortable: true,
@@ -1263,7 +1410,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
   return (
     <div className={styles.wrapper}>
       <div className={styles.container}>
-        <div className={styles.header}>
+        <div className={`${styles.header} filter-header-box`}>
           <div className={styles.headerLeft}>
             <Tabs tabs={tabs} activeTab={activeTab} onTabChange={handleTabChange} />
           </div>
@@ -1544,6 +1691,56 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
           </div>
         </div>
 
+        {/* Revenue Summary Box */}
+        {!loading && !error && isAdmin && (
+          <div className={styles.revenueSummaryBox}>
+            <div className={styles.revenueSummaryItem}>
+              <div className={styles.revenueSummaryIcon}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div className={styles.revenueSummaryContent}>
+                <div className={styles.revenueSummaryLabel}>{Ltext('Total MRR')}</div>
+                <div className={styles.revenueSummaryValue}>
+                  {loadingRevenue ? (
+                    <div className={styles.revenueLoading}>...</div>
+                  ) : (
+                    <>
+                      <span className={styles.revenueCurrency}>NOK</span>
+                      <span className={styles.revenueAmount}>{formatCurrency(revenueTotals.totalMRR)}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className={styles.revenueSummaryItem}>
+              <div className={styles.revenueSummaryIcon}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <div className={styles.revenueSummaryContent}>
+                <div className={styles.revenueSummaryLabel}>{Ltext('Total ARR')}</div>
+                <div className={styles.revenueSummaryValue}>
+                  {loadingRevenue ? (
+                    <div className={styles.revenueLoading}>...</div>
+                  ) : (
+                    <>
+                      <span className={styles.revenueCurrency}>NOK</span>
+                      <span className={styles.revenueAmount}>{formatCurrency(revenueTotals.totalARR)}</span>
+                    </>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {loading ? (
           <div className={styles.loadingState}>
             <div className={styles.loadingSpinner}></div>
@@ -1730,6 +1927,19 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
         </div>,
         document.body
       )}
+
+      {/* User Search Modal */}
+      <UserSearchModal
+        isOpen={isUserSearchModalOpen}
+        onClose={() => {
+          setIsUserSearchModalOpen(false);
+          setSelectedRowForCreatedBy(null);
+        }}
+        onSelect={handleUserSelect}
+        apiUrl={apiUrl}
+        user_token={user_token}
+        currentUserId={selectedRowForCreatedBy?.superadmin}
+      />
     </div>
   );
 }

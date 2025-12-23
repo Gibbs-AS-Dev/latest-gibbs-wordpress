@@ -71,6 +71,9 @@ class CustomerApi {
             case 'getUsers':
                 $this->getUsers($data);
                 break;
+            case 'searchUsers':
+                $this->searchUsers($data);
+                break;
             case 'getCustomerPreferences':
                 $this->getCustomerPreferences($data);
                 break;
@@ -91,6 +94,9 @@ class CustomerApi {
                 break;
             case 'getCustomerActions':
                 $this->getCustomerActions($data);
+                break;
+            case 'getRevenueTotals':
+                $this->getRevenueTotals($data);
                 break;
             default:
                 CoreResponse::error('Invalid action for GET request', 400);
@@ -123,6 +129,9 @@ class CustomerApi {
                 break;
             case 'updateMrrArr':
                 $this->updateMrrArr($data);
+                break;
+            case 'updateCreatedBy':
+                $this->updateCreatedBy($data);
                 break;
             default:
                 CoreResponse::error('Invalid action for POST request', 400);
@@ -327,6 +336,36 @@ class CustomerApi {
         }
     }
 
+    /**
+     * Update created_by for a customer
+     */
+    private function updateCreatedBy($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
+        $superadminId = isset($data['superadmin_id']) ? intval($data['superadmin_id']) : 0;
+        $createdByUserId = isset($data['created_by_user_id']) && $data['created_by_user_id'] !== '' && $data['created_by_user_id'] !== null 
+            ? intval($data['created_by_user_id']) 
+            : null;
+
+        if (!$superadminId) {
+            CoreResponse::error('Superadmin ID is required', 400);
+            return;
+        }
+
+        $result = $this->db->updateCreatedBy($superadminId, $createdByUserId);
+
+        if ($result) {
+            CoreResponse::success(
+                ['superadmin_id' => $superadminId, 'created_by_user_id' => $createdByUserId],
+                'Created by updated successfully'
+            );
+        } else {
+            CoreResponse::error('Failed to update created by', 500);
+        }
+    }
+
     private function updateSuperadminData($data) {
         if(!$this->isAuthenticated()){
             CoreResponse::error('You are not authorized to access this page', 403);
@@ -419,6 +458,7 @@ class CustomerApi {
             CoreResponse::error('You are not authorized to access this page', 403);
             return;
         }
+        $current_user_id = $this->getCurrentUserId();
 
         $params = [
             'page' => isset($data['page']) ? intval($data['page']) : 1,
@@ -437,7 +477,7 @@ class CustomerApi {
             $params['selected_countries'] = isset($data['selected_countries']) ? $data['selected_countries'] : [];
         }
 
-        $result = $this->db->getCustomers($params);
+        $result = $this->db->getCustomers($params,$current_user_id);
 
         CoreResponse::success($result, 'Customers retrieved successfully');
     }
@@ -454,6 +494,23 @@ class CustomerApi {
             'role' => isset($data['role']) ? $data['role'] : '',
         ];
         $result = $this->db->getUsers($params);
+        CoreResponse::success($result, 'Users retrieved successfully');
+        return $result;
+    }
+    private function searchUsers($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
+        $params = [
+            'page' => isset($data['page']) ? intval($data['page']) : 1,
+            'per_page' => isset($data['per_page']) ? intval($data['per_page']) : 20,
+            'search' => isset($data['search']) ? $data['search'] : '',
+            'role' => isset($data['role']) ? $data['role'] : '',
+            'sort_by' => isset($data['sort_by']) ? $data['sort_by'] : 'display_name',
+            'sort_direction' => isset($data['sort_direction']) ? $data['sort_direction'] : 'asc',
+        ];
+        $result = $this->db->searchUsers($params);
         CoreResponse::success($result, 'Users retrieved successfully');
         return $result;
     }
@@ -553,7 +610,7 @@ class CustomerApi {
        
 
         // Implementation for creating customer
-        $current_user_id = $this->getCurrentUserId();
+        $current_user_id = get_current_user_id();
 
         if(!$current_user_id){
             CoreResponse::error('User is not authenticated', 401);
@@ -617,7 +674,7 @@ class CustomerApi {
 
            $user_data = get_user_by('id', $user_id);
 
-           $group_data = $this->createGroupAndAssignUser($user_data, $data["group_name"]);
+           $group_data = $this->createGroupAndAssignUser($user_data, $data["group_name"],$current_user_id);
 
            $stripe_customer_id = "";
 
@@ -639,11 +696,11 @@ class CustomerApi {
         }
     }
 
-    private function createGroupAndAssignUser($user_data, $group_name){
+    private function createGroupAndAssignUser($user_data, $group_name, $created_by){
 
         $user_id = $user_data->ID;
 
-        $group_id = $this->db->createGroup($group_name, $user_id);
+        $group_id = $this->db->createGroup($group_name, $user_id, $created_by);
         if($group_id){
             $group_role = "3";
             $assign_user_to_group = $this->db->assignUserToGroup($group_id, $user_id, $group_role);
@@ -1122,6 +1179,33 @@ class CustomerApi {
 
         $actions = Customer_Actions::get_actions_array();
         CoreResponse::success(['actions' => $actions], 'Customer actions retrieved successfully');
+    }
+
+    /**
+     * Get revenue totals (MRR and ARR)
+     */
+    private function getRevenueTotals($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
+        $current_user_id = $this->getCurrentUserId();
+
+        $params = [
+            'tab' => isset($data['tab']) ? $data['tab'] : 'all',
+            'search' => isset($data['search']) ? $data['search'] : '',
+            'status' => isset($data['status']) ? $data['status'] : 'all',
+            'country' => isset($data['country']) ? $data['country'] : 'all',
+            'industry' => isset($data['industry']) ? $data['industry'] : 'all',
+            'owner_id' => isset($data['owner_id']) ? intval($data['owner_id']) : $this->current_user_id,
+        ];
+        if(isset($data['sales_rep']) && $data['sales_rep'] != ''){
+            $params['sales_rep'] = $data['sales_rep'];
+            $params['selected_countries'] = isset($data['selected_countries']) ? $data['selected_countries'] : [];
+        }
+
+        $result = $this->db->getRevenueTotals($params, $current_user_id);
+        CoreResponse::success($result, 'Revenue totals retrieved successfully');
     }
 }
 
