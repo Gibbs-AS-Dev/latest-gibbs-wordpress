@@ -26,7 +26,7 @@ const Footer = ({
   };
 
   return (
-    <footer className={getFooterClassName()}>
+    <footer className={getFooterClassName()} style={{ display: 'none' }}>
       <div className={styles.footerContent}>
         <div className={styles.footerLeft}>
           {copyrightText ? (

@@ -38,6 +38,7 @@ class Customer_Columns {
             'stripe_license' => __('Stripe License', 'gibbs-react-booking'),
             'payment' => __('Payment', 'gibbs-react-booking'),
             'next_invoice' => __('Next Invoice', 'gibbs-react-booking'),
+            'created_by' => __('Created By', 'gibbs-react-booking'),
             'canceled_at' => __('Cancel Date', 'gibbs-react-booking')
         );
     }

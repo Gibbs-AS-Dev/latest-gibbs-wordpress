@@ -28,7 +28,7 @@
   margin: 0;
   position: sticky;
   top: 0px;
-  z-index: 100;
+  z-index: 9999;
   background: #ffffff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   border-radius: 8px 8px 0 0;
@@ -55,6 +55,105 @@
   gap: 12px;
   flex-wrap: wrap;
   // margin-right: 15px;
+}
+
+.revenueSummaryBox {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 11px;
+  padding: 9px 16px;
+  border-bottom: 1px solid #e5e7eb;
+  margin: 0;
+}
+
+.revenueSummaryItem {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 17px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+
+  // &:hover {
+  //   transform: translateY(-2px);
+  //   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  //   background: rgba(255, 255, 255, 1);
+  // }
+}
+
+.revenueSummaryIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+
+  svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+.revenueSummaryContent {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+}
+
+.revenueSummaryLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+.revenueSummaryValue {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.revenueCurrency {
+  font-size: 14px;
+  font-weight: 600;
+  color: #9ca3af;
+  margin-right: 4px;
+}
+
+.revenueAmount {
+  font-size: 28px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.revenueLoading {
+  font-size: 24px;
+  font-weight: 600;
+  color: #9ca3af;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 .tableSection {

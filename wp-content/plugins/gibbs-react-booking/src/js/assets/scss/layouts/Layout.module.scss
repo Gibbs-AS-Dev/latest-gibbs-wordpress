@@ -9,11 +9,11 @@ $sidebar-width-collapsed: 64px;
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
-  background-color: #f9f9f9;
+  // background-color: #f9f9f9;
 
   .layoutBody {
-    display: flex;
-    flex: 1;
+    // display: flex;
+    // flex: 1;
     margin-top: $header-height;
     min-height: calc(100vh - #{$header-height} - #{$footer-height});
     transition: margin-left 0.3s ease;
@@ -40,10 +40,10 @@ $sidebar-width-collapsed: 64px;
   .mainContent {
     flex: 1;
     padding: 24px;
-    background-color: #ffffff;
+    // background-color: #ffffff;
     margin: 0;
     transition: margin-left 0.3s ease;
-    overflow-y: auto;
+    // overflow-y: auto;
     min-height: calc(100vh - #{$header-height} - #{$footer-height});
   }
 }

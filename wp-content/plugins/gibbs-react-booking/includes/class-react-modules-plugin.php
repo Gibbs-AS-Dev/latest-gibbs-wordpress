@@ -221,6 +221,117 @@ class ReactModulesPlugin {
         return $template;
     }
 
+    public function header_data() {
+        global $post,$wpdb;
+        $post_id = $post->ID;
+        $active_group_id = 0;
+        $groups_results = array();
+        $all_joined_groups_results = array();
+        $current_user = wp_get_current_user();
+        $parent_user_id = $current_user->ID;
+        $sub_users = array();
+
+        if(is_user_logged_in()){
+            $sub_user_ids = get_user_meta( $current_user->ID, 'sub_users',true );
+
+            if (isset($_SESSION['parent_user_id'])) {
+
+                $sub_user_ids = get_user_meta( $_SESSION['parent_user_id'], 'sub_users',true );
+
+
+
+                $sub_user_data2 = get_userdata($_SESSION['parent_user_id']);
+
+                $sub_users[$sub_user_data2->ID] = $sub_user_data2->display_name;
+
+            }
+            if(!empty($sub_user_ids)){
+                
+                foreach ($sub_user_ids as $key => $sub_user_id) {
+                    $sub_user_data = get_userdata($sub_user_id);
+                    $sub_users[$sub_user_data->ID] = $sub_user_data->display_name;
+                }
+            } 
+            $all_joined_groups_results = $wpdb->get_results( 
+                $wpdb->prepare("SELECT * FROM {$wpdb->prefix}users_groups WHERE id IN (SELECT users_groups_id FROM {$wpdb->prefix}users_and_users_groups WHERE users_id = %d AND role IN (3,4,5) )", $current_user->ID), ARRAY_A
+            );
+
+            $active_group_id = get_user_meta( $current_user->ID, '_gibbs_active_group_id',true );
+
+            // Filter out the active group id from all_joined_groups_results
+            if (!empty($active_group_id) && !empty($all_joined_groups_results)) {
+                $groups_results = array_filter($all_joined_groups_results, function($group) use ($active_group_id) {
+                    return (int)$group['id'] === (int)$active_group_id;
+                });
+                
+               
+            }
+            if(!empty($groups_results)){
+                $groups_results = array_values($groups_results)[0];
+            }else{
+                if(get_user_meta( $current_user->ID, '_gibbs_active_group_id',true )){
+                    delete_user_meta( $current_user->ID, '_gibbs_active_group_id' );
+                }
+            }
+            
+        }
+
+        if (!empty($all_joined_groups_results)) {
+            $post_id = isset($post_id) ? $post_id : 0;
+            $all_joined_groups_results = array_map(function($group) use ($post_id) {
+                $bare_url = get_permalink($post_id);
+                $bare_url = add_query_arg(array(
+                    'group_action' => 'Switch_Group',
+                    'post_id' => $post_id,
+                    'new_active_group_id' => $group["id"]
+                ), $bare_url);
+                $switch_group_url = wp_nonce_url($bare_url, 'Switch_Group_' . $post_id, 'gibbs_nonce');
+                $group['switch_group_url'] = $switch_group_url;
+                return $group;
+            }, $all_joined_groups_results);
+        }
+        
+
+        $display_user_name = $current_user->display_name;
+        $display_user_email = $current_user->user_email;
+
+        $active_group_name = "";
+        if($active_group_id){
+            $top_user_name = $display_user_name;
+            if(!empty($groups_results) && isset($groups_results["name"])){
+                $group_name_display = $groups_results["name"];
+            }else{
+                $group_name_display = "Active User";
+            }
+        }else{
+            $top_user_name = "Aktiv bruker";
+            $group_name_display = $display_user_name;
+        }
+        if(isset($current_user->listeo_core_avatar_id)){
+            $custom_avatar = $current_user->listeo_core_avatar_id;
+            $user_avatar_url = wp_get_attachment_url($custom_avatar,array('size' => 40));
+        }
+
+
+        $data = array(
+            'display_user_name' => $display_user_name,
+            'display_user_email' => $display_user_email,
+            'top_user_name' => $top_user_name,
+            'group_name_display' => $group_name_display,
+            'user_avatar_url' => $user_avatar_url,
+            'sub_users' => $sub_users,
+            'active_group_id' => $active_group_id,
+            'all_joined_groups_results' => $all_joined_groups_results,
+            'groups_results' => $groups_results,
+            'current_user' => $current_user,
+            'parent_user_id' => $parent_user_id,
+            'post_id' => $post_id,
+        );
+
+        //echo "<pre>"; print_r($data); die;
+        return $data;
+    }
+
     public function react_header() {
 
         ob_start();
@@ -968,6 +1079,7 @@ class ReactModulesPlugin {
                 'actions' => $this::get_available_actions(),
                 'sales_rep_role' => $cr_role,
                 'selected_countries' => $selected_countries,
+                'is_admin' => current_user_can('administrator')?'true':'false',
             );
             // print_r($customer_list_data);
             // echo "</pre>";

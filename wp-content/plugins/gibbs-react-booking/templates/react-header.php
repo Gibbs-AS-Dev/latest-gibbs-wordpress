@@ -124,6 +124,8 @@ if(defined('GIBBS_VERSION')){
         // Add more as needed
     ];
 
+    $header_data = $this->header_data();
+    $data = array_merge($data, $header_data);
     // Allow filtering data to provide more via hooks
     $data = apply_filters('gibbs_react_page_data', $data);
 
