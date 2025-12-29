@@ -28,7 +28,10 @@ const Header = ({
     parent_user_id = "", 
     post_id = "",
     display_user_email = "",
-    display_user_name = ""
+    display_user_name = "",
+    sub_user_link = "",
+    language_switcher = {},
+    current_language = {}
   } = window.pagedata || {};
 
   // Build a unified user info object based on pagedata, with sane fallbacks
@@ -110,16 +113,18 @@ const Header = ({
 
       <div className={styles.headerRight}>
         <div className={styles.languageSwitcher}>
-          <button 
-            className={styles.langButton}
-            onClick={() => setShowLangDropdown(!showLangDropdown)}
-            aria-label="Change language"
-          >
-            <span className={styles.flag}>{getLanguageFlag(currentLang)}</span>
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="6 9 12 15 18 9"/>
-            </svg>
-          </button>
+          {current_language && current_language.flag_link && (
+            <button 
+              className={styles.langButton}
+              onClick={() => setShowLangDropdown(!showLangDropdown)}
+              aria-label="Change language"
+            >
+              <span className={styles.flag}><img src={current_language.flag_link} alt={current_language.language_name} width="20" height="20" /></span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <polyline points="6 9 12 15 18 9"/>
+              </svg>
+            </button>
+          )}
           
           {showLangDropdown && (
             <>
@@ -128,20 +133,18 @@ const Header = ({
                 onClick={() => setShowLangDropdown(false)}
               />
               <div className={styles.langDropdown}>
-                <button
-                  className={styles.langOption}
-                  onClick={() => handleLanguageSelect('no')}
-                >
-                  <span className={styles.flag}>🇳🇴</span>
-                  <span>Norsk</span>
-                </button>
-                <button
-                  className={styles.langOption}
-                  onClick={() => handleLanguageSelect('en')}
-                >
-                  <span className={styles.flag}>🇬🇧</span>
-                  <span>English</span>
-                </button>
+                  {language_switcher && Object.keys(language_switcher).length > 0 && Object.values(language_switcher).map((lang, index) => (
+                      <button
+                        key={lang.language_code || index}
+                        className={styles.langOption}
+                        onClick={() => {
+                          window.location.href = lang.current_page_url;
+                        }}
+                      >
+                        <span className={styles.flag}><img src={lang.flag_link} alt={lang.language_name} width="20" height="20" /></span>
+                        <span>{lang.language_name}</span>
+                      </button>
+                  ))}
               </div>
             </>
           )}
@@ -272,6 +275,11 @@ const Header = ({
                         type="button"
                         className={styles.userEditButton}
                         aria-label="Rediger bruker"
+                        onClick={() => {
+                          if(sub_user_link) {
+                            window.location.href = sub_user_link;
+                          }
+                        }}
                       >
                         ✎
                       </button>
