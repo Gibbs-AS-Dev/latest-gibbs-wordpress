@@ -312,6 +312,21 @@ class ReactModulesPlugin {
             $user_avatar_url = wp_get_attachment_url($custom_avatar,array('size' => 40));
         }
 
+        // Get TranslatePress language switcher data (flags with links)
+        $language_switcher_data = array();
+        if (function_exists('trp_custom_language_switcher')) {
+            $language_switcher_data = trp_custom_language_switcher();
+        }
+        $current_language_data = get_locale();
+
+        if($language_switcher_data && isset($language_switcher_data[$current_language_data])){
+            $current_language = $language_switcher_data[$current_language_data];
+        }else if($language_switcher_data && isset($language_switcher_data["nb_NO"])){
+            $current_language = $language_switcher_data["nb_NO"];
+        }else{
+            $current_language = array();
+        }
+        
 
         $data = array(
             'display_user_name' => $display_user_name,
@@ -326,9 +341,11 @@ class ReactModulesPlugin {
             'current_user' => $current_user,
             'parent_user_id' => $parent_user_id,
             'post_id' => $post_id,
+            'sub_user_link' => home_url()."/sub-user",
+            'language_switcher' => $language_switcher_data,
+            'current_language' => $current_language
         );
 
-        //echo "<pre>"; print_r($data); die;
         return $data;
     }
 
@@ -1081,6 +1098,7 @@ class ReactModulesPlugin {
                 'selected_countries' => $selected_countries,
                 'is_admin' => current_user_can('administrator')?'true':'false',
             );
+            // echo "<pre>";
             // print_r($customer_list_data);
             // echo "</pre>";
             // die();

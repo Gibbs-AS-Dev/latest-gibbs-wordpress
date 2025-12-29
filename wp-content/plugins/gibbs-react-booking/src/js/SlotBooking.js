@@ -1313,7 +1313,12 @@ const getAvailableDurations = async (slots) => {
   }
 
   return (
-    <div className={styles.slotBooking} style={{ maxWidth: 350, margin: '0 auto' }}>
+    <div 
+      className={styles.slotBooking} 
+      style={{ maxWidth: 350, margin: '0 auto' }}
+      data-translate="no"
+      translate="no"
+    >
       <div className={`${styles.header} rmp-slot-booking-header`}>
         <div className='header_top'>
           <strong>{Ltext("Booking")}</strong>

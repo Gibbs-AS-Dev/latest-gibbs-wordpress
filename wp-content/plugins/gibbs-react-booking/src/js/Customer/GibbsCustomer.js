@@ -82,6 +82,8 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
   const [salesRepRole, setSalesRepRole] = useState(window.customerListData.sales_rep_role);
   const [selectedCountries, setSelectedCountries] = useState(window.customerListData.selected_countries);
   const [isAdmin, setIsAdmin] = useState(window.customerListData.is_admin === 'true' ? true : false);
+  const [hasTotalARR, setHasTotalARR] = useState(customerActions.includes('total_arr') ? true : false);
+  const [hasTotalMRR, setHasTotalMRR] = useState(customerActions.includes('total_mrr') ? true : false);
 
 
   const tabs = [
@@ -767,7 +769,7 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
   // Fetch revenue totals from API
   const fetchRevenueTotals = useCallback(async () => {
     if (!apiUrl) return;
-    if(!isAdmin) return;
+    if(!hasTotalARR && !hasTotalMRR) return;
 
     setLoadingRevenue(true);
     try {
@@ -1692,52 +1694,56 @@ function GibbsCustomer({ apiUrl, user_token, owner_id }) {
         </div>
 
         {/* Revenue Summary Box */}
-        {!loading && !error && isAdmin && (
+        {!loading && !error && (hasTotalARR || hasTotalMRR) && (
           <div className={styles.revenueSummaryBox}>
-            <div className={styles.revenueSummaryItem}>
-              <div className={styles.revenueSummaryIcon}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <div className={styles.revenueSummaryContent}>
-                <div className={styles.revenueSummaryLabel}>{Ltext('Total MRR')}</div>
-                <div className={styles.revenueSummaryValue}>
-                  {loadingRevenue ? (
-                    <div className={styles.revenueLoading}>...</div>
-                  ) : (
-                    <>
-                      <span className={styles.revenueCurrency}>NOK</span>
-                      <span className={styles.revenueAmount}>{formatCurrency(revenueTotals.totalMRR)}</span>
-                    </>
-                  )}
+            {hasTotalMRR && (
+              <div className={styles.revenueSummaryItem}>
+                <div className={styles.revenueSummaryIcon}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div className={styles.revenueSummaryContent}>
+                  <div className={styles.revenueSummaryLabel}>{Ltext('Total MRR')}</div>
+                  <div className={styles.revenueSummaryValue}>
+                    {loadingRevenue ? (
+                      <div className={styles.revenueLoading}>...</div>
+                    ) : (
+                      <>
+                        <span className={styles.revenueCurrency}>NOK</span>
+                        <span className={styles.revenueAmount}>{formatCurrency(revenueTotals.totalMRR)}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className={styles.revenueSummaryItem}>
-              <div className={styles.revenueSummaryIcon}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <div className={styles.revenueSummaryContent}>
-                <div className={styles.revenueSummaryLabel}>{Ltext('Total ARR')}</div>
-                <div className={styles.revenueSummaryValue}>
-                  {loadingRevenue ? (
-                    <div className={styles.revenueLoading}>...</div>
-                  ) : (
-                    <>
-                      <span className={styles.revenueCurrency}>NOK</span>
-                      <span className={styles.revenueAmount}>{formatCurrency(revenueTotals.totalARR)}</span>
-                    </>
-                  )}
+            )}
+            {hasTotalARR && (
+              <div className={styles.revenueSummaryItem}>
+                <div className={styles.revenueSummaryIcon}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </div>
+                <div className={styles.revenueSummaryContent}>
+                  <div className={styles.revenueSummaryLabel}>{Ltext('Total ARR')}</div>
+                  <div className={styles.revenueSummaryValue}>
+                    {loadingRevenue ? (
+                      <div className={styles.revenueLoading}>...</div>
+                    ) : (
+                      <>
+                        <span className={styles.revenueCurrency}>NOK</span>
+                        <span className={styles.revenueAmount}>{formatCurrency(revenueTotals.totalARR)}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </div>
         )}
 

@@ -117,14 +117,14 @@ $sidebar-width-collapsed: 64px;
         align-items: center;
         gap: 6px;
         padding: 8px 12px;
-        border: 1px solid $border-color;
-        background: white;
-        border-radius: 4px;
+        background: transparent;
         cursor: pointer;
         transition: all 0.2s;
+        border: none;
 
         &:hover {
-          border-color: $primary-color;
+          border-color: none;
+          box-shadow: none;
         }
 
         .flag {
@@ -132,8 +132,8 @@ $sidebar-width-collapsed: 64px;
         }
 
         svg {
-          width: 12px;
-          height: 12px;
+          width: 16px;
+          height: 16px;
         }
       }
 

@@ -34,6 +34,8 @@ class Customer_Actions {
             'update_group_licenses' => __('Update Group Licenses', 'gibbs-react-booking'),
             'update_next_invoice' => __('Update Next Invoice', 'gibbs-react-booking'),
             'update_mrr_arr' => __('Update MRR/ARR', 'gibbs-react-booking'),
+            'total_arr' => __('Total ARR', 'gibbs-react-booking'),
+            'total_mrr' => __('Total MRR', 'gibbs-react-booking'),
             'manage_preferences' => __('Manage Preferences', 'gibbs-react-booking'),
             'view_customer_list' => __('View Customer List', 'gibbs-react-booking')
         );
