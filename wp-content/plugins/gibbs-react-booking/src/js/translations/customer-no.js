@@ -2,6 +2,7 @@ export default {
   // General
   "Cancel": "Avbryt",
   "Save": "Lagre",
+  "Saving...": "Lagrer...",
   "Edit": "Rediger",
   "Delete": "Slett",
   "Register": "Registrer",
@@ -135,5 +136,21 @@ export default {
   "Public Sector": "Offentlig sektor",
   "Housing Association / Condominium": "Borettslag / Sameie",
   "Association / Sports Club": "Forening / Idrettslag",
+  
+  // Customer Notes
+  "CUSTOMER NOTES": "KUNDENOTATER",
+  "Edit Customer Notes": "Rediger kundenotater",
+  "Customer Notes": "Kundenotater",
+  "Enter customer notes...": "Skriv inn kundenotater...",
+  "Click to edit notes": "Klikk for å redigere notater",
+  "Click to add notes": "Klikk for å legge til notater",
+  "Click to add notes...": "Klikk for å legge til notater...",
+  "Failed to update customer notes": "Kunne ikke oppdatere kundenotater",
+  "created by": "Opprettet av",
+  "CREATED BY": "OPPRETTET AV",
+  "Cancel Date": "Kanselleringsdato",
+  "CANCEL DATE": "Kanselleringsdato",
+  "Total MRR": "Total MRR",
+  "Total ARR": "Total ARR",
 };
 

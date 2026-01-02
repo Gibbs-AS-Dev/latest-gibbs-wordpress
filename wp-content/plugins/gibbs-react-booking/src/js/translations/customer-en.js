@@ -2,6 +2,7 @@ export default {
   // General
   "Cancel": "Cancel",
   "Save": "Save",
+  "Saving...": "Saving...",
   "Edit": "Edit",
   "Delete": "Delete",
   "Register": "Register",
@@ -122,6 +123,22 @@ export default {
   "Error loading transactions": "Error loading transactions",
   "Displaying": "Displaying",
   "transactions": "transactions",
-  "Filter:": "Filter:"
+  "Filter:": "Filter:",
+  
+  // Customer Notes
+  "CUSTOMER NOTES": "CUSTOMER NOTES",
+  "Edit Customer Notes": "Edit Customer Notes",
+  "Customer Notes": "Customer Notes",
+  "Enter customer notes...": "Enter customer notes...",
+  "Click to edit notes": "Click to edit notes",
+  "Click to add notes": "Click to add notes",
+  "Click to add notes...": "Click to add notes...",
+  "Failed to update customer notes": "Failed to update customer notes",
+  "created by": "created by",
+  "CREATED BY": "CREATED BY",
+  "Cancel Date": "Cancel Date",
+  "CANCEL DATE": "CANCEL DATE",
+  "Total MRR": "Total MRR",
+  "Total ARR": "Total ARR",
 };
 

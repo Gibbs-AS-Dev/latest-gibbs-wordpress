@@ -389,7 +389,7 @@ class CustomerDatabase {
         $offset = ($page - 1) * $perPage;
 
         // Validate sort column
-        $allowedSortColumns = ['name', 'created_at', 'superadmin', 'group_admin', 'type_of_form', 'email', 'group_updated_at', 'company_country', 'company_industry', 'next_invoice', 'canceled_at'];
+        $allowedSortColumns = ['name', 'created_at', 'superadmin', 'group_admin', 'type_of_form', 'email', 'group_updated_at', 'company_country', 'company_industry', 'next_invoice', 'canceled_at', 'mrr', 'arr'];
         $sortBy = in_array($sortBy, $allowedSortColumns) ? $sortBy : 'id';
         
 
@@ -618,7 +618,9 @@ class CustomerDatabase {
                      ($sortBy === 'company_country' ? 'um_country.meta_value' : 
                      ($sortBy === 'canceled_at' ? 'um_canceled_at.meta_value' : 
                      ($sortBy === 'next_invoice' ? "COALESCE(NULLIF(um_next_invoice.meta_value, ''), '9999-12-31')" : 
-                     ($sortBy === 'company_industry' ? 'um_industry.meta_value' : 'ug.name')))))))))));
+                     ($sortBy === 'company_industry' ? 'um_industry.meta_value' : 
+                     ($sortBy === 'mrr' ? "CAST(COALESCE(NULLIF(um_mrr.meta_value, ''), '0') AS DECIMAL(10,2))" : 
+                     ($sortBy === 'arr' ? "CAST(COALESCE(NULLIF(um_arr.meta_value, ''), '0') AS DECIMAL(10,2))" : 'ug.name')))))))))))));
 
         // Build meta joins when needed (supports multiple meta-based sorts)
         $metaJoinParts = [];
@@ -633,8 +635,22 @@ class CustomerDatabase {
         }
         if ($sortBy === 'canceled_at') {
             $metaJoinParts[] = "LEFT JOIN {$this->wp_prefix}usermeta um_canceled_at ON ug.superadmin = um_canceled_at.user_id AND um_canceled_at.meta_key = 'canceled_at'";
+        }
+        if ($sortBy === 'mrr') {
+            $metaJoinParts[] = "LEFT JOIN {$this->wp_prefix}usermeta um_mrr ON ug.superadmin = um_mrr.user_id AND um_mrr.meta_key = 'mrr'";
+        }
+        if ($sortBy === 'arr') {
+            $metaJoinParts[] = "LEFT JOIN {$this->wp_prefix}usermeta um_arr ON ug.superadmin = um_arr.user_id AND um_arr.meta_key = 'arr'";
         }   
         $metaJoinClause = implode(' ', $metaJoinParts);
+        
+        // Build ORDER BY clause - for mrr and arr, sort empty values last
+        if ($sortBy === 'mrr' || $sortBy === 'arr') {
+            $metaValueColumn = $sortBy === 'mrr' ? 'um_mrr.meta_value' : 'um_arr.meta_value';
+            $orderByClause = "(CASE WHEN {$metaValueColumn} IS NULL OR {$metaValueColumn} = '' THEN 1 ELSE 0 END), {$sortColumn} {$sortDirection}";
+        } else {
+            $orderByClause = "{$sortColumn} {$sortDirection}";
+        }
         
         $sql = "SELECT 
             ug.id,
@@ -668,7 +684,7 @@ class CustomerDatabase {
         LEFT JOIN {$this->wp_prefix}users u ON ug.superadmin = u.ID
         {$metaJoinClause}
         {$outerWhereClause}
-        ORDER BY {$sortColumn} {$sortDirection}
+        ORDER BY {$orderByClause}
         LIMIT :limit OFFSET :offset";
         
         // Build final query parameters
@@ -719,7 +735,7 @@ class CustomerDatabase {
                 $customer['usergroups'] = $this->getUsergroupsBySuperadmin($customer['superadmin']);
                 // Map fields for compatibility
 
-                $meta_keys = ['first_name', 'last_name', 'phone', 'company_company_name', 'country_code', 'package_id', 'license_status', 'subscription_type', 'subscription_id', "next_invoice", "company_country", "company_industry", 'mrr', 'arr', 'subscription_interval', 'subscription_amount', 'subscription_currency', 'subscription_status', 'canceled_at'];
+                $meta_keys = ['first_name', 'last_name', 'phone', 'company_company_name', 'country_code', 'package_id', 'license_status', 'subscription_type', 'subscription_id', "next_invoice", "company_country", "company_industry", 'mrr', 'arr', 'subscription_interval', 'subscription_amount', 'subscription_currency', 'subscription_status', 'canceled_at', 'customer_notes'];
 
                 $getPostMetaMultiple = $this->getUserMetaMultiple($customer['superadmin'], $meta_keys);
 
@@ -739,6 +755,7 @@ class CustomerDatabase {
                 $customer['mrr'] = $getPostMetaMultiple['mrr'] ?? "";
                 $customer['arr'] = $getPostMetaMultiple['arr'] ?? "";
                 $customer['canceled_at'] = $getPostMetaMultiple['canceled_at'] ?? "";
+                $customer['customer_notes'] = $getPostMetaMultiple['customer_notes'] ?? ($customer['abdis_notes'] ?? '');
 
                 if(isset($customer['created_by']) && $customer['created_by'] > 0){
                     $customer['created_by'] = $this->getUserById($customer['created_by']);
@@ -1623,6 +1640,26 @@ class CustomerDatabase {
         } catch (PDOException $e) {
             if (function_exists('error_log')) {
                 error_log('[CustomerDatabase] Update next invoice error: ' . $e->getMessage());
+            }
+            return false;
+        }
+    }
+
+    /**
+     * Update customer notes for a superadmin (in usermeta)
+     */
+    public function updateCustomerNotes($superadminId, $customerNotes) {
+        if (!$this->connection || !$superadminId) {
+            return false;
+        }
+
+        try {
+            // Update or insert customer_notes in usermeta
+            $this->updateUserMeta($superadminId, 'customer_notes', $customerNotes);
+            return true;
+        } catch (PDOException $e) {
+            if (function_exists('error_log')) {
+                error_log('[CustomerDatabase] Update customer notes error: ' . $e->getMessage());
             }
             return false;
         }
