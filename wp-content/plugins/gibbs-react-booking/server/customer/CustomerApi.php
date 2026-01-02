@@ -133,6 +133,9 @@ class CustomerApi {
             case 'updateCreatedBy':
                 $this->updateCreatedBy($data);
                 break;
+            case 'updateCustomerNotes':
+                $this->updateCustomerNotes($data);
+                break;
             default:
                 CoreResponse::error('Invalid action for POST request', 400);
         }
@@ -333,6 +336,31 @@ class CustomerApi {
             );
         } else {
             CoreResponse::error('Failed to update MRR/ARR', 500);
+        }
+    }
+
+    /**
+     * Update customer notes for a superadmin
+     */
+    private function updateCustomerNotes($data) {
+        if(!$this->isAuthenticated()){
+            CoreResponse::error('You are not authorized to access this page', 403);
+            return;
+        }
+        $superadminId = isset($data['superadmin_id']) ? intval($data['superadmin_id']) : 0;
+        $customerNotes = isset($data['customer_notes']) ? trim($data['customer_notes']) : '';
+
+        if (!$superadminId) {
+            CoreResponse::error('Superadmin ID is required', 400);
+            return;
+        }
+
+        $result = $this->db->updateCustomerNotes($superadminId, $customerNotes);
+        
+        if ($result) {
+            CoreResponse::success(['superadmin_id' => $superadminId, 'customer_notes' => $customerNotes], 'Customer notes updated successfully');
+        } else {
+            CoreResponse::error('Failed to update customer notes', 500);
         }
     }
 
